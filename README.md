@@ -5,3 +5,4 @@ Our project, VacaPal, is developing a travel planning and coordination app to he
 ### Collaborator List
 1. Muyang Li
 2. Grace Su
+3. Julie
