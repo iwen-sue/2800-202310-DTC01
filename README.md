@@ -6,3 +6,4 @@ Our project, VacaPal, is developing a travel planning and coordination app to he
 1. Muyang Li
 2. Grace Su
 3. Julie
+4. Nicole Hsu
