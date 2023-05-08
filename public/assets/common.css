@@ -1,0 +1,14 @@
+/* this file includes some common css settings for all pages */
+
+/* erase some unnecessary default css setting */
+* {
+    margin:0;
+    padding:0;
+    text-decoration: none;
+}
+
+/* common css style start here */
+.content {
+    padding-left:20px;
+    padding-right:5vw;
+}
