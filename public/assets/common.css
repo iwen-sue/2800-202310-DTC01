@@ -1,4 +1,29 @@
 /* this file includes some common css settings for all pages */
+:root {
+    --lightTheme: #A72D8b;
+    --theme: #672c79;
+    --blush: #C96B67;
+    --pink: #e994a9;
+    --beige: #f8c1a5;
+    --text: #81868d;
+    --backgroundWhite: #FFFFFF;
+}
+
+.theme {
+    background-color: var(--theme);
+}
+
+.kightTheme {
+    background-color: var(--lightTheme);
+}
+
+.text {
+    color: var(--text);
+}
+
+.background {
+    background-color: var(--backgroundWhite);
+}
 
 /* erase some unnecessary default css setting */
 * {
