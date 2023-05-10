@@ -38,8 +38,8 @@ app.set('view engine', 'ejs');
 app.use(express.urlencoded({extended: false}))
 
 const store = new mongoDBSession({
-    uri: `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/?retryWrites=true&w=majority`,
-    collection:"mySessions",
+    uri: `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/${mongodb_database}?retryWrites=true&w=majority`,
+    collection:"sessions",
     crypto: {
 		secret: mongodb_session_secret
 	}
@@ -91,8 +91,6 @@ function adminAuthorization(req, res, next) {
 // middleware function finishes
 
 app.get('/', (req,res) => {
-    // check connection
-    // console.log(userCollection)
     res.render("index");
 });
 
