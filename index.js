@@ -3,17 +3,20 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const mongoDBSession = require('connect-mongodb-session')(session);
-const MongoStore = require('connect-mongo');
+// const MongoStore = require('connect-mongo');
 const bcrypt = require('bcrypt');
+const usersModel = require('./models/user.js');
+const ejs = require('ejs');
 
 const app = express();
+app.use(express.urlencoded({ extended: false }));
 
 const port = process.env.PORT || 3000;
 
 const Joi = require("joi");
 
 
-const expireTime =  60 * 60 * 1000; 
+const expireTime = 60 * 60 * 1000;
 
 //control the strength of the password
 const saltRounds = 6;
@@ -27,7 +30,7 @@ const mongodb_session_secret = process.env.MONGODB_SESSION_SECRET;
 const node_session_secret = process.env.NODE_SESSION_SECRET;
 /* END secret section */
 
-var {database} = include('databaseConnection');
+var { database } = include('databaseConnection');
 
 const userCollection = database.db(mongodb_database).collection('users');
 
@@ -35,21 +38,21 @@ const userCollection = database.db(mongodb_database).collection('users');
 app.set('view engine', 'ejs');
 
 //false: url decode only support array or string
-app.use(express.urlencoded({extended: false}))
+app.use(express.urlencoded({ extended: false }))
 
 const store = new mongoDBSession({
     uri: `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/${mongodb_database}?retryWrites=true&w=majority`,
-    collection:"sessions",
+    collection: "sessions",
     crypto: {
-		secret: mongodb_session_secret
-	}
+        secret: mongodb_session_secret
+    }
 });
 
-app.use(session({ 
+app.use(session({
     secret: node_session_secret,
-	store: store, //default is memory store 
-	saveUninitialized: false, 
-	resave: true
+    store: store, //default is memory store 
+    saveUninitialized: false,
+    resave: true
 }
 ));
 
@@ -61,7 +64,7 @@ function isValidSession(req) {
     return false;
 }
 
-function sessionValidation(req,res,next) {
+function sessionValidation(req, res, next) {
     if (isValidSession(req)) {
         next();
     }
@@ -81,7 +84,7 @@ function isAdmin(req) {
 function adminAuthorization(req, res, next) {
     if (!isAdmin(req)) {
         res.status(403);
-        res.render("errorMessage", {error: "Not Authorized"});
+        res.render("errorMessage", { error: "Not Authorized" });
         return;
     }
     else {
@@ -90,11 +93,11 @@ function adminAuthorization(req, res, next) {
 }
 // middleware function finishes
 
-app.get('/', (req,res) => {
+app.get('/', (req, res) => {
     res.render("index");
 });
 
-app.get('/home', (req,res) => {
+app.get('/home', (req, res) => {
     res.render("home");
 });
 
@@ -106,14 +109,40 @@ app.get('/login', (req, res) => {
     res.render("login");
 });
 
+//Test Post
+app.post('/signup', async (req, res) => {
+
+    try {
+        console.log("hit signup post")
+        const hashedPassword = await bcrypt.hash(req.body.password, 10);
+        console.log("hashedPassword: " + hashedPassword);
+        console.log("req.body.email: " + req.body.email);
+        const user = new usersModel({
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            email: req.body.email,
+            password: hashedPassword
+        });
+        await user.save();
+        res.redirect('/login');
+    } catch {
+        res.redirect('/signup');
+    }
+}
+);
+
+
+
+
+
 //static images address
 app.use(express.static(__dirname + "/public"));
 
 // handle 404 - page not found
 // must put this in the very last otherwise it will catch all routes as 404
-app.get("*", (req,res) => {
-	res.status(404);
-	res.render("404");
+app.get("*", (req, res) => {
+    res.status(404);
+    res.render("404");
 })
 
 
