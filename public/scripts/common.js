@@ -1,6 +1,6 @@
 // this file includes common functions we need for all pages
 
-// for headers and navs
+// for navs
 /* Set the width of the side navigation to 250px */
 
 function openNav() {
@@ -14,10 +14,9 @@ function closeNav() {
 
 function setup() {
     console.log("setup!");
-    $(".div").click(function () {
-        console.log("div clicked!");
-        closeNav();
-    });
+    
+    // for navs
+    
 }
 
 $(document).ready(setup);
