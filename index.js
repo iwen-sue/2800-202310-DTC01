@@ -140,7 +140,7 @@ app.post('/signup', async (req, res) => {
         res.redirect('/home');
     } catch (error) {
         console.error(error);
-        res.redirect('/signup?error=ServerError');
+        res.render("errorMessage", { error: error });
     }
 });
 
