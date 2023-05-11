@@ -133,15 +133,15 @@ app.post('/signup', async (req, res) => {
         });
         await user.save();
         req.session.authenticated = true;
-        req.session.lastName = req.body.firstName;
-        req.session.firstName = req.body.lastName;
+        req.session.lastName = req.body.lastName;
+        req.session.firstName = req.body.firstName;
         req.session.password = hashedPassword;
         req.session.email = req.body.email;
         req.session.cookie.maxAge = Infinity;
         res.redirect('/home');
     } catch (error) {
         console.error(error);
-        res.render("errorMessage", { error: error });
+        res.render("signup", { error: "Try use another email that is already exists" });
     }
 });
 
