@@ -16,7 +16,7 @@ const port = process.env.PORT || 3000;
 const Joi = require("joi");
 
 
-const expireTime = 60 * 60 * 1000;
+
 
 //control the strength of the password
 const saltRounds = 6;
@@ -131,7 +131,13 @@ app.post('/signup', async (req, res) => {
             password: hashedPassword
         });
         await user.save();
-        res.redirect('/login');
+        req.session.authenticated = true;
+        req.session.lastName = req.body.firstName;
+        req.session.firstName = req.body.lastName;
+        req.session.password = hashedPassword;
+        req.session.email = req.body.email;
+        req.session.cookie.maxAge = Infinity;
+        res.redirect('/home');
     } catch (error) {
         console.error(error);
         res.redirect('/signup?error=ServerError');
@@ -182,12 +188,14 @@ app.post('/login', async (req, res) => {
         return res.render("login", { error: error, errorType: 'UserNotFound' });
     }
     if (await bcrypt.compare(password, result[0].password)) {
+        console.log("password is correct");
         req.session.authenticated = true;
         req.session.lastName = result[0].lastName;
+        console.log("req.session.lastName: " + req.session.lastName)
         req.session.firstName = result[0].firstName;
         req.session.password = result[0].password;
         req.session.email = result[0].email;
-        req.session.cookie.maxAge = expireTime;
+        req.session.cookie.maxAge = Infinity;
 
         res.redirect('/home');
     }

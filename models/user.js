@@ -26,7 +26,8 @@ const usersSchema = new mongoose.Schema({
     email: {
         type: String,
         match: /^\S+@\S+\.\S+$/, // regular expression for a valid email format
-        required: true
+        required: true,
+        unique: true
     },
     password: {
         type: String,
