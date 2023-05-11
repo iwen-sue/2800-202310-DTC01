@@ -34,6 +34,7 @@ var { database } = include('databaseConnection');
 
 const userCollection = database.db(mongodb_database).collection('users');
 
+
 //declare we use ejs res.render will use ejs the ejs files created under views
 app.set('view engine', 'ejs');
 

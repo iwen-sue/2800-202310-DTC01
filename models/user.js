@@ -5,7 +5,10 @@ const mongodb_user = process.env.MONGODB_USER;
 const mongodb_password = process.env.MONGODB_PASSWORD;
 const mongodb_database = process.env.MONGODB_DATABASE;
 
-mongoose.connect(`mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/${mongodb_database}?retryWrites=true&w=majority`).then(
+mongoose.connect(`mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/${mongodb_database}`, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+}).then(
     () => {
         console.log("Connected to MongoDB successfully!");
     },
@@ -47,5 +50,12 @@ const usersSchema = new mongoose.Schema({
 });
 
 const usersModel = mongoose.model('users', usersSchema);
+
+
+
+
+mongoose.connection.once('open', () => {
+    usersModel.createIndexes();
+  });
 
 module.exports = usersModel;
