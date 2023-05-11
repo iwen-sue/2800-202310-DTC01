@@ -27,10 +27,10 @@
             </div>
         </main>
         <% if (typeof error !== 'undefined') { %>
-            <div class="alert alert-danger d-flex justify-content-center mx-auto mb-0" style="width: 33%;" role="alert">
+            <div class="alert alert-danger d-flex justify-content-center mx-auto mb-0" style="width: 23%;" role="alert">
                 <p class="alert-heading">
                     <% if (errorType === 'InvalidEmailFormat') { %>
-                        Invalid email format. Please enter a valid email address.
+                        Invalid email format.<br> Please enter a valid email address.
                     <% } else if (errorType === 'UserNotFound') { %>
                         User is not found.
                     <% } else if (errorType === 'IncorrectPassword') { %>
