@@ -106,7 +106,6 @@ app.get('/login', (req, res) => {
     res.render("login");
 });
 
-
 //static images address
 app.use(express.static(__dirname + "/public"));
 
