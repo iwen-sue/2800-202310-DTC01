@@ -3,10 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const mongoDBSession = require('connect-mongodb-session')(session);
-<<<<<<< HEAD
 // const MongoStore = require('connect-mongo');
-=======
->>>>>>> Muyang_Li_userprofile
 const bcrypt = require('bcrypt');
 const usersModel = require('./models/user.js');
 const ejs = require('ejs');
