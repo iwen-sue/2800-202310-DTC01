@@ -110,6 +110,13 @@ app.get('/login', (req, res) => {
     res.render("login");
 });
 
+app.get('/logout', (req,res) => {
+	req.session.destroy(function(err){
+        // res.clearCookie(this.cookie, { path: '/' });
+        res.redirect('/');
+     });
+});
+
 //static images address
 app.use(express.static(__dirname + "/public"));
 
