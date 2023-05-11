@@ -96,7 +96,14 @@ app.get('/', (req,res) => {
 
 app.get('/home', (req,res) => {
     res.render("home");
+}); app.get('/signup', (req, res) => {
+    res.render("signup");
+}); app.get('/login', (req, res) => {
+    res.render("login");
 });
+
+
+
 
 //static images address
 app.use(express.static(__dirname + "/public"));
