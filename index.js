@@ -3,7 +3,6 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const mongoDBSession = require('connect-mongodb-session')(session);
-const MongoStore = require('connect-mongo');
 const bcrypt = require('bcrypt');
 
 const app = express();
@@ -66,7 +65,7 @@ function sessionValidation(req,res,next) {
         next();
     }
     else {
-        res.redirect('/login');
+        res.redirect('/');
     }
 }
 
