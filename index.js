@@ -168,7 +168,7 @@ app.post('/login', async (req, res) => {
     var password = req.body.password;
     var email = req.body.email;
 
-    const schema = Joi.string().max(20).required();
+    const schema = Joi.string().max(30).required();
     const validationResult = schema.validate(email);
     if (validationResult.error != null) {
         var error = "Invalid email format. Please enter a valid email address.";
