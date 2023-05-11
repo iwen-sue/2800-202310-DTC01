@@ -42,6 +42,7 @@ app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: false }))
 
 const store = new mongoDBSession({
+    // uri: 'mongodb://127.0.0.1:27017/connect_mongodb_session_test',
     uri: `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/${mongodb_database}?retryWrites=true&w=majority`,
     collection: "sessions",
     crypto: {
