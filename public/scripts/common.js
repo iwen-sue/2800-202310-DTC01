@@ -14,7 +14,7 @@ function closeNav() {
 
 function setup() {
     console.log("setup!");
-    $(".content").click(function () {
+    $(".div").click(function () {
         console.log("div clicked!");
         closeNav();
     });
