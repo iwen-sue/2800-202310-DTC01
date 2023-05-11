@@ -1,0 +1,60 @@
+<%- include("templates/header") %>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/assets/common.css" />
+    <!-- cite css or js files here -->
+    </head>
+
+    <body id="indexPage">
+        <div class="container text-center itinerarySection">
+            <div class="container" id="headerSection">
+                <h1>Itinerary</h1>
+                <span class="material-symbols-outlined">
+                    edit
+                </span>
+            </div>
+            <div class="container itineraryDetails">
+                <h4>Nothing here!</h4>
+                <button type="button" class="btn btn-primary" id="startItineraryBtn">Start Itinerary</button>
+            </div>
+
+        </div>
+        <hr>
+        <div class="container text-center expenseSection">
+            <div class="container" id="headerSection">
+                <h1>Expenses</h1>
+                <span class="material-symbols-outlined">
+                    edit
+                </span>
+            </div>
+            <div class="expenseChart">
+                <h3>Expense Breakdown</h3>
+                <img
+                    src="https://www.amcharts.com/docs/v4/wp-content/uploads/sites/2/2019/03/image-7.png">
+            </div>
+            <div class="expenseDetails">
+                <p>Total group spending: <span id="groupTotal">3,000</span></p>
+                <p>Total you paid for: <span id="userPaid">1,200</span></p>
+                <p>Your total share: <span id="userShare">1,000</span></p>
+                <p>Your total balance: <span id="userBalance">-200</span></p>
+            </div>
+        </div>
+        <!-- <div class="container text-center itinerarySection">
+            <div class="container" id="headerSection">
+                <h1>Itinerary</h1>
+                <span class="material-symbols-outlined">
+                    edit
+                </span>
+            </div>
+            <div class="container itineraryDetails">
+                <p>Nothing here!</p>
+                <button type="button" class="btn btn-primary">Start Itinerary</button>
+            </div>
+        </div> -->
+
+    </body>
+
+    </html>
