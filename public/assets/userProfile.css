@@ -103,3 +103,15 @@
     background-color: var(--lightTheme);
     color: var(--backgroundWhite);
 }
+
+.navbar-brand {
+    float: left;
+    height: 50px;
+    padding: 15px 15px;
+    font-size: 18px;
+    line-height: 20px;
+}
+
+/* .modal-dialog{
+    margin-top: 70%;
+} */
