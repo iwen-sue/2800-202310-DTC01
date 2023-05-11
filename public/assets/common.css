@@ -33,10 +33,16 @@
     text-decoration: none;
 }
 
+html, body {
+    background-color: var(--backgroundWhite);
+    color: var(--text)
+}
+
 /* common css style start here */
 .content {
     padding-left:5vw;
     padding-right:5vw;
+    padding-top:50px;
 }
 
 /* common css style end here */
@@ -102,3 +108,5 @@ div#landingPage {
     align-items: center;
     justify-content: space-between;
 }
+    
+

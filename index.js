@@ -98,6 +98,10 @@ app.get('/home', (req,res) => {
     res.render("home");
 });
 
+app.get('/userprofile', (req,res) => {
+    res.render("userprofile");
+});
+
 //static images address
 app.use(express.static(__dirname + "/public"));
 
