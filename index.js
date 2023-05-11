@@ -13,7 +13,7 @@ const port = process.env.PORT || 3000;
 const Joi = require("joi");
 
 
-const expireTime =  60 * 60 * 1000; 
+const expireTime = 60 * 60 * 1000;
 
 //control the strength of the password
 const saltRounds = 6;
@@ -27,7 +27,7 @@ const mongodb_session_secret = process.env.MONGODB_SESSION_SECRET;
 const node_session_secret = process.env.NODE_SESSION_SECRET;
 /* END secret section */
 
-var {database} = include('databaseConnection');
+var { database } = include('databaseConnection');
 
 const userCollection = database.db(mongodb_database).collection('users');
 
@@ -35,21 +35,21 @@ const userCollection = database.db(mongodb_database).collection('users');
 app.set('view engine', 'ejs');
 
 //false: url decode only support array or string
-app.use(express.urlencoded({extended: false}))
+app.use(express.urlencoded({ extended: false }))
 
 const store = new mongoDBSession({
-    uri: `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/${mongodb_database}?retryWrites=true&w=majority`,
-    collection:"sessions",
+    url: `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/${mongodb_database}?retryWrites=true&w=majority`,
+    collection: "sessions",
     crypto: {
-		secret: mongodb_session_secret
-	}
+        secret: mongodb_session_secret
+    }
 });
 
-app.use(session({ 
+app.use(session({
     secret: node_session_secret,
-	store: store, //default is memory store 
-	saveUninitialized: false, 
-	resave: true
+    store: store, //default is memory store 
+    saveUninitialized: false,
+    resave: true
 }
 ));
 
@@ -61,7 +61,7 @@ function isValidSession(req) {
     return false;
 }
 
-function sessionValidation(req,res,next) {
+function sessionValidation(req, res, next) {
     if (isValidSession(req)) {
         next();
     }
@@ -81,7 +81,7 @@ function isAdmin(req) {
 function adminAuthorization(req, res, next) {
     if (!isAdmin(req)) {
         res.status(403);
-        res.render("errorMessage", {error: "Not Authorized"});
+        res.render("errorMessage", { error: "Not Authorized" });
         return;
     }
     else {
@@ -90,22 +90,29 @@ function adminAuthorization(req, res, next) {
 }
 // middleware function finishes
 
-app.get('/', (req,res) => {
+app.get('/', (req, res) => {
     res.render("index");
 });
 
+app.get('/signup', (req, res) => {
+    res.render("signup");
+});
+
+app.get('/login', (req, res) => {
+    res.render("login");
+});
 
 //static images address
 app.use(express.static(__dirname + "/public"));
 
 // handle 404 - page not found
 // must put this in the very last otherwise it will catch all routes as 404
-app.get("*", (req,res) => {
-	res.status(404);
-	res.render("404");
+app.get("*", (req, res) => {
+    res.status(404);
+    res.render("404");
 })
 
 
-app.listen(port, ()=>{
+app.listen(port, () => {
     console.log("Node application listening on part" + port)
 })
