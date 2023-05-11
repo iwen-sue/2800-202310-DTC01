@@ -15,7 +15,7 @@
     background-color: var(--theme);
 }
 
-.kightTheme {
+.lightTheme {
     background-color: var(--lightTheme);
 }
 
@@ -26,7 +26,6 @@
 .background {
     background-color: var(--backgroundWhite);
 }
-
 /* erase some unnecessary default css setting */
 * {
     margin:0;
@@ -41,3 +40,65 @@
 }
 
 /* common css style end here */
+/* index page styles */
+body.theme {
+    color: #FFFFFF;
+}
+div#landingPage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.btn-secondary {
+    background-color: var(--pink);
+    color: white;
+    border: none;
+}
+
+.btn-secondary:hover {
+    background-color: var(--pink);
+    color: white;
+    border: none;
+}
+
+.btn-secondary:focus {
+    background-color: var(--pink);
+    color: white;
+    border: none !important;
+}
+
+.btn-secondary:active {
+    background-color: var(--pink) !important;
+    color: white;
+    border: none !important;
+}
+/* home page styles */
+.btn-primary {
+    background-color: var(--theme);
+    color: white;
+    border: none;
+}
+.btn-primary:hover {
+    background-color: var(--lightTheme);
+    color: white;
+    border: none;
+}
+.btn-primary:focus {
+    background-color: var(--lightTheme);
+    color: white;
+    border: none !important;
+}
+.btn-primary:active {
+    background-color: var(--lightTheme) !important;
+    color: white;
+    border: none !important;
+}
+#startItineraryBtn {
+    font-size: 1.5em;
+}
+#headerSection {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
