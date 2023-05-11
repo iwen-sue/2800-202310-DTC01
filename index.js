@@ -3,7 +3,10 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const mongoDBSession = require('connect-mongodb-session')(session);
+<<<<<<< HEAD
 // const MongoStore = require('connect-mongo');
+=======
+>>>>>>> Muyang_Li_userprofile
 const bcrypt = require('bcrypt');
 const usersModel = require('./models/user.js');
 const ejs = require('ejs');
@@ -71,7 +74,7 @@ function sessionValidation(req, res, next) {
         next();
     }
     else {
-        res.redirect('/login');
+        res.redirect('/');
     }
 }
 
@@ -99,7 +102,10 @@ app.get('/', (req, res) => {
     res.render("index");
 });
 
-app.get('/home', (req, res) => {
+
+app.use('/', sessionValidation)
+
+app.get('/home', (req,res) => {
     res.render("home");
 });
 
@@ -116,6 +122,15 @@ app.get('/login', (req, res) => {
 });
 
 //Test Post
+app.get('/logout', (req,res) => {
+	req.session.destroy(function(err){
+        // res.clearCookie(this.cookie, { path: '/' });
+        res.redirect('/');
+     });
+});
+
+//static images address
+app.use(express.static(__dirname + "/public"));
 
 app.post('/signup', async (req, res) => {
     try {
