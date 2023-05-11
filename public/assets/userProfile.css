@@ -14,7 +14,7 @@
 .userProfileContent .profile .ImageArea {
     width:100px;
     height:100px;
-    box-shadow:1px 3px 3px rgba(197, 194, 194, 0.3);
+    box-shadow:1px 2px 2px 1px rgba(197, 194, 194, 0.3);
     border:1px solid rgba(197, 194, 194, 0.5);
     border-radius: 50%;
     display:flex;
