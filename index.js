@@ -131,21 +131,56 @@ app.post('/signup', async (req, res) => {
 }
 );
 
+app.post('/login', async (req, res) => {
+    var password = req.body.password;
+    var email = req.body.email;
 
+    const schema = Joi.string().max(20).required();
+    const validationResult = schema.validate(email);
+    if (validationResult.error != null) {
+        console.log("email error :", validationResult.error);
+        res.redirect("/login");
+        return;
+    }
+    
+    const result = await usersModel.find({ email: email }).select('email type firstName lastName password _id').exec();
+    console.log("result: ", result);
+    console.log("password: ", result[0].password);
+    console.log("email: ", result[0].email);
+    if (result.length == 0) {
+        var message = "User is not found";
+        res.render("loginError", { error: message });
+    }
+    if (await bcrypt.compare(password, result[0].password)) {
+        req.session.authenticated = true;
+        req.session.lastName = result[0].lastName;
+        req.session.firstName = result[0].firstName;
+        req.session.password = result[0].password;
+        req.session.email = result[0].email;
+        req.session.cookie.maxAge = expireTime;
 
-
-
-//static images address
-app.use(express.static(__dirname + "/public"));
-
-// handle 404 - page not found
-// must put this in the very last otherwise it will catch all routes as 404
-app.get("*", (req, res) => {
-    res.status(404);
-    res.render("404");
-})
-
-
-app.listen(port, () => {
-    console.log("Node application listening on port " + port);
+        res.redirect('/home');
+    }
+    else {
+        var message = "Password is not correct";
+        res.render("loginError", { error: message });
+    }
 });
+
+
+
+
+    //static images address
+    app.use(express.static(__dirname + "/public"));
+
+    // handle 404 - page not found
+    // must put this in the very last otherwise it will catch all routes as 404
+    app.get("*", (req, res) => {
+        res.status(404);
+        res.render("404");
+    })
+
+
+    app.listen(port, () => {
+        console.log("Node application listening on port " + port);
+    });
