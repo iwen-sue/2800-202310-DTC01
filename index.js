@@ -100,13 +100,13 @@ app.get('/', (req, res) => {
 });
 
 
-app.use('/', sessionValidation)
+// app.use('/', sessionValidation)
 
-app.get('/home', (req,res) => {
+app.get('/home', sessionValidation, (req,res) => {
     res.render("home");
 });
 
-app.get('/userprofile', (req,res) => {
+app.get('/userprofile', sessionValidation, (req,res) => {
     res.render("userprofile");
 });
 
@@ -119,7 +119,7 @@ app.get('/login', (req, res) => {
 });
 
 //Test Post
-app.get('/logout', (req,res) => {
+app.get('/logout', sessionValidation, (req,res) => {
 	req.session.destroy(function(err){
         // res.clearCookie(this.cookie, { path: '/' });
         res.redirect('/');
