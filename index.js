@@ -94,6 +94,9 @@ app.get('/', (req,res) => {
     res.render("index");
 });
 
+app.get('/userprofile', (req,res) => {
+    res.render("userprofile");
+});
 
 //static images address
 app.use(express.static(__dirname + "/public"));

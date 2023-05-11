@@ -32,8 +32,14 @@
     text-decoration: none;
 }
 
+html, body {
+    background-color: var(--backgroundWhite);
+    color: var(--text)
+}
+
 /* common css style start here */
 .content {
     padding-left:5vw;
     padding-right:5vw;
+    padding-top:50px;
 }
