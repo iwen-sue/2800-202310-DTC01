@@ -23,6 +23,10 @@
     color: var(--text);
 }
 
+.whiteText {
+    color: var(--backgroundWhite);
+}
+
 .background {
     background-color: var(--backgroundWhite);
 }

@@ -1,4 +1,35 @@
 /* The side navigation menu */
+.topnav{
+  background-color: var(--theme);
+  background-image: linear-gradient(to bottom right, var(--lightTheme), var(--theme));
+}
+
+.nav {
+  box-shadow: 2px 2px 20px 2px rgba(0,0,0,.15)
+}
+
+.bottomNav {
+  color: var(--theme);
+  font-size: 10px;
+}
+
+.bottomNav:hover {
+  color: var(--lightTheme);
+}
+
+.bottomTitle {
+  font-size : 8px;
+  margin-bottom: 1px;
+}
+
+.material-symbols-outlined{
+  font-variation-settings:
+  'FILL' 1,
+  'wght' 600,
+  'GRAD' 0,
+  'opsz' 48
+}
+
 .sidenav {
     height: 100%; /* 100% Full-height */
     width: 0; /* 0 width - change this with JavaScript */
@@ -6,10 +37,11 @@
     z-index: 1; /* Stay on top */
     top: 0; /* Stay at the top */
     left: 0;
-    background-color: #111; /* Black*/
+    background-color: var(--theme); /* theme*/
     overflow-x: hidden; /* Disable horizontal scroll */
     padding-top: 60px; /* Place content 60px from the top */
     transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
+    opacity: .9;
   }
   
   /* The navigation menu links */
@@ -17,7 +49,7 @@
     padding: 8px 8px 8px 32px;
     text-decoration: none;
     font-size: 25px;
-    color: #818181;
+    color: var(--backgroundWhite);
     display: block;
     transition: 0.3s;
   }
