@@ -8,6 +8,7 @@
                     <img class="mb-4" src="https://getbootstrap.com/docs/4.0/assets/brand/bootstrap-solid.svg" alt=""
                         width="72" height="72">
                     <h1 class="h3 mb-3 font-weight-normal">Please sign up</h1>
+                    <p> * All fields are required *</p>
     
                     <div class="form-floating">
                         <input type="text" class="form-control" id="firstName" name="firstName" placeholder="">
@@ -33,5 +34,10 @@
                 </form>
             </div>
         </main>
+        <% if (typeof error !== 'undefined' && error === 'MissingFields') { %>
+            <div class="alert alert-danger d-flex justify-content-center mx-auto mb-0" style="width: 20%;" role="alert">
+                <p class="alert-heading">Please fill in all required fields.</p>
+            </div>
+        <% } %>
     </body>
     

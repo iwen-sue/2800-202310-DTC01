@@ -110,13 +110,16 @@ app.get('/login', (req, res) => {
 });
 
 //Test Post
-app.post('/signup', async (req, res) => {
 
+app.post('/signup', async (req, res) => {
     try {
-        console.log("hit signup post")
+        // Check if all required fields are present
+        if (!req.body.firstName || !req.body.lastName || !req.body.email || !req.body.password) {
+            // Render the signup page with an error message
+            return res.render('signup', { error: 'MissingFields' });
+        }
+
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
-        console.log("hashedPassword: " + hashedPassword);
-        console.log("req.body.email: " + req.body.email);
         const user = new usersModel({
             firstName: req.body.firstName,
             lastName: req.body.lastName,
@@ -125,11 +128,37 @@ app.post('/signup', async (req, res) => {
         });
         await user.save();
         res.redirect('/login');
-    } catch {
-        res.redirect('/signup');
+    } catch (error) {
+        console.error(error);
+        res.redirect('/signup?error=ServerError');
     }
-}
-);
+});
+
+
+
+
+// app.post('/signup', async (req, res) => {
+
+//     try {
+//         console.log("hit signup post")
+//         const hashedPassword = await bcrypt.hash(req.body.password, 10);
+//         console.log("hashedPassword: " + hashedPassword);
+//         console.log("req.body.email: " + req.body.email);
+//         const user = new usersModel({
+//             firstName: req.body.firstName,
+//             lastName: req.body.lastName,
+//             email: req.body.email,
+//             password: hashedPassword
+//         });
+//         await user.save();
+//         res.redirect('/login');
+//     } catch {
+//         res.redirect('/signup');
+//     }
+// }
+// );
+
+
 
 app.post('/login', async (req, res) => {
     var password = req.body.password;
@@ -138,18 +167,15 @@ app.post('/login', async (req, res) => {
     const schema = Joi.string().max(20).required();
     const validationResult = schema.validate(email);
     if (validationResult.error != null) {
-        console.log("email error :", validationResult.error);
-        res.redirect("/login");
-        return;
+        var error = "Invalid email format. Please enter a valid email address.";
+        return res.render("login", { error: error, errorType: 'InvalidEmailFormat' });
     }
     
     const result = await usersModel.find({ email: email }).select('email type firstName lastName password _id').exec();
-    console.log("result: ", result);
-    console.log("password: ", result[0].password);
-    console.log("email: ", result[0].email);
+
     if (result.length == 0) {
-        var message = "User is not found";
-        res.render("loginError", { error: message });
+        var error = "User is not found";
+        return res.render("login", { error: error, errorType: 'UserNotFound' });
     }
     if (await bcrypt.compare(password, result[0].password)) {
         req.session.authenticated = true;
@@ -162,10 +188,48 @@ app.post('/login', async (req, res) => {
         res.redirect('/home');
     }
     else {
-        var message = "Password is not correct";
-        res.render("loginError", { error: message });
+        var error = "Password is not correct";
+        return res.render("login", { error: error, errorType: 'IncorrectPassword' });
     }
 });
+
+
+
+// app.post('/login', async (req, res) => {
+//     var password = req.body.password;
+//     var email = req.body.email;
+
+//     const schema = Joi.string().max(20).required();
+//     const validationResult = schema.validate(email);
+//     if (validationResult.error != null) {
+//         console.log("email error :", validationResult.error);
+//         res.redirect("/login");
+//         return;
+//     }
+    
+//     const result = await usersModel.find({ email: email }).select('email type firstName lastName password _id').exec();
+//     console.log("result: ", result);
+//     console.log("password: ", result[0].password);
+//     console.log("email: ", result[0].email);
+//     if (result.length == 0) {
+//         var message = "User is not found";
+//         res.render("loginError", { error: message });
+//     }
+//     if (await bcrypt.compare(password, result[0].password)) {
+//         req.session.authenticated = true;
+//         req.session.lastName = result[0].lastName;
+//         req.session.firstName = result[0].firstName;
+//         req.session.password = result[0].password;
+//         req.session.email = result[0].email;
+//         req.session.cookie.maxAge = expireTime;
+
+//         res.redirect('/home');
+//     }
+//     else {
+//         var message = "Password is not correct";
+//         res.render("loginError", { error: message });
+//     }
+// });
 
 
 
