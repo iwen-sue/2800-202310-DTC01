@@ -1,0 +1,29 @@
+<%- include('templates/header') %>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    
+    
+    
+    
+    <link rel="stylesheet" href="/assets/common.css" />
+    <!-- cite css or js files here -->
+</head>
+<body>
+    <%- include('templates/nav') %>
+    <div class="container">
+        <div class="card text-center m-4">
+            <div class="card-title">
+                <h1>Create your group!</h1>
+            </div>
+            <div class="card-body">
+                <h3>Group created successfully!</h3>
+                <p>"<%- groupName %>"</p>
+                <button class="btn btn-primary" onclick="window.location.href='/userprofile/groupdetails'">View Group Details</button>
+            </div>
+        </div>
+    </div>
+    <%- include('templates/bottomNav') %>
+</body>
