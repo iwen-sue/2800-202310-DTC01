@@ -1,0 +1,27 @@
+<%- include("templates/header") %>
+    </head>
+
+    <body>
+        <main class="form-signin w-100 m-auto">
+            <div class="d-flex gap-2 justify-content-center py-5">
+                <form class="text-center" action="/login" method="post">
+                    <img class="mb-4" src="https://getbootstrap.com/docs/4.0/assets/brand/bootstrap-solid.svg" alt=""
+                        width="72" height="72">
+                    <h1 class="h3 mb-3 font-weight-normal">Please sign up</h1>
+
+                    <div class="form-floating">
+                        <input type="email" class="form-control" id="email" placeholder="">
+                        <label for="email">Email address</label>
+                    </div>
+
+                    <div class="form-floating">
+                        <input type="password" class="form-control" id="password" placeholder="">
+                        <label for="password">Password</label>
+                    </div>
+                    <br>
+                    <button class="btn btn-block" type="submit" value="login"
+                        style="background-color: #2f164f; color: white;">Log in</button>
+                </form>
+            </div>
+        </main>
+    </body>

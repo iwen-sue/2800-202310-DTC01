@@ -102,6 +102,14 @@ app.get('/userprofile', (req,res) => {
     res.render("userprofile");
 });
 
+app.get('/signup', (req, res) => {
+    res.render("signup");
+});
+
+app.get('/login', (req, res) => {
+    res.render("login");
+});
+
 //static images address
 app.use(express.static(__dirname + "/public"));
 
@@ -113,6 +121,6 @@ app.get("*", (req,res) => {
 })
 
 
-app.listen(port, ()=>{
-    console.log("Node application listening on part" + port)
-})
+app.listen(port, () => {
+    console.log("Node application listening on port " + port);
+});
