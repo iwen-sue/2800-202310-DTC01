@@ -12,6 +12,10 @@ function closeNav() {
     document.getElementById("mySidenav").style.width = "0";
 }
 
+function logout(){
+    window.location.href = "/logout"
+}
+
 function setup() {
     console.log("setup!");
     
