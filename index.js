@@ -133,11 +133,11 @@ app.post('/signup', async (req, res) => {
         });
         await user.save();
         req.session.authenticated = true;
-        req.session.lastName = req.body.firstName;
-        req.session.firstName = req.body.lastName;
+        req.session.firstName = req.body.firstName;
+        req.session.lastName = req.body.lastName;
         req.session.password = hashedPassword;
         req.session.email = req.body.email;
-        req.session.cookie.maxAge = Infinity;
+        req.session.cookie.maxAge = 2147483647;
         res.redirect('/home');
     } catch (error) {
         console.error(error);
@@ -196,7 +196,7 @@ app.post('/login', async (req, res) => {
         req.session.firstName = result[0].firstName;
         req.session.password = result[0].password;
         req.session.email = result[0].email;
-        req.session.cookie.maxAge = Infinity;
+        req.session.cookie.maxAge = 2147483647;
 
         res.redirect('/home');
     }
