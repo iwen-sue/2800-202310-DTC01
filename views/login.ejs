@@ -7,15 +7,17 @@
                 <form class="text-center" action="/login" method="post">
                     <img class="mb-4" src="https://getbootstrap.com/docs/4.0/assets/brand/bootstrap-solid.svg" alt=""
                         width="72" height="72">
-                    <h1 class="h3 mb-3 font-weight-normal">Please sign up</h1>
+                    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+
 
                     <div class="form-floating">
-                        <input type="email" class="form-control" id="email" placeholder="">
+                        <input type="email" class="form-control" id="email" name="email" placeholder="">
                         <label for="email">Email address</label>
                     </div>
+                    
 
                     <div class="form-floating">
-                        <input type="password" class="form-control" id="password" placeholder="">
+                        <input type="password" class="form-control" id="password" name="password" placeholder="">
                         <label for="password">Password</label>
                     </div>
                     <br>
@@ -24,4 +26,18 @@
                 </form>
             </div>
         </main>
+        <% if (typeof error !== 'undefined') { %>
+            <div class="alert alert-danger d-flex justify-content-center mx-auto mb-0" style="width: 23%;" role="alert">
+                <p class="alert-heading">
+                    <% if (errorType === 'InvalidEmailFormat') { %>
+                        Invalid email format.<br> Please enter a valid email address.
+                    <% } else if (errorType === 'UserNotFound') { %>
+                        User is not found.
+                    <% } else if (errorType === 'IncorrectPassword') { %>
+                        Password is not correct.
+                    <% } %>
+                </p>
+            </div>
+        <% } %>
+        
     </body>
