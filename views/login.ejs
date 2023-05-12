@@ -1,5 +1,8 @@
 <%- include("templates/header") %>
-    </head>
+<link rel="stylesheet" href="/assets/login.css" />   
+
+
+</head>
 
     <body>
         <%- include("templates/nav") %>
@@ -27,10 +30,11 @@
                         <label for="password">Password</label>
                     </div>
                     <br>
-                    <button class="btn btn-block" type="submit" value="login"
-                        style="background-color: #2f164f; color: white;">Log in</button>
+                    <button class="btn btn-block loginBtn" type="submit" value="login">Sign in</button>
+                    <br>
+                    <a href="/forgotPassword" class="forgotId">Forgot password?</a>
                 </form>
-                <a href="/forgotPassword">Forgot password?</a>
+                
             </div>
         </main>
         <% if (typeof error !== 'undefined') { %>
