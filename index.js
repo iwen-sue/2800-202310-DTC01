@@ -122,9 +122,7 @@ app.get('/userprofile', (req,res) => {
 });
 
 app.get('/signup', (req, res) => {
-    console.log(req.query.groupToken)
     if (req.query.groupToken != null) {
-        console.log("groupToken: " + req.query.groupToken);
         res.render("signup", { groupToken: req.query.groupToken });
     }
     else {
