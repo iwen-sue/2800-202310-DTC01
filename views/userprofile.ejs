@@ -80,19 +80,24 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">Edit Profile</h1>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-                        <div class="modal-body" style="height:300px;">
+                        <div class="modal-body" style="height:300px;overflow: hidden;">
                             <div class="row">
-                                <div class="col">
-                                  <input type="text" class="form-control" placeholder="First name" aria-label="First name">
+                                <div class="col inputBox">
+                                  <input type="text" class="form-control" placeholder="First name" aria-label="First name" value="<%= user.firstName %>">
                                 </div>
-                                <div class="col">
-                                  <input type="text" class="form-control" placeholder="Last name" aria-label="Last name">
+                                <div class="col inputBox">
+                                  <input type="text" class="form-control" placeholder="Last name" aria-label="Last name" value="<%= user.lastName %>">
                                 </div>
                               </div>
-                              <input type="text" class="form-control" placeholder="Input address" aria-label="address">
+                              <input type="text" style="margin-bottom: 20px;" class="form-control" placeholder="Input address" aria-label="address" value="<%= user.home_city %>">
+                              <div id="imagePreview">
+                                <img src="userProfileImages/avatar-default.png" alt="avatar_preview" />
+                                <input type="file" id="imageInput" style="z-index:0;position: absolute;"/>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">upload avatar</button>
+                              </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
