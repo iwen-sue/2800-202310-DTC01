@@ -238,7 +238,7 @@ app.post('/login', async (req, res) => {
         req.session.firstName = result[0].firstName;
         req.session.password = result[0].password;
         req.session.email = result[0].email;
-        req.session.bucketlist = result[0].bucketlist[0];
+        // req.session.bucketlist = result[0].bucketlist[0];
         req.session.cookie.maxAge = 2147483647;
 
         res.redirect('/home');
