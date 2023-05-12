@@ -5,6 +5,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <link rel="stylesheet" href="/assets/common.css" />
+<script src="/scripts/groupdetails.js" defer></script>
 <!-- cite css or js files here -->
 </head>
 <body id="groupDetailsPage">
@@ -22,7 +23,7 @@
     </div>
     <div class="modal" id="addMemberModal"tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
-            <form class="modal-content" action="/invitesent" method="post">
+            <form class="modal-content" action="/invite" method="post">
                 <div class="modal-header">
                     <h5 class="modal-title">Add a Member to <%- groupName %></h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -35,7 +36,7 @@
                     <input type="hidden" name="groupID" value="<%- groupID %>">
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary" >Send Invite</button>
+                    <button type="submit" id="inviteBtn" class="btn btn-primary" >Send Invite</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </form>

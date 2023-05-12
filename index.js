@@ -237,7 +237,7 @@ app.get('/userprofile/groupdetails', sessionValidation, async (req, res) => {
     })
 });
 
-app.post('/invitesent', sessionValidation, async (req, res) => {
+app.post('/invite', sessionValidation, async (req, res) => {
     var inviteEmail = req.body.inviteeEmail;
     const userName = req.session.firstName + " " + req.session.lastName;
     const groupToken = req.body.groupID
@@ -251,12 +251,14 @@ app.post('/invitesent', sessionValidation, async (req, res) => {
 
     transporter.sendMail(inviteMessage, (err, info) => {
         if (err) {
+            res.render('emailconfirmation', { error: err });
             console.log(err);
         } else {
+            res.render('emailconfirmation', { error: null });
             console.log(info.response);
         }
     });
-    res.redirect('/userprofile/groupdetails');
+    // res.redirect('/userprofile/groupdetails');
 });
 //static images address
 app.use(express.static(__dirname + "/public"));
