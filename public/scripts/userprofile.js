@@ -5,7 +5,7 @@ console.log(typeof userData)
 if(userData){
   var imageData = userData;
 }else{
-  var imageData;
+  var imageData = "";
 }
 // var imageData
 
