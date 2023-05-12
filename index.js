@@ -9,7 +9,7 @@ const usersModel = require('./models/user.js');
 const ejs = require('ejs');
 
 const app = express();
-app.use(express.urlencoded({ extended: false }));
+
 
 const port = process.env.PORT || 3000;
 
@@ -104,6 +104,12 @@ app.get('/', (req, res) => {
 
 app.get('/home', sessionValidation, (req,res) => {
     res.render("home");
+});
+
+const bucketlist = require('./enterBucket.js');
+app.post('/enterBucket',bucketlist)
+app.get('/enterBucket', (req, res) => {
+    res.render("enterBucket");
 });
 
 app.get('/userprofile', sessionValidation, (req,res) => {
