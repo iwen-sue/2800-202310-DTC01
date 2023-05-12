@@ -137,12 +137,12 @@ app.get('/userprofile/travel_history', (req, res) => {
     res.render("travel_history");
 });
 
-app.get('/userprofile', sessionValidation, async (req,res) => {
-    const result = await usersModel.findOne({ email: req.session.email });
-    var bucketlist = result.bucketlist;
-    var travelHistory = result.travelHistory;
-    res.render("userprofile", {user: req.session, bucketlist: bucketlist, travelHistory: travelHistory});
-});
+// app.get('/userprofile', sessionValidation, async (req,res) => {
+//     const result = await usersModel.findOne({ email: req.session.email });
+//     var bucketlist = result.bucketlist;
+//     var travelHistory = result.travelHistory;
+//     res.render("userprofile", {user: req.session, bucketlist: bucketlist, travelHistory: travelHistory});
+// });
 
 app.get('/signup', (req, res) => {
     res.render("signup");
