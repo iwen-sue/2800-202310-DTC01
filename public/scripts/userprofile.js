@@ -4,12 +4,25 @@ function goTravelHistroy() {
     window.location.href = "/userprofile/travel_history";
 }
 
+function convertImgToBase64(file, callback) {
+    let reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function() {
+      callback(reader.result);
+    };
+    reader.onerror = function(error) {
+      console.log('Error: ', error);
+    };
+  }
+
 function uploadImage(e) {
     console.log(event.target.files[0])
     var imageUrl = URL.createObjectURL(event.target.files[0]);
     var elem = document.getElementById("imagePreviewHolder")
     elem.setAttribute("src", imageUrl)
-    imageData = event.target.files[0];
+    convertImgToBase64(event.target.files[0], function(base64) {
+        imageData = base64;
+    });
 }
 
 function submitForm() {

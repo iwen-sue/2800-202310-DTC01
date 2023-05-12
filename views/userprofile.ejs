@@ -21,11 +21,15 @@
                         edit
                     </span>
                     <div class="ImageArea">
+                        <% if (user.profilePic ) { %>
+                        <img src="<%= user.profilePic %>" alt="avatar" />
+                        <%} else { %>
                         <img src="userProfileImages/avatar-default.png" alt="avatar" />
+                        <% } %>
                     </div>
                     <p class="username">
                         <%= user.firstName %>
-                            <%= user.lastName %>
+                        <%= user.lastName %>
                     </p>
                     <div class="InfoArea">
                         <div class="box boxOne">
@@ -44,12 +48,12 @@
                             <span class="material-symbols-outlined boxIcon">
                                 where_to_vote
                             </span>
-                            <% if (!user.bucketlist) { %>
-                                <p class="boxText">0 country</p>
+                            <% if (user.bucketlist.length) { %>
+                                <p class="boxText">
+                                    <%= user.bucketlist.length %> countries
+                                </p>
                                 <%} else { %>
-                                    <p class="boxText">
-                                        <%= user.bucketlist.length %> countries
-                                    </p>
+                                    <p class="boxText">0 country</p>
                                 <% } %>
                         </div>
                     </div>
@@ -79,7 +83,7 @@
                                 Join Group
                             </div>
                         </section>
-                        <% } %>
+                    <% } %>
             </div>
 
             <!-- Modal -->
@@ -105,10 +109,15 @@
                             <input id="emailInput" type="text" name="email" style="margin-bottom: 20px;" class="form-control"
                                 placeholder="Input email" aria-label="email" value="<%= user.email %>">
                             <input id="homeCityInput" type="text" name="home_city" style="margin-bottom: 20px;" class="form-control"
-                                placeholder="Input home city" aria-label="address" value="<%= user.home_city %>">
+                                placeholder="Input home city" aria-label="address" value="<%= user.homeCity %>">
                             <div id="imagePreview">
+                                <% if (user.profilePic ) { %>
+                                    <img id="imagePreviewHolder" src="<%= user.profilePic %>"
+                                    alt="avatar_preview" />
+                                <%} else { %>
                                 <img id="imagePreviewHolder" src="userProfileImages/avatar-default.png"
                                     alt="avatar_preview" />
+                                <% } %>
                                 <input type="file" id="imageInput" style="z-index:0;position: absolute;"
                                     onchange="uploadImage()" />
                                 <label for="imageInput" class="btn btn-secondary">upload avatar</label>
