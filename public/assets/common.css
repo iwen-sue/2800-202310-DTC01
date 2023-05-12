@@ -111,3 +111,11 @@ div#landingPage {
     align-items: center;
     justify-content: space-between;
 }
+/* group details styling */
+div.groupDetails ul li {
+    list-style-type: none;
+    padding: 5px;
+}
+#groupDetailsPage {
+    color: black;
+}
