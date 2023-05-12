@@ -2,6 +2,12 @@
     </head>
 
     <body>
+        <%- include("templates/nav") %>
+        <% if (typeof success !== 'undefined') { %>
+            <div class="alert alert-success">
+                <%= success %>
+            </div>
+        <% } %>
         <main class="form-signin w-100 m-auto">
             <div class="d-flex gap-2 justify-content-center py-5">
                 <form class="text-center" action="/login" method="post">
@@ -28,7 +34,7 @@
             </div>
         </main>
         <% if (typeof error !== 'undefined') { %>
-            <div class="alert alert-danger d-flex justify-content-center mx-auto mb-0" style="width: 23%;" role="alert">
+            <div class="alert alert-danger d-flex justify-content-center mx-auto mb-0" id="alertBox" style="width: 23%;" role="alert">
                 <p class="alert-heading">
                     <% if (errorType === 'InvalidEmailFormat') { %>
                         Invalid email format.<br> Please enter a valid email address.
@@ -40,5 +46,6 @@
                 </p>
             </div>
         <% } %>
-        
+        <%- include("templates/bottomNav") %>
+        <script src="/scripts/resetPassword.js"></script>
     </body>

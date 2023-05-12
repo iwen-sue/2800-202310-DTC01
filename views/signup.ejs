@@ -2,6 +2,7 @@
     </head>
 
     <body>
+        <%- include("templates/nav") %>
         <main class="form-signin w-100 m-auto">
             <div class="d-flex gap-2 justify-content-center py-5">
                 <form class="text-center" action="/signup" method="post">
@@ -35,14 +36,16 @@
             </div>
         </main>
         <% if (typeof error !== 'undefined' && error === 'MissingFields') { %>
-            <div class="alert alert-danger d-flex justify-content-center mx-auto mb-0" style="width: 20%;" role="alert">
+            <div class="alert alert-danger d-flex justify-content-center mx-auto mb-0" id="alertBox" style="width: 20%;" role="alert">
                 <p class="alert-heading">Please fill in all required fields.</p>
             </div>
         <% } %>
         <% if (typeof error !== 'undefined' && error === 'Try use another email that is already exists') { %>
-            <div class="alert alert-danger d-flex justify-content-center mx-auto mb-0" style="width: 28%;" role="alert">
+            <div class="alert alert-danger d-flex justify-content-center mx-auto mb-0" style="width: 28%;" id="alertBox" role="alert">
                 <p class="alert-heading">Try use another email that is already exists.</p>
             </div>
         <% } %>
+        <%- include("templates/bottomNav") %>
+    <script src="/scripts/resetPassword.js"></script>
     </body>
     

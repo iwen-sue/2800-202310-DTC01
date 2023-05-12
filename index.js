@@ -16,6 +16,7 @@ app.use(express.urlencoded({ extended: false }));
 const port = process.env.PORT || 3000;
 
 const Joi = require("joi");
+const { ConnectionClosedEvent } = require("mongodb");
 
 
 
@@ -247,32 +248,58 @@ app.post('/resetPassword', async (req, res) => {
     try {
         const token = req.body.token;
         const email = req.body.email;
-        console.log(email)
-
-        console.log(token);
-
+        console.log(email);
 
         const newPassword = req.body.password;
         const confirmPassword = req.body.confirmPassword;
 
-        if (newPassword != confirmPassword) {
-            return res.render('resetPassword', { error_message: 'PasswordNotMatch', token: token, email: email });
-            
-        }else{
-            const hashedPassword = await bcrypt.hash(req.body.password, 10);
-            await usersModel.findOneAndUpdate({ resetToken: token }, { hashedPassword}).exec();
-            
+        if (newPassword !== confirmPassword) {
+            return res.render('resetPassword', { error: 'PasswordNotMatch', token: token, email: email });
+        } else {
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
+            await usersModel.findOneAndUpdate({ resetToken: token }, { password: hashedPassword }).exec();
+            return res.render('login', { success: 'Password is succesfully reset. Please try log in again' })
         }
-
-        res.render('resetPassword', { success: 'PasswordReset' , token: token, email: email});
-
-        console.log("token: " + token);
-
     } catch (error) {
         console.error(error);
-        // res.render('resetPassword', { error_message: 'Error' , token: token, email: email});
+        return res.render('resetPassword', { error: 'Error', token: req.body.token, email: req.body.email });
     }
 });
+
+
+
+
+// app.post('/resetPassword', async (req, res) => {
+//     try {
+//         const token = req.body.token;
+//         const email = req.body.email;
+//         console.log(email)
+
+//         console.log(token);
+
+
+//         const newPassword = req.body.password;
+//         const confirmPassword = req.body.confirmPassword;
+
+//         if (newPassword != confirmPassword) {
+//             return res.render('resetPassword', { error_message: 'PasswordNotMatch', token: token, email: email });
+            
+//         }else{
+//             const hashedPassword = await bcrypt.hash(req.body.password, 10);
+//             await usersModel.findOneAndUpdate({ resetToken: token }, { hashedPassword}).exec();
+            
+//         }
+
+
+//         res.render('resetPassword', { success: 'PasswordReset' , token: token, email: email});
+
+//         console.log("token: " + token);
+
+//     } catch (error) {
+//         console.error(error);
+//         // res.render('resetPassword', { error_message: 'Error' , token: token, email: email});
+//     }
+// });
 
     //static images address
     app.use(express.static(__dirname + "/public"));
