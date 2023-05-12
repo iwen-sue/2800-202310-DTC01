@@ -7,6 +7,8 @@ const mongoDBSession = require('connect-mongodb-session')(session);
 const bcrypt = require('bcrypt');
 const usersModel = require('./models/user.js');
 const ejs = require('ejs');
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
 
 const app = express();
 app.use(express.urlencoded({ extended: false }));
@@ -115,6 +117,23 @@ app.get('/login', (req, res) => {
     res.render("login");
 });
 
+app.get('/forgotPassword', (req, res) => {
+    res.render('forgotPassword.ejs'); // Render the forgotPassword.ejs template
+  });
+
+
+app.get('/resetPassword', async (req, res) => {
+    console.log(req.query.token);
+    const user = await usersModel.findOne({ resetToken: req.query.token }).exec();
+console.log(user);
+    if (!user) {
+        res.redirect('/home');
+    }else{
+        res.render('resetPassword', { email: user.email});
+    }
+    
+});
+    
 //Test Post
 
 app.post('/signup', async (req, res) => {
@@ -145,30 +164,6 @@ app.post('/signup', async (req, res) => {
         res.render("signup", { error: "Try use another email that is already exists" });
     }
 });
-
-
-
-
-// app.post('/signup', async (req, res) => {
-
-//     try {
-//         console.log("hit signup post")
-//         const hashedPassword = await bcrypt.hash(req.body.password, 10);
-//         console.log("hashedPassword: " + hashedPassword);
-//         console.log("req.body.email: " + req.body.email);
-//         const user = new usersModel({
-//             firstName: req.body.firstName,
-//             lastName: req.body.lastName,
-//             email: req.body.email,
-//             password: hashedPassword
-//         });
-//         await user.save();
-//         res.redirect('/login');
-//     } catch {
-//         res.redirect('/signup');
-//     }
-// }
-// );
 
 
 
@@ -208,45 +203,75 @@ app.post('/login', async (req, res) => {
 });
 
 
+app.post('/forgotPassword', async (req, res) => {
+    try {
+        const email = req.body.email;
+        const user = await usersModel.findOne({ email: email }).exec();
+        if (!user) {
+            return res.render('forgotPassword', { error: 'UserNotFound' });
+        }
+        const resetToken = crypto.randomBytes(20).toString('hex');
+        const resetTokenExpiry = Date.now() + 3600000; // 1 hour from now
+        console.log(resetTokenExpiry)
 
-// app.post('/login', async (req, res) => {
-//     var password = req.body.password;
-//     var email = req.body.email;
+        user.resetToken = resetToken;
+        user.resetTokenExpiration = resetTokenExpiry;
+        await user.save();
 
-//     const schema = Joi.string().max(20).required();
-//     const validationResult = schema.validate(email);
-//     if (validationResult.error != null) {
-//         console.log("email error :", validationResult.error);
-//         res.redirect("/login");
-//         return;
-//     }
-    
-//     const result = await usersModel.find({ email: email }).select('email type firstName lastName password _id').exec();
-//     console.log("result: ", result);
-//     console.log("password: ", result[0].password);
-//     console.log("email: ", result[0].email);
-//     if (result.length == 0) {
-//         var message = "User is not found";
-//         res.render("loginError", { error: message });
-//     }
-//     if (await bcrypt.compare(password, result[0].password)) {
-//         req.session.authenticated = true;
-//         req.session.lastName = result[0].lastName;
-//         req.session.firstName = result[0].firstName;
-//         req.session.password = result[0].password;
-//         req.session.email = result[0].email;
-//         req.session.cookie.maxAge = expireTime;
+        const transporter = nodemailer.createTransport({
+            service: 'hotmail',
+            auth: {
+                user: 'vacapal@outlook.com',
+                pass: 'comp2800!'
+            }
+        });
+        const resetUrl = `http://localhost:3000/resetPassword?token=${resetToken}`;
+        const mailOptions = {
+            to: user.email,
+            from: 'vacapal@outlook.com',
+            subject: 'Reset your password on Vacapal',
+            text: `Hi ${user.firstName} ${user.lastName} \n
+            Please click on the following link, or paste this into your browser to complete the process:\n
+            ${resetUrl}\n
+            If you did not request this, please ignore this email and your password will remain unchanged.\n`
+        };
+        await transporter.sendMail(mailOptions);
+        res.render('forgotPassword', { success: 'EmailSent' });
+    } catch (error) {
+        console.error(error);
+        res.render('forgotPassword', { error: 'Error' });
+    }
+});
 
-//         res.redirect('/home');
-//     }
-//     else {
-//         var message = "Password is not correct";
-//         res.render("loginError", { error: message });
-//     }
-// });
+app.post('/resetPassword', async (req, res) => {
+    try {
+        const token = req.query.token;
+        const email = req.body.email;
+        console.log(email)
+        const user = usersModel.findOneAndUpdate({ resetToken: token }, { password: req.body.password}).exec();
+        console.log(token);
+        console.log(user)
+        if(!user){
+            console.log("user not found");
+        }
+
+        const newPassword = req.body.password;
+        const confirmPassword = req.body.confirmPassword;
+
+        if (newPassword != confirmPassword) {
+            return res.render('resetPassword', { error: 'PasswordNotMatch' });
+            
+        }
 
 
+        res.render('resetPassword', { success: 'PasswordReset' });
+        console.log("token: " + token);
 
+    } catch (error) {
+        console.error(error);
+        res.render('resetPassword', { error: 'Error' });
+    }
+});
 
     //static images address
     app.use(express.static(__dirname + "/public"));
