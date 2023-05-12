@@ -22,7 +22,7 @@
                     </span>
                     <div class="ImageArea">
                         <% if (user.profilePic ) { %>
-                        <img src="<%= user.profilePic %>" alt="avatar" />
+                        <img id="userAvatar" src="<%= user.profilePic %>" alt="avatar" />
                         <%} else { %>
                         <img src="userProfileImages/avatar-default.png" alt="avatar" />
                         <% } %>
@@ -37,9 +37,9 @@
                                 home_pin
                             </span>
                             <% if (!user.homeCity) { %>
-                                <p class="boxText">unknown</p>
+                                <p id="userHome" class="boxText">unknown</p>
                                 <%} else { %>
-                                    <p class="boxText">
+                                    <p id="userHome" class="boxText">
                                         <%= user.homeCity %>
                                     </p>
                                     <% } %>
@@ -49,9 +49,9 @@
                                 where_to_vote
                             </span>
                             <% if (user.travelHistory.length) { %>
-                                <p class="boxText"><%= user.travelHistory.length %> countries</p>
+                                <p id="travelHistory" class="boxText"><%= user.travelHistory.length %> countries</p>
                             <%} else { %>
-                                <p class="boxText">0 country</p>
+                                <p id="travelHistory" class="boxText">0 country</p>
                             <% } %>
                         </div>
                     </div>
@@ -135,7 +135,7 @@
             <%- include("templates/bucketlist", { bucketlist: user.bucketlist}) %>
             
             <%- include("templates/bottomNav") %>
-                <script src="/scripts/userprofile.js"></script>
+            <script src="/scripts/userprofile.js" userData="<%= user.profilePic %>"></script>
     </body>
 
     </html>

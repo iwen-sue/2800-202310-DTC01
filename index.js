@@ -266,7 +266,8 @@ app.post('/editProfile', async (req, res) => {
             query.then((docs) => {
                 res.status(200);
                 res.json(docs)
-                res.redirect("/userprofile");
+                res.end()
+                // res.render("userprofile", { user: docs });
             }).catch((err) => {
                 console.error(err);
             });

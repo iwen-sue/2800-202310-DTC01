@@ -1,4 +1,14 @@
-var imageData;
+var userData = document.currentScript.getAttribute('userData');
+// userData = JSON.parse(userData);
+console.log(userData)
+console.log(typeof userData)
+if(userData){
+  var imageData = userData;
+}else{
+  var imageData;
+}
+// var imageData
+
 
 function goTravelHistroy() {
   window.location.href = "/userprofile/travel_history";
@@ -51,10 +61,22 @@ function submitForm() {
     },
     body: urlEncodedData
   })
-    .then(response => response.json())
+    .then(response => {
+      console.log(response)
+      if(!response.ok){
+        alert("Network response failed");
+      }else{
+        return response.json();
+      }
+    })
     .then(data => {
       console.log(data); // do something with the JSON response
-      user = data
+      location.reload()
+      // document.getElementById("userAvatar").setAttribute("src", data.profilePic);
+      // document.getElementsByClassName("username")[0].innerHTML = data.firstName + " " + data.lastName;
+      // document.getElementById("userHome").innerHTML = data.homeCity;
+      
+
     })
     .catch(error => {
       console.error('Error:', error);
