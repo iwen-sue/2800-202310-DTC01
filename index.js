@@ -95,7 +95,11 @@ function adminAuthorization(req, res, next) {
 // middleware function finishes
 
 app.get('/', (req, res) => {
-    res.render("index");
+    if (req.session.authenticated) {
+        res.render("home")
+    }else{
+        res.render("index");
+    }
 });
 
 
