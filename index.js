@@ -376,7 +376,7 @@ app.post('/forgotPassword', async (req, res) => {
             subject: 'Reset your password on Vacapal',
             text: `Hi ${user.firstName} ${user.lastName} \n
             Please click on the following link, or paste this into your browser to complete the process:\n
-            ${resetUrl}\n
+            <a href="${resetUrl}">here</a>}\n
             If you did not request this, please ignore this email and your password will remain unchanged.\n`
         };
         await transporter.sendMail(mailOptions);
