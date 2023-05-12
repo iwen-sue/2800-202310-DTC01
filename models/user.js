@@ -1,3 +1,4 @@
+const { number } = require('joi');
 const mongoose = require('mongoose');
 require('dotenv').config();
 const mongodb_host = process.env.MONGODB_HOST;
@@ -50,6 +51,8 @@ const usersSchema = new mongoose.Schema({
     groupID: String,
     travelHistory: [BucketlistSchema],
     bucketlist: [BucketlistSchema],
+    resetToken: String,
+    resetTokenExpiration: Number
 });
 
 const usersModel = mongoose.model('users', usersSchema);
