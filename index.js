@@ -19,8 +19,6 @@ const Joi = require("joi");
 const { ConnectionClosedEvent } = require("mongodb");
 
 
-
-
 //control the strength of the password
 const saltRounds = 6;
 
@@ -106,7 +104,7 @@ app.get('/home', (req, res) => {
     res.render("home");
 });
 
-app.get('/userprofile', (req,res) => {
+app.get('/userprofile', (req, res) => {
     res.render("userprofile");
 });
 
@@ -120,21 +118,21 @@ app.get('/login', (req, res) => {
 
 app.get('/forgotPassword', (req, res) => {
     res.render('forgotPassword.ejs'); // Render the forgotPassword.ejs template
-  });
+});
 
 
 app.get('/resetPassword', async (req, res) => {
     console.log(req.query.token);
     const user = await usersModel.findOne({ resetToken: req.query.token }).exec();
-console.log(user);
+    console.log(user);
     if (!user) {
         res.redirect('/home');
-    }else{
+    } else {
         res.render('resetPassword', { email: user.email, token: req.query.token });
     }
-    
+
 });
-    
+
 //Test Post
 
 app.post('/signup', async (req, res) => {
@@ -178,7 +176,7 @@ app.post('/login', async (req, res) => {
         var error = "Invalid email format. Please enter a valid email address.";
         return res.render("login", { error: error, errorType: 'InvalidEmailFormat' });
     }
-    
+
     const result = await usersModel.find({ email: email }).select('email type firstName lastName password _id').exec();
 
     if (result.length == 0) {
@@ -207,17 +205,35 @@ app.post('/login', async (req, res) => {
 app.post('/forgotPassword', async (req, res) => {
     try {
         const email = req.body.email;
+        console.log(email)
         const user = await usersModel.findOne({ email: email }).exec();
         if (!user) {
             return res.render('forgotPassword', { error: 'UserNotFound' });
         }
         const resetToken = crypto.randomBytes(20).toString('hex');
-        const resetTokenExpiry = Date.now() + 3600000; // 1 hour from now
-        console.log(resetTokenExpiry)
+
+
+        const resetTokenExpiry = Date.now() + 3600000; // Expiration in 1 hour
+        const expiryDate = new Date(resetTokenExpiry);
+
+
+        console.log(expiryDate)
 
         user.resetToken = resetToken;
-        user.resetTokenExpiration = resetTokenExpiry;
-        await user.save();
+        user.resetTokenExpiration = expiryDate;
+
+
+
+        await user.save().then(async () => {
+            res.render('forgotPassword', { success: 'Email is successfully sent.' });
+        }).catch((err) => {
+            console.log(err);
+        });
+
+
+        setTimeout(async () => {
+            await usersModel.updateOne({ email: email }, { $unset: { resetTokenExpiration: 1 } });
+        }, 3600000);
 
         const transporter = nodemailer.createTransport({
             service: 'hotmail',
@@ -266,52 +282,17 @@ app.post('/resetPassword', async (req, res) => {
     }
 });
 
+//static images address
+app.use(express.static(__dirname + "/public"));
+
+// handle 404 - page not found
+// must put this in the very last otherwise it will catch all routes as 404
+app.get("*", (req, res) => {
+    res.status(404);
+    res.render("404");
+})
 
 
-
-// app.post('/resetPassword', async (req, res) => {
-//     try {
-//         const token = req.body.token;
-//         const email = req.body.email;
-//         console.log(email)
-
-//         console.log(token);
-
-
-//         const newPassword = req.body.password;
-//         const confirmPassword = req.body.confirmPassword;
-
-//         if (newPassword != confirmPassword) {
-//             return res.render('resetPassword', { error_message: 'PasswordNotMatch', token: token, email: email });
-            
-//         }else{
-//             const hashedPassword = await bcrypt.hash(req.body.password, 10);
-//             await usersModel.findOneAndUpdate({ resetToken: token }, { hashedPassword}).exec();
-            
-//         }
-
-
-//         res.render('resetPassword', { success: 'PasswordReset' , token: token, email: email});
-
-//         console.log("token: " + token);
-
-//     } catch (error) {
-//         console.error(error);
-//         // res.render('resetPassword', { error_message: 'Error' , token: token, email: email});
-//     }
-// });
-
-    //static images address
-    app.use(express.static(__dirname + "/public"));
-
-    // handle 404 - page not found
-    // must put this in the very last otherwise it will catch all routes as 404
-    app.get("*", (req, res) => {
-        res.status(404);
-        res.render("404");
-    })
-
-
-    app.listen(port, () => {
-        console.log("Node application listening on port " + port);
-    });
+app.listen(port, () => {
+    console.log("Node application listening on port " + port);
+});
