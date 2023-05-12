@@ -120,13 +120,18 @@
 #imagePreview img {
     height:80px;
     width:80px;
+    border-radius: 50%;
+    /* position: absolute;
+    z-index:1; */
 }
 
-#imagePreview button {
+#imagePreview label {
     margin-left:20px;
 }
 
 #imageInput {
     position: absolute;
-    transform: translate(500px);
+    transform: translate(-85px, 20px);
+    opacity: 0;
+    z-index:-1;
 }
