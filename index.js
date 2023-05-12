@@ -129,7 +129,7 @@ console.log(user);
     if (!user) {
         res.redirect('/home');
     }else{
-        res.render('resetPassword', { email: user.email});
+        res.render('resetPassword', { email: user.email, token: req.query.token });
     }
     
 });
@@ -245,7 +245,7 @@ app.post('/forgotPassword', async (req, res) => {
 
 app.post('/resetPassword', async (req, res) => {
     try {
-        const token = req.query.token;
+        const token = req.body.token;
         const email = req.body.email;
         console.log(email)
         const user = usersModel.findOneAndUpdate({ resetToken: token }, { password: req.body.password}).exec();
@@ -264,12 +264,13 @@ app.post('/resetPassword', async (req, res) => {
         }
 
 
-        res.render('resetPassword', { success: 'PasswordReset' });
+        res.render('resetPassword', { success: 'PasswordReset' , token: token, email: email});
+
         console.log("token: " + token);
 
     } catch (error) {
         console.error(error);
-        res.render('resetPassword', { error: 'Error' });
+        res.render('resetPassword', { error: 'Error' , token: token, email: email});
     }
 });
 
