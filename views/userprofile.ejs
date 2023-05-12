@@ -22,36 +22,56 @@
                     <div class="ImageArea">
                         <img src="userProfileImages/avatar-default.png" alt="avatar" />
                     </div>
-                    <p class="username">Muyang Li</p>
+                    <p class="username"><%= user.firstName %> <%= user.lastName %></p>
                     <div class="InfoArea">
                         <div class="box boxOne">
                             <span class="material-symbols-outlined boxIcon">
                                 home_pin
                             </span>
-                            <p class="boxText">Vancouver</p>
+                            <% if (!user.home_city) { %>
+                                <p class="boxText">unknown</p>
+                            <%} else { %>
+                                <p class="boxText"><%= user.home_city %></p>
+                            <% } %>
                         </div>
                         <div class="box boxTwo" onclick="goTravelHistroy()">
                             <span class="material-symbols-outlined boxIcon">
                                 where_to_vote
                             </span>
-                            <p class="boxText">5 countries</p>
+                            <% if (!user.travel_history) { %>
+                                <p class="boxText">0 country</p>
+                            <%} else { %>
+                                <p class="boxText"><%= user.travel_history.length %> countries</p>
+                            <% } %>
                         </div>
                     </div>
                 </section>
-                <section class="buttonArea">
-                    <div class="ButtonAreaCard">
-                        <span class="material-symbols-outlined buttonIcon">
-                            group_add
-                        </span>
-                        Create Group
-                    </div>
-                    <div class="ButtonAreaCard">
-                        <span class="material-symbols-outlined  buttonIcon">
-                            group
-                        </span>
-                        Join Group
-                    </div>
-                </section>
+                <% if (user.type == "leader") { %>
+                    <section class="buttonArea">
+                        <div class="ButtonAreaCard">
+                            <span class="material-symbols-outlined">
+                                manage_accounts
+                            </span>
+                            Manage Group
+                        </div>
+
+                    </section>
+                <%} else{ %>
+                    <section class="buttonArea">
+                        <div class="ButtonAreaCard">
+                            <span class="material-symbols-outlined buttonIcon">
+                                group_add
+                            </span>
+                            Create Group
+                        </div>
+                        <div class="ButtonAreaCard">
+                            <span class="material-symbols-outlined  buttonIcon">
+                                group
+                            </span>
+                            Join Group
+                        </div>
+                    </section>
+                <% } %>
             </div>
 
             <!-- Modal -->
