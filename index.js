@@ -248,21 +248,21 @@ app.post('/resetPassword', async (req, res) => {
         const token = req.body.token;
         const email = req.body.email;
         console.log(email)
-        const user = usersModel.findOneAndUpdate({ resetToken: token }, { password: req.body.password}).exec();
+
         console.log(token);
-        console.log(user)
-        if(!user){
-            console.log("user not found");
-        }
+
 
         const newPassword = req.body.password;
         const confirmPassword = req.body.confirmPassword;
 
         if (newPassword != confirmPassword) {
-            return res.render('resetPassword', { error: 'PasswordNotMatch' });
+            return res.render('resetPassword', { error_message: 'PasswordNotMatch', token: token, email: email });
+            
+        }else{
+            const hashedPassword = await bcrypt.hash(req.body.password, 10);
+            await usersModel.findOneAndUpdate({ resetToken: token }, { hashedPassword}).exec();
             
         }
-
 
         res.render('resetPassword', { success: 'PasswordReset' , token: token, email: email});
 
@@ -270,7 +270,7 @@ app.post('/resetPassword', async (req, res) => {
 
     } catch (error) {
         console.error(error);
-        res.render('resetPassword', { error: 'Error' , token: token, email: email});
+        // res.render('resetPassword', { error_message: 'Error' , token: token, email: email});
     }
 });
 
