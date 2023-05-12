@@ -9,20 +9,21 @@ router.post('/toHistory', async (req, res) => {
     });
 
     result.bucketlist.forEach(async (item) => {
-        if (item.country == req.body.country && item.city == req.body.city) {
+        if (item._id == req.body.bucketID) {
             await usersModel.updateOne({ email: req.session.email }, {
                 $push: {
                     travelHistory: {
                         country: item.country,
                         city: item.city,
+                        description: item.description,
+                        countryImg: item.countryImg,
                     }
                 }
             });
             await usersModel.updateOne({ email: req.session.email }, {
                 $pull: {
                     bucketlist: {
-                        country: item.country,
-                        city: item.city,
+                        _id: item._id,
                     }
                 }
             });
