@@ -111,3 +111,11 @@ div#landingPage {
     align-items: center;
     justify-content: space-between;
 }
+
+.navbar-brand {
+    float: left;
+    height: 50px;
+    padding: 15px 15px;
+    font-size: 18px;
+    line-height: 20px;
+}
