@@ -55,8 +55,7 @@ const usersSchema = new mongoose.Schema({
     bucketlist: {
         country: String,
         city: String,
-        ExpectedDate: Date,
-        todo: String,
+        description: String,
         countryImg: String,
     }
 });
