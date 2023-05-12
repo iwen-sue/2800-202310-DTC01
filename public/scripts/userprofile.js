@@ -86,3 +86,6 @@ function submitForm() {
 function goCreateGroup(){
     window.location.href = "/creategroup";
 }
+function goGroupDetails(){
+    window.location.href = "/userprofile/groupdetails";
+}
