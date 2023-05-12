@@ -13,7 +13,7 @@
 <body id="groupDetailsPage">
     <%- include('templates/nav') %>
     <div class="container text-center groupDetails">
-        <h1><%- groupName %></h1>
+        <h1>Group: <%- groupName %></h1>
         <h2>Members</h2>
         <ul>
             <% for(var i = 0; i < group.length; i++) { %>
@@ -33,7 +33,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <p>Enter their email:</p>
+                    <p>Enter invitee's email:</p>
                     <input type="text" name="inviteeEmail" id="inviteeEmail">
                     <input type="hidden" name="groupID" value="<%- groupID %>">
                 </div>
