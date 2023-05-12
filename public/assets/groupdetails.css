@@ -1,0 +1,10 @@
+div.groupDetails ul li {
+    list-style-type: none;
+    padding: 5px;
+}
+ul {
+    padding-left: 0px;
+}
+h1 {
+    border-bottom: 1px solid rgba(197, 194, 194, 0.5);
+}

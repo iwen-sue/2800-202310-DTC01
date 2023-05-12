@@ -82,3 +82,7 @@ function submitForm() {
       console.error('Error:', error);
     });
 }
+
+function goCreateGroup(){
+    window.location.href = "/creategroup";
+}
