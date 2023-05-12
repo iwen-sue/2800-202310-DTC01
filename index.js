@@ -119,8 +119,8 @@ app.get('/userprofile', sessionValidation, async (req, res) => {
         email: req.session.email,
     });
     query.then((docs) => {
-        console.log(docs)
         res.render("userprofile", { user: docs });
+
     }).catch((err) => {
         console.error(err);
     });
@@ -237,10 +237,6 @@ app.post('/editProfile', async (req, res) => {
     var email = req.body.email;
     var profilePic = req.body.avatar
 
-    console.log(req.body)
-    console.log(profilePic)
-
-
     const result = await usersModel.findOne({
         email: req.session.email,
     });
@@ -261,13 +257,16 @@ app.post('/editProfile', async (req, res) => {
             await usersModel.updateMany({ email: req.session.email }, update);
             req.session.email = email;
             req.session.firstName = firstName;
-            req.session.email = email;
-            req.session.profilePic = profilePic;
-            req.session.homeCity = homeCity;
+            req.session.lastName = lastName;
+
+            const query = usersModel.findOne({
+                email: req.session.email,
+            });
 
             query.then((docs) => {
-                console.log(docs)
-                res.render("userprofile", { user: docs });
+                res.status(200);
+                res.json(docs)
+                res.res.redirect("/userprofile");
             }).catch((err) => {
                 console.error(err);
             });
