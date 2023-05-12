@@ -48,8 +48,10 @@
                             <span class="material-symbols-outlined boxIcon">
                                 where_to_vote
                             </span>
-                            <% if (user.travelHistory.length) { %>
+                            <% if (user.travelHistory.length && user.travelHistory.length > 1) { %>
                                 <p id="travelHistory" class="boxText"><%= user.travelHistory.length %> countries</p>
+                                <%} else if (user.travelHistory.length && user.travelHistory.length == 1){ %>
+                                    <p id="travelHistory" class="boxText">1 country</p>
                             <%} else { %>
                                 <p id="travelHistory" class="boxText">0 country</p>
                             <% } %>
