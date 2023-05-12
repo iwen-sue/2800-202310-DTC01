@@ -49,7 +49,7 @@ const usersSchema = new mongoose.Schema({
         required: true
     },
     type: String,
-    profilePic: Buffer,
+    profilePic: String,
     homeCity: String,
     groupID: String,
     bucketlist: {
