@@ -237,7 +237,7 @@ app.post('/signup', async (req, res) => {
         res.redirect('/home');
     } catch (error) {
         console.error(error);
-        res.render("signup", { error: "Try use another email that is already exists" });
+        res.render("signup", { error: "Try use another email that is already exists", groupToken: req.body.groupToken });
     }
 });
 
