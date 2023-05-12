@@ -112,3 +112,21 @@
     font-size: 18px;
     line-height: 20px;
 }
+
+.inputBox {
+    margin-bottom: 20px;
+}
+
+#imagePreview img {
+    height:80px;
+    width:80px;
+}
+
+#imagePreview button {
+    margin-left:20px;
+}
+
+#imageInput {
+    position: absolute;
+    transform: translate(500px);
+}
