@@ -7,6 +7,7 @@
 
     <link rel="stylesheet" href="/assets/common.css" />
     <link rel="stylesheet" href="/assets/userProfile.css" />
+    <link rel="stylesheet" href="/assets/bucketlist.css" />
     <!-- cite css or js files here -->
     </head>
 
@@ -73,9 +74,11 @@
                     </div>
                 </div>
             </div>
-            </div>
+            
+            <%- include("templates/bucketlist") %>
+            
             <%- include("templates/bottomNav") %>
-                <script src="/scripts/userprofile.js"></script>
+                <script src="/scripts/userprofile.js"></script>  
     </body>
 
     </html>
