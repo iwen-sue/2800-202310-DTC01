@@ -369,10 +369,10 @@ app.post('/forgotPassword', async (req, res) => {
                 pass: 'comp2800!'
             }
         });
-        const resetUrl = `http://localhost:3000/resetPassword?token=${resetToken}`;
+        const resetUrl = `http://${process.env.APP_DOMAIN}/resetPassword?token=${resetToken}`;
         const mailOptions = {
             to: user.email,
-            from: 'vacapal@outlook.com',
+            from: process.env.EMAIL,
             subject: 'Reset your password on Vacapal',
             text: `Hi ${user.firstName} ${user.lastName} \n
             Please click on the following link, or paste this into your browser to complete the process:\n
@@ -459,7 +459,7 @@ app.post('/invite', sessionValidation, async (req, res) => {
         to: inviteEmail,
         subject: 'You have been invited to join a group on VacaPal!',
         html: `<h1>You have been invited by ${userName} to join their group on VacaPal!</h1>
-        <p>Click <a href="http://localhost:3000/signup?groupToken=${groupToken}">here</a> to sign up and join the group!</p>`
+        <p>Click <a href="http://${process.env.APP_DOMAIN}/signup?groupToken=${groupToken}">here</a> to sign up and join the group!</p>`
 }
 
     transporter.sendMail(inviteMessage, (err, info) => {
