@@ -124,8 +124,9 @@ app.get('/forgotPassword', (req, res) => {
 app.get('/resetPassword', async (req, res) => {
     console.log(req.query.token);
     const user = await usersModel.findOne({ resetToken: req.query.token }).exec();
-    console.log(user);
-    if (!user) {
+    console.log(user)
+    console.log(req.query.token===null)
+    if (!user || !req.query.token) {
         res.redirect('/home');
     } else {
         res.render('resetPassword', { email: user.email, token: req.query.token });
