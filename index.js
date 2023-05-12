@@ -94,6 +94,11 @@ function adminAuthorization(req, res, next) {
 }
 // middleware function finishes
 
+app.use('/', (req, res, next) => {  // for local variables
+    console.log("req.session: " + JSON.stringify(req.session));
+    next();
+});
+
 app.get('/', (req, res) => {
     res.render("index");
 });
@@ -118,13 +123,22 @@ app.get('/userprofile', sessionValidation, async (req, res) => {
 });
 
 const bucketlist = require('./enterBucket.js');
+const toHistory = require('./toHistory.js');
 app.post('/enterBucket', bucketlist)
+app.post('/toHistory', toHistory)
 app.get('/enterBucket', (req, res) => {
     res.render("enterBucket");
 });
+app.get('/userprofile/travel_history', (req, res) => {
+    res.render("travel_history");
+});
 
-
-
+app.get('/userprofile', sessionValidation, async (req,res) => {
+    const result = await usersModel.findOne({ email: req.session.email });
+    var bucketlist = result.bucketlist;
+    var travelHistory = result.travelHistory;
+    res.render("userprofile", {user: req.session, bucketlist: bucketlist, travelHistory: travelHistory});
+});
 
 app.get('/signup', (req, res) => {
     res.render("signup");
@@ -201,6 +215,7 @@ app.post('/login', async (req, res) => {
         req.session.firstName = result[0].firstName;
         req.session.password = result[0].password;
         req.session.email = result[0].email;
+        req.session.bucketlist = result[0].bucketlist[0];
         req.session.cookie.maxAge = 2147483647;
 
         res.redirect('/home');
