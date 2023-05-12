@@ -1,0 +1,44 @@
+<%- include("templates/header") %>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="/assets/common.css" />
+    <!-- cite css or js files here -->
+    </head>
+
+    <body>
+        <%- include("templates/nav") %>
+
+            <container>
+                <div class="container">
+                    <h1 class="display-1">Enter Bucket List</h1>
+                    <p>Your bucketlist will always come true.</p>
+                    <form action="/enterBucket" method="post">
+
+                        <div class="form-group">
+                            <input type="country" class="form-control" name="country" placeholder="Country">
+                        </div>
+
+                        <div class="form-group">
+                            <input type="city" class="form-control" name="city" placeholder="City">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea type="description" class="form-control" name="description" rows="3"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </container>
+
+
+
+            <%- include("templates/bottomNav") %>
+    </body>
+
+    </html>

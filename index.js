@@ -112,10 +112,19 @@ app.get('/userprofile', sessionValidation, async (req, res) => {
     query.then((docs) => {
         console.log(docs)
         res.render("userprofile", { user: docs });
-      }).catch((err) => {
+    }).catch((err) => {
         console.error(err);
-      });
+    });
 });
+
+const bucketlist = require('./enterBucket.js');
+app.post('/enterBucket', bucketlist)
+app.get('/enterBucket', (req, res) => {
+    res.render("enterBucket");
+});
+
+
+
 
 app.get('/signup', (req, res) => {
     res.render("signup");
@@ -227,10 +236,10 @@ app.post('/editProfile', async (req, res) => {
         }
     }
 
-    if(result){
+    if (result) {
 
-        try{
-            await usersModel.updateMany({email: req.session.email}, update);
+        try {
+            await usersModel.updateMany({ email: req.session.email }, update);
             req.session.email = email;
             req.session.firstName = firstName;
             req.session.email = email;
@@ -240,16 +249,16 @@ app.post('/editProfile', async (req, res) => {
             query.then((docs) => {
                 console.log(docs)
                 res.render("userprofile", { user: docs });
-              }).catch((err) => {
+            }).catch((err) => {
                 console.error(err);
-              });
+            });
 
-        }catch(err){
+        } catch (err) {
             console.error(err)
             console.log(err)
         }
     }
-    
+
 
 })
 
