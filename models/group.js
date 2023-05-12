@@ -5,14 +5,14 @@ const mongodb_user = process.env.MONGODB_USER;
 const mongodb_password = process.env.MONGODB_PASSWORD;
 const mongodb_database = process.env.MONGODB_DATABASE;
 
-mongoose.connect(`mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/${mongodb_database}?retryWrites=true&w=majority`).then(
-    () => {
-        console.log("Connected to MongoDB successfully!");
-    },
-    err => {
-        console.log("Connection to MongoDB failed!" + err);
-    }
-);
+// mongoose.connect(`mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/${mongodb_database}?retryWrites=true&w=majority`).then(
+//     () => {
+//         console.log("Connected to MongoDB successfully! in group schema");
+//     },
+//     err => {
+//         console.log("Connection to MongoDB failed! in group schema" + err);
+//     }
+// );
 
 const groupsSchema = new mongoose.Schema({
     groupName: {
