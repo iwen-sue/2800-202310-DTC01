@@ -60,7 +60,7 @@
                 </section>
                 <% if (user.type=="leader" ) { %>
                     <section class="buttonArea">
-                        <div class="ButtonAreaCard">
+                        <div class="ButtonAreaCard" onclick="goGroupDetails()">
                             <span class="material-symbols-outlined">
                                 manage_accounts
                             </span>
@@ -70,7 +70,7 @@
                     </section>
                     <%} else{ %>
                         <section class="buttonArea">
-                            <div class="ButtonAreaCard">
+                            <div class="ButtonAreaCard" onclick="goCreateGroup()">
                                 <span class="material-symbols-outlined buttonIcon">
                                     group_add
                                 </span>
