@@ -202,7 +202,7 @@ app.post('/signup', async (req, res) => {
         // Check if all required fields are present
         if (!req.body.firstName || !req.body.lastName || !req.body.email || !req.body.password) {
             // Render the signup page with an error message
-            return res.render('signup', { error: 'MissingFields' });
+            return res.render('signup', { error: 'MissingFields', groupToken: req.body.groupToken });
         }
         console.log(req.body.groupToken, 'groupToken')
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
