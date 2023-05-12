@@ -61,7 +61,6 @@
 .addbtn {
     width: 150px;
     height: 150px;
-
     margin: 3px;
     display: flex;
     justify-content: center;
@@ -76,3 +75,14 @@ button .material-symbols-outlined {
     font-size: 100px;
     color: rgb(198, 198, 198)
 }
+
+/* for modal */
+.modal-cover {
+    text-align: center;
+    position: relative;
+  }
+  
+  .modal-cover img {
+    width: 100%;
+  }
+  

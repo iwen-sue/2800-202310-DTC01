@@ -1,0 +1,73 @@
+<%- include("templates/header") %>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="/assets/common.css" />
+    <!-- cite css or js files here -->
+    </head>
+
+    <body>
+        <%- include("templates/nav") %>
+
+            <container>
+                <div class="container">
+
+                    <div id="imagePreview">
+                        <input type="file" id="imageInput" onchange="uploadImage()" /><br>
+                        <label for="imageInput" class="btn btn-secondary">upload avatar</label>
+                    </div>
+
+                    <h1 class="display-1">Edit Bucket List</h1>
+                    <p>Take record of your unforgetable memory here</p>
+                    <form action="/editBucket.js" method="post">
+
+                        <div class="form-group">
+                            <label for=""></label>
+                            <input id="" type="hidden" class="form-control" name="country" placeholder="Country">
+                        </div>
+
+                        <div class="form-group">
+                            <label for=""></label>
+                            <input id="" type="hidden" class="form-control" name="city" placeholder="City">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea type="description" class="form-control" name="description" rows="5"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </container>
+
+            <%- include("templates/bottomNav") %>
+    </body>
+
+    <script>
+        function convertImgToBase64(file, callback) {
+            let reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function () {
+                callback(reader.result);
+            };
+            reader.onerror = function (error) {
+                console.log('Error: ', error);
+            };
+        }
+
+        function uploadImage(e) {
+            console.log(event.target.files[0])
+            var imageUrl = URL.createObjectURL(event.target.files[0]);
+            var elem = document.getElementById("imagePreviewHolder")
+            elem.setAttribute("src", imageUrl)
+            convertImgToBase64(event.target.files[0], function (base64) {
+                imageData = base64;
+            });
+        }
+    </script>
+
+    </html>

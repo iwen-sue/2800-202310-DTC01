@@ -128,21 +128,29 @@ app.get('/userprofile', sessionValidation, async (req, res) => {
 
 const bucketlist = require('./enterBucket.js');
 const toHistory = require('./toHistory.js');
+const editBucket = require('./editBucket.js');
 app.post('/enterBucket', bucketlist)
 app.post('/toHistory', toHistory)
+app.post('/editBucket', editBucket)
+
+app.get('/editBucket', (req, res) => {
+    const query = usersModel.findOne({
+        email: req.session.email,
+    });
+    query.then((docs) => {
+        res.render("editBucket", { user: docs });
+
+    }).catch((err) => {
+        console.error(err);
+    });
+});
 app.get('/enterBucket', (req, res) => {
+    
     res.render("enterBucket");
 });
 app.get('/userprofile/travel_history', (req, res) => {
     res.render("travel_history");
 });
-
-// app.get('/userprofile', sessionValidation, async (req,res) => {
-//     const result = await usersModel.findOne({ email: req.session.email });
-//     var bucketlist = result.bucketlist;
-//     var travelHistory = result.travelHistory;
-//     res.render("userprofile", {user: req.session, bucketlist: bucketlist, travelHistory: travelHistory});
-// });
 
 app.get('/signup', (req, res) => {
     res.render("signup");
