@@ -1,3 +1,4 @@
+const { number } = require('joi');
 const mongoose = require('mongoose');
 require('dotenv').config();
 const mongodb_host = process.env.MONGODB_HOST;
@@ -58,7 +59,9 @@ const usersSchema = new mongoose.Schema({
         ExpectedDate: Date,
         todo: String,
         countryImg: String,
-    }
+    },
+    resetToken: String,
+    resetTokenExpiration: Number
 });
 
 const usersModel = mongoose.model('users', usersSchema);
