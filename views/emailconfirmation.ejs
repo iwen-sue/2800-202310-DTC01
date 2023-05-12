@@ -11,10 +11,11 @@
     <%- include('templates/nav') %>
     <div class="container text-center">
     <% if(error) { %>
-            <h1>Email does not exist!</h1>
+            <h1>Email not found!</h1>
+            <h4>Please enter in an existing email.</h4>
     <% } else { %>
             <h1>Email has been sent!</h1>
-            <h4>Our emails tend to get caught in the spam folder, so let your group members know to check their spam!</h4>
+            <p>Our emails tend to get caught in the spam folder, so let your group members know to check their spam! Only click links from our official email address: <b>vacapal@outlook.com</b>.</p>
     <% } %>
             <button class="btn btn-primary"onclick="window.location.href='/userprofile/groupdetails'">Go Back to Group Details</button>
     </div>
