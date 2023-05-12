@@ -7,14 +7,15 @@ const mongoDBSession = require('connect-mongodb-session')(session);
 const bcrypt = require('bcrypt');
 const usersModel = require('./models/user.js');
 const ejs = require('ejs');
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
 
 const app = express();
 
 const port = process.env.PORT || 3000;
 
 const Joi = require("joi");
-
-
+const { ConnectionClosedEvent } = require("mongodb");
 
 
 //control the strength of the password
@@ -152,6 +153,24 @@ app.get('/login', (req, res) => {
     res.render("login");
 });
 
+app.get('/forgotPassword', (req, res) => {
+    res.render('forgotPassword.ejs'); // Render the forgotPassword.ejs template
+});
+
+
+app.get('/resetPassword', async (req, res) => {
+    console.log(req.query.token);
+    const user = await usersModel.findOne({ resetToken: req.query.token }).exec();
+    console.log(user)
+    console.log(req.query.token===null)
+    if (!user || !req.query.token) {
+        res.redirect('/home');
+    } else {
+        res.render('resetPassword', { email: user.email, token: req.query.token });
+    }
+
+});
+
 //Test Post
 app.get('/logout', sessionValidation, (req, res) => {
     req.session.destroy(function (err) {
@@ -280,6 +299,85 @@ app.post('/editProfile', async (req, res) => {
 
 
 })
+app.post('/forgotPassword', async (req, res) => {
+    try {
+        const email = req.body.email;
+        console.log(email)
+        const user = await usersModel.findOne({ email: email }).exec();
+        if (!user) {
+            return res.render('forgotPassword', { error: 'UserNotFound' });
+        }
+        const resetToken = crypto.randomBytes(20).toString('hex');
+
+
+        const resetTokenExpiry = Date.now() + 3600000; // Expiration in 1 hour
+        const expiryDate = new Date(resetTokenExpiry);
+
+
+        console.log(expiryDate)
+
+        user.resetToken = resetToken;
+        user.resetTokenExpiration = expiryDate;
+
+
+
+        await user.save().then(async () => {
+            res.render('forgotPassword', { success: 'Email is successfully sent.' });
+        }).catch((err) => {
+            console.log(err);
+        });
+
+
+        setTimeout(async () => {
+            await usersModel.updateOne({ email: email }, { $unset: { resetTokenExpiration: 1 } });
+        }, 3600000);
+
+        const transporter = nodemailer.createTransport({
+            service: 'hotmail',
+            auth: {
+                user: 'vacapal@outlook.com',
+                pass: 'comp2800!'
+            }
+        });
+        const resetUrl = `http://localhost:3000/resetPassword?token=${resetToken}`;
+        const mailOptions = {
+            to: user.email,
+            from: 'vacapal@outlook.com',
+            subject: 'Reset your password on Vacapal',
+            text: `Hi ${user.firstName} ${user.lastName} \n
+            Please click on the following link, or paste this into your browser to complete the process:\n
+            ${resetUrl}\n
+            If you did not request this, please ignore this email and your password will remain unchanged.\n`
+        };
+        await transporter.sendMail(mailOptions);
+        res.render('forgotPassword', { success: 'EmailSent' });
+    } catch (error) {
+        console.error(error);
+        res.render('forgotPassword', { error: 'Error' });
+    }
+});
+
+app.post('/resetPassword', async (req, res) => {
+    try {
+        const token = req.body.token;
+        const email = req.body.email;
+        console.log(email);
+
+        const newPassword = req.body.password;
+        const confirmPassword = req.body.confirmPassword;
+
+        if (newPassword !== confirmPassword) {
+            return res.render('resetPassword', { error: 'PasswordNotMatch', token: token, email: email });
+        } else {
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
+            await usersModel.findOneAndUpdate({ resetToken: token }, { password: hashedPassword }).exec();
+            return res.render('login', { success: 'Password is succesfully reset. Please try log in again' })
+        }
+    } catch (error) {
+        console.error(error);
+        return res.render('resetPassword', { error: 'Error', token: req.body.token, email: req.body.email });
+    }
+});
 
 //static images address
 app.use(express.static(__dirname + "/public"));

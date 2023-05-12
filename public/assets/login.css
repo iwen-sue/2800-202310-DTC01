@@ -1,0 +1,48 @@
+.forgotId{
+    font-size: small;
+
+}
+
+.loginBtn{
+    background-color: #2f164f;
+    color: white;
+    padding: 10px 20px;
+    margin: 0;
+    border: none;
+    cursor: pointer;
+    width: 60%;
+    font-size: small;
+}
+
+.resetBtn{
+    background-color: #2f164f;
+    color: white;
+    padding: 10px 20px;
+    margin: 0;
+    border: none;
+    width: 60%;
+    font-size: small;
+}
+
+.resetBtn:hover {
+    background-color: #2f164f;
+    color: white;
+}
+
+.resetConfirmBtn {
+    background-color: #2f164f;
+    color: white;
+    padding: 10px 20px;
+    margin: 0;
+    border: none;
+    width: 70%;
+    font-size: small;
+}
+
+.resetConfirmBtn:hover {
+    background-color: #2f164f;
+    color: white;
+}
+
+
+

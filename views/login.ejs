@@ -1,7 +1,16 @@
 <%- include("templates/header") %>
-    </head>
+<link rel="stylesheet" href="/assets/login.css" />   
+
+
+</head>
 
     <body>
+        <%- include("templates/nav") %>
+        <% if (typeof success !== 'undefined') { %>
+            <div class="alert alert-success" id="alertBox">
+                <%= success %>
+            </div>
+        <% } %>
         <main class="form-signin w-100 m-auto">
             <div class="d-flex gap-2 justify-content-center py-5">
                 <form class="text-center" action="/login" method="post">
@@ -21,13 +30,15 @@
                         <label for="password">Password</label>
                     </div>
                     <br>
-                    <button class="btn btn-block" type="submit" value="login"
-                        style="background-color: #2f164f; color: white;">Log in</button>
+                    <button class="btn btn-block loginBtn" type="submit" value="login">Sign in</button>
+                    <br>
+                    <a href="/forgotPassword" class="forgotId">Forgot password?</a>
                 </form>
+                
             </div>
         </main>
         <% if (typeof error !== 'undefined') { %>
-            <div class="alert alert-danger d-flex justify-content-center mx-auto mb-0" style="width: 23%;" role="alert">
+            <div class="alert alert-danger d-flex justify-content-center mx-auto mb-0" id="alertBox" style="width: 23%;" role="alert">
                 <p class="alert-heading">
                     <% if (errorType === 'InvalidEmailFormat') { %>
                         Invalid email format.<br> Please enter a valid email address.
@@ -39,5 +50,6 @@
                 </p>
             </div>
         <% } %>
-        
+        <%- include("templates/bottomNav") %>
+        <script src="/scripts/resetPassword.js"></script>
     </body>
