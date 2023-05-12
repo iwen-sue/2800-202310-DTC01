@@ -19,7 +19,7 @@ const mongodb_database = process.env.MONGODB_DATABASE;
 
 mongoose.connect(`mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/${mongodb_database}`, {
   useNewUrlParser: true,
-  useUnifiedTopology: true,
+//   useUnifiedTopology: true,
 }).then(
     () => {
         console.log("Connected to MongoDB successfully!");
@@ -49,8 +49,8 @@ const usersSchema = new mongoose.Schema({
         required: true
     },
     type: String,
-    profilePic: String,
-    homeCountry: String,
+    profilePic: Buffer,
+    homeCity: String,
     groupID: String,
     bucketlist: {
         country: String,

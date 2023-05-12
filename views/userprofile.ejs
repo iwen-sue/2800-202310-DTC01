@@ -22,31 +22,38 @@
                     <div class="ImageArea">
                         <img src="userProfileImages/avatar-default.png" alt="avatar" />
                     </div>
-                    <p class="username"><%= user.firstName %> <%= user.lastName %></p>
+                    <p class="username">
+                        <%= user.firstName %>
+                            <%= user.lastName %>
+                    </p>
                     <div class="InfoArea">
                         <div class="box boxOne">
                             <span class="material-symbols-outlined boxIcon">
                                 home_pin
                             </span>
-                            <% if (!user.home_city) { %>
+                            <% if (!user.homeCity) { %>
                                 <p class="boxText">unknown</p>
-                            <%} else { %>
-                                <p class="boxText"><%= user.home_city %></p>
-                            <% } %>
+                                <%} else { %>
+                                    <p class="boxText">
+                                        <%= user.homeCity %>
+                                    </p>
+                                    <% } %>
                         </div>
                         <div class="box boxTwo" onclick="goTravelHistroy()">
                             <span class="material-symbols-outlined boxIcon">
                                 where_to_vote
                             </span>
-                            <% if (!user.travel_history) { %>
+                            <% if (!user.bucketlist) { %>
                                 <p class="boxText">0 country</p>
-                            <%} else { %>
-                                <p class="boxText"><%= user.travel_history.length %> countries</p>
-                            <% } %>
+                                <%} else { %>
+                                    <p class="boxText">
+                                        <%= user.bucketlist.length %> countries
+                                    </p>
+                                <% } %>
                         </div>
                     </div>
                 </section>
-                <% if (user.type == "leader") { %>
+                <% if (user.type=="leader" ) { %>
                     <section class="buttonArea">
                         <div class="ButtonAreaCard">
                             <span class="material-symbols-outlined">
@@ -56,22 +63,22 @@
                         </div>
 
                     </section>
-                <%} else{ %>
-                    <section class="buttonArea">
-                        <div class="ButtonAreaCard">
-                            <span class="material-symbols-outlined buttonIcon">
-                                group_add
-                            </span>
-                            Create Group
-                        </div>
-                        <div class="ButtonAreaCard">
-                            <span class="material-symbols-outlined  buttonIcon">
-                                group
-                            </span>
-                            Join Group
-                        </div>
-                    </section>
-                <% } %>
+                    <%} else{ %>
+                        <section class="buttonArea">
+                            <div class="ButtonAreaCard">
+                                <span class="material-symbols-outlined buttonIcon">
+                                    group_add
+                                </span>
+                                Create Group
+                            </div>
+                            <div class="ButtonAreaCard">
+                                <span class="material-symbols-outlined  buttonIcon">
+                                    group
+                                </span>
+                                Join Group
+                            </div>
+                        </section>
+                        <% } %>
             </div>
 
             <!-- Modal -->
@@ -86,27 +93,34 @@
                         <div class="modal-body" style="height:300px;overflow: hidden;">
                             <div class="row">
                                 <div class="col inputBox">
-                                  <input type="text" class="form-control" placeholder="First name" aria-label="First name" value="<%= user.firstName %>">
+                                    <input id="firstNameInput" type="text" name="firstName" class="form-control" placeholder="First name"
+                                        aria-label="First name" value="<%= user.firstName %>">
                                 </div>
                                 <div class="col inputBox">
-                                  <input type="text" class="form-control" placeholder="Last name" aria-label="Last name" value="<%= user.lastName %>">
+                                    <input id="lastNameInput" type="text" name="lastName" class="form-control" placeholder="Last name"
+                                        aria-label="Last name" value="<%= user.lastName %>">
                                 </div>
-                              </div>
-                              <input type="text" style="margin-bottom: 20px;" class="form-control" placeholder="Input address" aria-label="address" value="<%= user.home_city %>">
-                              <div id="imagePreview">
-                                <img src="userProfileImages/avatar-default.png" alt="avatar_preview" />
-                                <input type="file" id="imageInput" style="z-index:0;position: absolute;"/>
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">upload avatar</button>
-                              </div>
+                            </div>
+                            <input id="emailInput" type="text" name="email" style="margin-bottom: 20px;" class="form-control"
+                                placeholder="Input email" aria-label="email" value="<%= user.email %>">
+                            <input id="homeCityInput" type="text" name="home_city" style="margin-bottom: 20px;" class="form-control"
+                                placeholder="Input home city" aria-label="address" value="<%= user.home_city %>">
+                            <div id="imagePreview">
+                                <img id="imagePreviewHolder" src="userProfileImages/avatar-default.png"
+                                    alt="avatar_preview" />
+                                <input type="file" id="imageInput" style="z-index:0;position: absolute;"
+                                    onchange="uploadImage()" />
+                                <label for="imageInput" class="btn btn-secondary">upload avatar</label>
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary">Save changes</button>
+                            <button onclick="submitForm()" type="button" class="btn btn-primary">Save changes</button>
                         </div>
                     </div>
                 </div>
             </div>
-            </div>
+
             <%- include("templates/bottomNav") %>
                 <script src="/scripts/userprofile.js"></script>
     </body>

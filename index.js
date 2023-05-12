@@ -9,7 +9,6 @@ const usersModel = require('./models/user.js');
 const ejs = require('ejs');
 
 const app = express();
-app.use(express.urlencoded({ extended: false }));
 
 const port = process.env.PORT || 3000;
 
@@ -39,7 +38,7 @@ const userCollection = database.db(mongodb_database).collection('users');
 app.set('view engine', 'ejs');
 
 //false: url decode only support array or string
-app.use(express.urlencoded({ extended: false }))
+app.use(express.urlencoded({ extended: true }))
 
 const store = new mongoDBSession({
     // uri: 'mongodb://127.0.0.1:27017/connect_mongodb_session_test',
@@ -102,12 +101,20 @@ app.get('/', (req, res) => {
 
 // app.use('/', sessionValidation)
 
-app.get('/home', sessionValidation, (req,res) => {
+app.get('/home', sessionValidation, (req, res) => {
     res.render("home");
 });
 
-app.get('/userprofile', sessionValidation, (req,res) => {
-    res.render("userprofile", {user: req.session});
+app.get('/userprofile', sessionValidation, async (req, res) => {
+    const query = usersModel.findOne({
+        email: req.session.email,
+    });
+    query.then((docs) => {
+        console.log(docs)
+        res.render("userprofile", { user: docs });
+      }).catch((err) => {
+        console.error(err);
+      });
 });
 
 app.get('/signup', (req, res) => {
@@ -119,11 +126,11 @@ app.get('/login', (req, res) => {
 });
 
 //Test Post
-app.get('/logout', sessionValidation, (req,res) => {
-	req.session.destroy(function(err){
+app.get('/logout', sessionValidation, (req, res) => {
+    req.session.destroy(function (err) {
         // res.clearCookie(this.cookie, { path: '/' });
         res.redirect('/');
-     });
+    });
 });
 
 //static images address
@@ -170,7 +177,7 @@ app.post('/login', async (req, res) => {
         var error = "Invalid email format. Please enter a valid email address.";
         return res.render("login", { error: error, errorType: 'InvalidEmailFormat' });
     }
-    
+
     const result = await usersModel.find({ email: email }).select('email type firstName lastName password _id').exec();
 
     if (result.length == 0) {
@@ -195,17 +202,68 @@ app.post('/login', async (req, res) => {
     }
 });
 
-    //static images address
-    app.use(express.static(__dirname + "/public"));
+app.post('/editProfile', async (req, res) => {
+    var firstName = req.body.firstName;
+    var lastName = req.body.lastName;
+    var homeCity = req.body.homeCity;
+    var email = req.body.email;
+    var profilePic = req.body.avatar
 
-    // handle 404 - page not found
-    // must put this in the very last otherwise it will catch all routes as 404
-    app.get("*", (req, res) => {
-        res.status(404);
-        res.render("404");
-    })
+    console.log(req.body)
+    console.log(profilePic)
 
 
-    app.listen(port, () => {
-        console.log("Node application listening on port " + port);
+    const result = await usersModel.findOne({
+        email: req.session.email,
     });
+
+    const update = {
+        $set: {
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            profilePic: profilePic,
+            homeCity: homeCity
+        }
+    }
+
+    if(result){
+
+        try{
+            await usersModel.updateMany({email: req.session.email}, update);
+            req.session.email = email;
+            req.session.firstName = firstName;
+            req.session.email = email;
+            req.session.profilePic = profilePic;
+            req.session.homeCity = homeCity;
+
+            query.then((docs) => {
+                console.log(docs)
+                res.render("userprofile", { user: docs });
+              }).catch((err) => {
+                console.error(err);
+              });
+
+        }catch(err){
+            console.error(err)
+            console.log(err)
+        }
+    }
+    
+
+})
+
+//static images address
+app.use(express.static(__dirname + "/public"));
+
+// handle 404 - page not found
+// must put this in the very last otherwise it will catch all routes as 404
+app.get("*", (req, res) => {
+    res.status(404);
+    res.render("404");
+})
+
+
+app.listen(port, () => {
+    console.log("Node application listening on port " + port);
+});
