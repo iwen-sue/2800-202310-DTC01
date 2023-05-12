@@ -7,7 +7,7 @@
     <body>
         <%- include("templates/nav") %>
         <% if (typeof success !== 'undefined') { %>
-            <div class="alert alert-success">
+            <div class="alert alert-success" id="alertBox">
                 <%= success %>
             </div>
         <% } %>
