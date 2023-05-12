@@ -39,10 +39,10 @@
                             <span class="material-symbols-outlined boxIcon">
                                 where_to_vote
                             </span>
-                            <% if (!user.travel_history) { %>
+                            <% if (!travelHistory) { %>
                                 <p class="boxText">0 country</p>
                             <%} else { %>
-                                <p class="boxText"><%= user.travel_history.length %> countries</p>
+                                <p class="boxText"><%= travelHistory.length %> countries</p>
                             <% } %>
                         </div>
                     </div>
@@ -102,11 +102,13 @@
                     </div>
                 </div>
             </div>
+
             
-            <%- include("templates/bucketlist") %>
+            
+            <%- include("templates/bucketlist", { bucketlist: bucketlist}) %>
             
             <%- include("templates/bottomNav") %>
-                <script src="/scripts/userprofile.js"></script>  
+                <script src="/scripts/userprofile.js"></script>
     </body>
 
     </html>
