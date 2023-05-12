@@ -17,6 +17,14 @@ mongoose.connect(`mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_ho
     }
 );
 
+const BucketlistSchema = new mongoose.Schema({
+    country: String,
+    city: String,
+    description: String,
+    countryImg: String,
+  });
+
+
 const usersSchema = new mongoose.Schema({
     firstName: {
         type: String,
@@ -40,12 +48,8 @@ const usersSchema = new mongoose.Schema({
     profilePic: String,
     homeCity: String,
     groupID: String,
-    bucketlist: {
-        country: String,
-        city: String,
-        description: String,
-        countryImg: String,
-    }
+    travelHistory: [BucketlistSchema],
+    bucketlist: [BucketlistSchema],
 });
 
 const usersModel = mongoose.model('users', usersSchema);
