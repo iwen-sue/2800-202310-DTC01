@@ -67,7 +67,7 @@
 
                             <div class="modal-footer">
                                 <form action="/toHistory" method="post">
-                                    <input type="hidden" name="bucketID">
+                                    <input type="hidden" name="bucketID" value="<%=bucketlist[i]._id %>">
                                     <button type="submit" class="btn btn-secondary">Move to history</button>
                                 </form>
                                 <button type="button" class="btn btn-primary" id="<%=bucketlist[i]._id %>" value="<%=bucketlist[i]._id %>" onclick="window.location.href = '/editBucket?cardID=<%= bucketlist[i]._id %>';">Edit</button>
