@@ -10,14 +10,19 @@
     </head>
 
     <style>
-        .img-fluid {
+        form {
             position: relative
+        }
+
+        .location {
+            font-weight: 300;
+            font-size: 2rem;
         }
 
         .label-overlay {
             position: absolute;
-            top: 34%;
-            left: 95%;
+            top: -36%;
+            left: 98%;
             transform: translate(-50%, -50%);
             text-align: center;
             z-index: 1;
@@ -40,7 +45,7 @@
 
                 <div class="container">
                     <h1 class="display-1">Edit Bucket List</h1>
-                    <p>Take record of your unforgetable memory here</p>
+                    <p>Take record of your unforgetable journey here</p>
                     
                     <form action="/editBucket" method="post" enctype="multipart/form-data">
                         <label for="imageInput" style="float:right" class="label-overlay">
@@ -53,15 +58,15 @@
                             <input id="imageInput" type="file" name="avatar" style="display:none;" />
                         </div>
 
-                        <div class="form-group">
-                            <label for=""></label>
-                            <input id="" type="hidden" class="form-control" name="cardID" value="<%= card._id %>">
+                        <div class="form-group mb-0">
+                            <label for="location" class="location"><%= card.country %> - <%= card.city %></label>
+                            <input id="location" type="hidden" class="form-control" name="cardID" value="<%= card._id %>">
                         </div>
 
                         <div class="form-group">
                             <label for="description">Description</label>
                             <textarea type="description" class="form-control" name="description"
-                                rows="5"><%= card.description %></textarea>
+                                rows="10"><%= card.description %></textarea>
                         </div>
 
                         <button type="submit" class="btn btn-primary">Submit</button>

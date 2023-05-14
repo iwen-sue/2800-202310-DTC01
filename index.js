@@ -173,7 +173,16 @@ app.get('/enterBucket', (req, res) => {
     res.render("enterBucket");
 });
 app.get('/userprofile/travel_history', (req, res) => {
-    res.render("travel_history");
+    const query = usersModel.findOne({
+        email: req.session.email,
+    });
+    query.then((docs) => {
+        
+        res.render("travel_history", {travelHistory: docs.travelHistory});
+
+    }).catch((err) => {
+        console.error(err);
+    });
 });
 
 app.get('/signup', (req, res) => {
