@@ -1,10 +1,9 @@
 
 
 var imageData = document.currentScript.getAttribute('imageData');
-var userId = document.currentScript.getAttribute('userId');
+
 // userData = JSON.parse(userData);
-console.log(imageData)
-console.log(userId)
+
 console.log(typeof imageData)
 if(imageData){
   var imageData = imageData;
@@ -46,26 +45,35 @@ function submitForm() {
   var lastName = $("#lastNameInput").val();
   var email = $("#emailInput").val();
   var homeCity = $("#homeCityInput").val();
+  var formData = new FormData();
+  var imageForm = new FormData();
 
-  const data = {
-    firstName: firstName,
-    lastName: lastName,
-    email: email,
-    homeCity: homeCity,
-    avatar: imageData
-  }
+  formData.append('avatar', imageData);
+  formData.append('firstName', firstName);
+  formData.append('lastName', lastName);
+  formData.append('email', email);
+  formData.append('homeCity', homeCity);
 
-  const urlEncodedData = new URLSearchParams();
-  for (const [key, value] of Object.entries(data)) {
-    urlEncodedData.append(key, value);
-  }
+
+  // const data = {
+  //   firstName: firstName,
+  //   lastName: lastName,
+  //   email: email,
+  //   homeCity: homeCity,
+  //   avatar: imageData
+  // }
+
+  // const urlEncodedData = new URLSearchParams();
+  // for (const [key, value] of Object.entries(data)) {
+  //   urlEncodedData.append(key, value);
+  // }
 
   fetch('/editProfile', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body: urlEncodedData
+    // headers: {
+    //   'Content-Type': 'multipart/form-data'
+    // },
+    body: formData
   })
     .then(response => {
       console.log(response)
@@ -77,7 +85,7 @@ function submitForm() {
     })
     .then(data => {
       console.log(data); // do something with the JSON response
-      // location.reload()
+      location.reload()
       // document.getElementById("userAvatar").setAttribute("src", data.profilePic);
       // document.getElementsByClassName("username")[0].innerHTML = data.firstName + " " + data.lastName;
       // document.getElementById("userHome").innerHTML = data.homeCity;
