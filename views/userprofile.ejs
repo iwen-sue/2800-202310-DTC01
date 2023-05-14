@@ -137,7 +137,7 @@
             <%- include("templates/bucketlist", { bucketlist: user.bucketlist}) %>
             
             <%- include("templates/bottomNav") %>
-            <script src="/scripts/userprofile.js" userData="<%= user.profilePic %>"></script>
+            <script src="/scripts/userprofile.js" imageData="<%= user.profilePic %>" userId="<%= user._id %>"></script>
     </body>
 
     </html>

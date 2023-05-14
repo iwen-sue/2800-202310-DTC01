@@ -1,13 +1,17 @@
-var userData = document.currentScript.getAttribute('userData');
+
+
+var imageData = document.currentScript.getAttribute('imageData');
+var userId = document.currentScript.getAttribute('userId');
 // userData = JSON.parse(userData);
-console.log(userData)
-console.log(typeof userData)
-if(userData){
-  var imageData = userData;
+console.log(imageData)
+console.log(userId)
+console.log(typeof imageData)
+if(imageData){
+  var imageData = imageData;
 }else{
   var imageData = "";
 }
-// var imageData
+
 
 
 function goTravelHistroy() {
@@ -26,13 +30,15 @@ function convertImgToBase64(file, callback) {
 }
 
 function uploadImage(e) {
-  console.log(event.target.files[0])
-  var imageUrl = URL.createObjectURL(event.target.files[0]);
+  imageData = event.target.files[0]
+  var imageUrl = URL.createObjectURL(imageData);
   var elem = document.getElementById("imagePreviewHolder")
   elem.setAttribute("src", imageUrl)
-  convertImgToBase64(event.target.files[0], function (base64) {
-    imageData = base64;
-  });
+  
+  
+  // convertImgToBase64(event.target.files[0], function (base64) {
+  //   imageData = base64;
+  // });
 }
 
 function submitForm() {
@@ -71,7 +77,7 @@ function submitForm() {
     })
     .then(data => {
       console.log(data); // do something with the JSON response
-      location.reload()
+      // location.reload()
       // document.getElementById("userAvatar").setAttribute("src", data.profilePic);
       // document.getElementsByClassName("username")[0].innerHTML = data.firstName + " " + data.lastName;
       // document.getElementById("userHome").innerHTML = data.homeCity;
@@ -81,6 +87,18 @@ function submitForm() {
     .catch(error => {
       console.error('Error:', error);
     });
+
+    // const formData = new FormData();
+    // const newName = userId + ".png"
+    // formData.append('image', imageData, newName);
+
+    // fetch('/sendProfileImage', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'multipart/form-data'
+    //   },
+    //   body: formData
+    // })
 }
 
 function goCreateGroup(){
