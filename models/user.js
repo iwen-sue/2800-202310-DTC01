@@ -46,7 +46,7 @@ const usersSchema = new mongoose.Schema({
         required: true
     },
     type: String,
-    profilePic: String,
+    profilePic: Buffer,
     homeCity: String,
     groupID: String,
     travelHistory: [BucketlistSchema],

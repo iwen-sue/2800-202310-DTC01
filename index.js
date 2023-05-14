@@ -202,6 +202,7 @@ app.get('/logout', sessionValidation, (req, res) => {
     });
 });
 
+
 //static images address
 app.use(express.static(__dirname + "/public"));
 
@@ -326,8 +327,6 @@ app.post('/editProfile', async (req, res) => {
             console.log(err)
         }
     }
-
-
 })
 app.post('/forgotPassword', async (req, res) => {
     try {
