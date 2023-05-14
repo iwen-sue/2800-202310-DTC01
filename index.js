@@ -140,9 +140,17 @@ app.get('/userprofile', sessionValidation, async (req, res) => {
 const bucketlist = require('./enterBucket.js');
 const toHistory = require('./toHistory.js');
 const editBucket = require('./editBucket.js');
+
 app.post('/enterBucket', bucketlist)
 app.post('/toHistory', toHistory)
 app.post('/editBucket', editBucket)
+
+
+// const multer = require('multer');  // npm install multer
+// const memoryStorage = multer.memoryStorage(); // store the file in memory as a buffer
+// const upload = multer({ storage: memoryStorage }); // specify the storage option
+const editProfile = require('./editProfile.js');
+app.post('/editProfile', editProfile);
 
 app.get('/editBucket', (req, res) => {
     const query = usersModel.findOne({
@@ -199,7 +207,6 @@ app.get('/resetPassword', async (req, res) => {
 
 });
 
-//Test Post
 app.get('/logout', sessionValidation, (req, res) => {
     req.session.destroy(function (err) {
         // res.clearCookie(this.cookie, { path: '/' });
@@ -285,54 +292,7 @@ app.post('/login', async (req, res) => {
     }
 });
 
-app.post('/editProfile', async (req, res) => {
-    var firstName = req.body.firstName;
-    var lastName = req.body.lastName;
-    var homeCity = req.body.homeCity;
-    var email = req.body.email;
-    var profilePic = req.body.avatar
 
-    const result = await usersModel.findOne({
-        email: req.session.email,
-    });
-
-    const update = {
-        $set: {
-            firstName: firstName,
-            lastName: lastName,
-            email: email,
-            profilePic: profilePic,
-            homeCity: homeCity
-        }
-    }
-
-    if (result) {
-
-        try {
-            await usersModel.updateMany({ email: req.session.email }, update);
-            req.session.email = email;
-            req.session.firstName = firstName;
-            req.session.lastName = lastName;
-
-            const query = usersModel.findOne({
-                email: req.session.email,
-            });
-
-            query.then((docs) => {
-                res.status(200);
-                res.json(docs)
-                res.end()
-                // res.render("userprofile", { user: docs });
-            }).catch((err) => {
-                console.error(err);
-            });
-
-        } catch (err) {
-            console.error(err)
-            console.log(err)
-        }
-    }
-})
 app.post('/forgotPassword', async (req, res) => {
     try {
         const email = req.body.email;

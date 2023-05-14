@@ -21,11 +21,13 @@
                         edit
                     </span>
                     <div class="ImageArea">
+                        <div style="overflow: hidden;border-radius: 50%;width: 90px;height:90px;">
                         <% if (user.profilePic ) { %>
-                        <img id="userAvatar" src="<%= user.profilePic %>" alt="avatar" />
+                        <img id="userAvatar" src="data:image/png;base64,<%= user.profilePic %>" alt="avatar" />
                         <%} else { %>
                         <img src="userProfileImages/avatar-default.png" alt="avatar" />
                         <% } %>
+                    </div>
                     </div>
                     <p class="username">
                         <%= user.firstName %>
@@ -112,7 +114,7 @@
                                 placeholder="Input home city" aria-label="address" value="<%= user.homeCity %>">
                             <div id="imagePreview">
                                 <% if (user.profilePic ) { %>
-                                    <img id="imagePreviewHolder" src="<%= user.profilePic %>"
+                                    <img id="imagePreviewHolder" src="data:image/png;base64, <%= user.profilePic %>"
                                     alt="avatar_preview" />
                                 <%} else { %>
                                 <img id="imagePreviewHolder" src="userProfileImages/avatar-default.png"
@@ -137,7 +139,7 @@
             <%- include("templates/bucketlist", { bucketlist: user.bucketlist}) %>
             
             <%- include("templates/bottomNav") %>
-            <script src="/scripts/userprofile.js" imageData="<%= user.profilePic %>" userId="<%= user._id %>"></script>
+            <script src="/scripts/userprofile.js" imageData="<%= user.profilePic %>"></script>
     </body>
 
     </html>
