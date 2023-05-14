@@ -1,1 +1,108 @@
-Hello
+<%- include("templates/header") %>
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- google icons -->
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <link rel="stylesheet" href="/assets/common.css" />
+    <link rel="stylesheet" href="/assets/travel_history.css">
+    <!-- cite css or js files here -->
+    </head>
+
+    <body>
+        <%- include("templates/nav") %>
+
+        <div class="container">
+            <h1 class="pt-3">Trave History</h1>
+            <hr>
+            <div id="travelHistory">
+                
+                <!-- above card is a place holder -->
+                <% for (var i = 0; i < travelHistory.length; i++) { %>
+                <div class="unit">
+                    <div class="card" data-toggle="modal" data-target="#<%= travelHistory[i]._id %>">
+                        <% if (travelHistory[i].travelImg) { %>
+                            <img class="card-image" src="data:image/png;base64,<%= travelHistory[i].travelImg %>" alt="Card image cap">
+                        <%} else { %>
+                            <img class="card-image" src="https://picsum.photos/300/200?random=<%= i %>" alt="Card image cap">
+                        <% } %>
+                        <div class="text-overlay">
+                            <h2><%= travelHistory[i].city %></h2>
+                            <!-- to change the data finding way -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal -->
+                <div class="modal fade" id="<%= travelHistory[i]._id %>" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+
+                        <div class="modal-content">
+
+                            <div class="modal-header">
+                                <h1 class="modal-title" id="<%= travelHistory[i]._id %>"><%= travelHistory[i].city %></h1>
+                                <!-- to change the data finding way -->
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <% if (travelHistory[i].travelImg) { %>
+                                <div class="modal-cover"><img id="<%= travelHistory[i]._id %>" src="data:image/png;base64,<%= travelHistory[i].travelImg %>" alt="Modal Image"></div>
+                            <%} else { %>
+                                <div class="modal-cover"><img id="<%= travelHistory[i]._id %>" src="https://picsum.photos/300/200?random=<%= i %>" alt="Modal Image"></div>
+                            <% } %>
+                            <div class="modal-body">
+                                <h5><%=travelHistory[i].country %>
+                                    <!-- to change the data finding way -->
+                                    <span style="float: right" class="material-symbols-outlined">
+                                    more_vert
+                                    </span>
+                                </h5>
+                                <p><%=travelHistory[i].description %></p>
+                                <!-- to change the data finding way -->
+                            </div>
+
+                            <!-- <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" id="<%=travelHistory[i]._id %>" value="<%=travelHistory[i]._id %>" onclick="window.location.href = '/editBucket?cardID=<%= travelHistory[i]._id %>';">Edit</button>
+                            </div> -->
+
+                        </div>
+
+                    </div>
+                </div>
+
+
+
+
+
+
+                <% } %>
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <%- include("templates/bottomNav") %>
+    </body>
+
+    </html>
