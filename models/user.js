@@ -1,5 +1,6 @@
 const { number } = require('joi');
 const mongoose = require('mongoose');
+const { buffer } = require('stream/consumers');
 require('dotenv').config();
 const mongodb_host = process.env.MONGODB_HOST;
 const mongodb_user = process.env.MONGODB_USER;
@@ -22,7 +23,7 @@ const BucketlistSchema = new mongoose.Schema({
     country: String,
     city: String,
     description: String,
-    countryImg: String,
+    travelImg: {type:Buffer, contentType:String},
   });
 
 
