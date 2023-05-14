@@ -16,7 +16,7 @@ router.post('/toHistory', async (req, res) => {
                         country: item.country,
                         city: item.city,
                         description: item.description,
-                        countryImg: item.countryImg,
+                        travelImg: item.travelImg,
                     }
                 }
             });
