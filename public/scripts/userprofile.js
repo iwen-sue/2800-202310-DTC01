@@ -77,8 +77,8 @@ function submitForm() {
   })
     .then(response => {
       console.log(response)
-      if(!response.ok){
-        alert("Network response failed");
+      if(!response.status == 200){
+        alert( response.statusText + ", with an error code" + response.status);
       }else{
         return response.json();
       }
@@ -93,6 +93,7 @@ function submitForm() {
 
     })
     .catch(error => {
+      alert('Error:', error)
       console.error('Error:', error);
     });
 
