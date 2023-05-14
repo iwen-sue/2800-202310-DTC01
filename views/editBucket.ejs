@@ -9,65 +9,82 @@
     <!-- cite css or js files here -->
     </head>
 
+    <style>
+        .img-fluid {
+            position: relative
+        }
+
+        .label-overlay {
+            position: absolute;
+            top: 34%;
+            left: 95%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 1;
+            color: white;
+            /* Set the text color */
+            opacity: 0.5;
+            /* Hidden by default */
+        }
+    </style>
+
     <body>
         <%- include("templates/nav") %>
 
             <container>
+                <% if (card.travelImg) { %>
+                    <img src="data:image/png;base64,<%= card.travelImg %>" alt="cover" class="img-fluid" style="width:100%">
+                <% } else { %>
+                    <img src="https://picsum.photos/seed/<%= card._id %>/300/200" alt="cover" class="img-fluid" style="width:100%">
+                <% } %>
+
                 <div class="container">
-
-                    <div id="imagePreview">
-                        <input type="file" id="imageInput" onchange="uploadImage()" /><br>
-                        <label for="imageInput" class="btn btn-secondary">upload avatar</label>
-                    </div>
-
                     <h1 class="display-1">Edit Bucket List</h1>
                     <p>Take record of your unforgetable memory here</p>
-                    <form action="/editBucket.js" method="post">
-
-                        <div class="form-group">
-                            <label for=""></label>
-                            <input id="" type="hidden" class="form-control" name="country" placeholder="Country">
+                    
+                    <form action="/editBucket" method="post" enctype="multipart/form-data">
+                        <label for="imageInput" style="float:right" class="label-overlay">
+                            <span class="material-symbols-outlined">
+                                imagesmode
+                            </span>
+                        </label>
+                        <div class="container">
+                            <br>
+                            <input id="imageInput" type="file" name="avatar" style="display:none;" />
                         </div>
 
                         <div class="form-group">
                             <label for=""></label>
-                            <input id="" type="hidden" class="form-control" name="city" placeholder="City">
+                            <input id="" type="hidden" class="form-control" name="cardID" value="<%= card._id %>">
                         </div>
 
                         <div class="form-group">
                             <label for="description">Description</label>
-                            <textarea type="description" class="form-control" name="description" rows="5"></textarea>
+                            <textarea type="description" class="form-control" name="description"
+                                rows="5"><%= card.description %></textarea>
                         </div>
 
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </form>
                 </div>
+
             </container>
 
             <%- include("templates/bottomNav") %>
     </body>
 
     <script>
-        function convertImgToBase64(file, callback) {
-            let reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = function () {
-                callback(reader.result);
-            };
-            reader.onerror = function (error) {
-                console.log('Error: ', error);
-            };
-        }
-
-        function uploadImage(e) {
-            console.log(event.target.files[0])
-            var imageUrl = URL.createObjectURL(event.target.files[0]);
-            var elem = document.getElementById("imagePreviewHolder")
-            elem.setAttribute("src", imageUrl)
-            convertImgToBase64(event.target.files[0], function (base64) {
-                imageData = base64;
+        $(document).ready(function () {
+            $("#imageInput").change(function () {
+                if (this.files && this.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('.img-fluid').attr('src', e.target.result);
+                    }
+                    reader.readAsDataURL(this.files[0]);
+                }
             });
-        }
+        });
     </script>
 
     </html>
