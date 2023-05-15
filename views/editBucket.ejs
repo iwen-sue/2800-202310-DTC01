@@ -38,9 +38,9 @@
 
             <container>
                 <% if (card.travelImg) { %>
-                    <img src="data:image/png;base64,<%= card.travelImg %>" alt="cover" class="img-fluid" style="width:100%">
+                    <img src="data:image/png;base64,<%= card.travelImg %>" alt="cover" class="img-fluid mt-5 pt-4" style="width:100%">
                 <% } else { %>
-                    <img src="https://picsum.photos/seed/<%= card._id %>/300/200" alt="cover" class="img-fluid" style="width:100%">
+                    <img src="https://picsum.photos/seed/<%= card._id %>/300/200" alt="cover" class="img-fluid mt-5 pt-4" style="width:100%">
                 <% } %>
 
                 <div class="container">
