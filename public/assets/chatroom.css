@@ -1,0 +1,96 @@
+#chatBackGround {
+    background-color: rgba(233, 148, 169, 0.25);
+}
+
+.chatBottomBox {
+    position: fixed;
+    bottom:0px;
+    left:0;
+    right:0;
+    height:45px;
+    background-color: var(--backgroundWhite);
+    box-shadow: 2px 2px 20px 2px rgba(0,0,0,.15);
+}
+
+.chatBottomBox{
+    display: flex;
+    align-items: center;
+}
+
+.chatIconButton{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: var(--blush);
+}
+
+.chatInput {
+    height:30px;
+    border-radius: 8px;
+    border:1px solid var(--lightTheme) !important;
+}
+
+.chatInput:focus{
+    outline: 1px solid rgba(167, 45, 139, 0.6) !important;
+}
+
+.chatMessage {
+    height:70px;
+    display: flex;
+    align-items: center;
+}
+
+
+.chatMessageBoxOne{
+    margin-right:5px;
+    width:50px;
+    height:50px;
+    display: inline-block;
+}
+
+.chatMessageBoxTwo{
+    position:relative;
+    height:70px;
+    flex:1;
+    background-color: unset;
+    display: inline-block;
+}
+
+.chatMessageHeader{
+    position:absolute;
+    top:12px;
+}
+
+.chatMessageText{
+    position:absolute;
+    top:35px;
+}
+
+.messageImage {
+    width:50px;
+    height:50px;
+    background-color: var(--backgroundWhite);
+    border-radius: 50%;
+    border: 1px solid #34495e;
+}
+
+.messagerName {
+    color:black;
+    font-weight:bold;
+}
+
+.chatMessageText {
+    font-size: 17px;
+    color:black;
+}
+
+.chatNotification{
+    margin-top:5px;
+    text-align: center;
+}
+
+
+#chatRoomView::-webkit-scrollbar {
+    display:none
+}

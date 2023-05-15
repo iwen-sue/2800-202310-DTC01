@@ -48,6 +48,12 @@ html, body {
     /* padding-top:50px; */
 }
 
+input:focus {
+    box-shadow: 0px 0px 2px 2px var(--lightTheme);
+    outline: 1px solid rgba(167, 45, 139, 0.6);
+    border-radius: 8px;
+  }
+
 /* common css style end here */
 /* index page styles */
 body.theme {
