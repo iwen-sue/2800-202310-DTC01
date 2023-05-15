@@ -125,6 +125,18 @@ app.get('/home', sessionValidation, (req, res) => {
     res.render("home");
 });
 
+app.get('/chatroom', sessionValidation, async (req, res) => {
+    const query = usersModel.findOne({
+        email: req.session.email,
+    });
+    query.then((docs) => {
+        res.render("chatroom", { user: docs });
+
+    }).catch((err) => {
+        console.error(err);
+    });
+});
+
 app.get('/userprofile', sessionValidation, async (req, res) => {
     const query = usersModel.findOne({
         email: req.session.email,
