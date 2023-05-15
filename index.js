@@ -195,7 +195,12 @@ app.get('/signup', (req, res) => {
 });
 
 app.get('/login', (req, res) => {
-    res.render("login");
+    if (req.query.groupToken !== null) {
+        res.render("login", { groupToken: req.query.groupToken });
+    }
+    else {
+        res.render("login", { groupToken: null });
+    }
 });
 
 app.get('/forgotPassword', (req, res) => {
@@ -268,6 +273,7 @@ app.post('/signup', async (req, res) => {
 app.post('/login', async (req, res) => {
     var password = req.body.password;
     var email = req.body.email;
+    const groupToken = req.body.groupToken;
 
     const schema = Joi.string().max(30).required();
     const validationResult = schema.validate(email);
@@ -276,7 +282,7 @@ app.post('/login', async (req, res) => {
         return res.render("login", { error: error, errorType: 'InvalidEmailFormat' });
     }
 
-    const result = await usersModel.find({ email: email }).select('email type firstName lastName password _id').exec();
+    const result = await usersModel.find({ email: email }).select('email type firstName lastName password profilePic _id').exec();
 
     if (result.length == 0) {
         var error = "User is not found";
@@ -292,7 +298,19 @@ app.post('/login', async (req, res) => {
         req.session.email = result[0].email;
         // req.session.bucketlist = result[0].bucketlist[0];
         req.session.cookie.maxAge = 2147483647;
-
+        if (groupToken !== null) {
+            await groupsModel.updateOne({ _id: groupToken }, { $push: { members:                 
+                {                
+                    email: result[0].email,
+                    type: 'leader',
+                    firstName: result[0].firstName,
+                    lastName: result[0].lastName,
+                    profilePic: result[0].profilePic
+                }            
+            } 
+            }).exec();
+            await usersModel.updateOne({ email: result[0].email }, { $set: { groupID: groupToken, type: 'member' } }).exec();
+        }
         res.redirect('/home');
     }
     else {
@@ -397,9 +415,18 @@ app.post('/groupconfirm', sessionValidation, async (req, res) => {
         var error = "Group name is too long. Please enter a group name that is 20 characters or less.";
         return res.render("creategroup", { error: error });
     }
+    const currentUser = await usersModel.findOne({ email: req.session.email }).exec();
     const newGroup = new groupsModel({
         groupName: groupName,
-        members: [req.session.email]
+        members: [
+            {            
+                email: currentUser.email,
+                type: 'leader',
+                firstName: currentUser.firstName,
+                lastName: currentUser.lastName,
+                profilePic: currentUser.profilePic
+            }        
+        ]
     });
     await newGroup.save();
     const group = await groupsModel.findOne({ groupName: groupName }).exec();
@@ -410,21 +437,23 @@ app.post('/groupconfirm', sessionValidation, async (req, res) => {
 app.get('/userprofile/groupdetails', sessionValidation, async (req, res) => {
     var currentUser = await usersModel.findOne({ email: req.session.email }).exec()
     const group = await groupsModel.findOne({ _id: currentUser.groupID }).exec()
-    var allMembers = group.members
+    console.log(group.members[0].lastName)
+    try {
+        var allMembers = group.members
+        res.render("groupdetails", { user: currentUser, group: allMembers, groupName: group.groupName, groupID: group._id});
 
-    const memberNames = allMembers.map(async (member) => {
-        member = await usersModel.findOne({ email: member }).exec()
-        return member.firstName + " " + member.lastName;
-    })
-    Promise.all(memberNames).then((memberNames) => {
-        res.render("groupdetails", { user: currentUser, group: memberNames, groupName: group.groupName, groupID: group._id, confirmation: null });
-    }, (err) => {
+    } catch (err) {
         console.log(err)
-    })
+        res.redirect("/userprofile")
+    }
 });
 
 app.post('/invite', sessionValidation, async (req, res) => {
     var inviteEmail = req.body.inviteeEmail;
+    // if (inviteEmail == "rickastley@gmail.com") {
+    //     res.redirect("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+    //     return
+    // }
     const userName = req.session.firstName + " " + req.session.lastName;
     const groupToken = req.body.groupID
     const inviteMessage = {
@@ -432,8 +461,9 @@ app.post('/invite', sessionValidation, async (req, res) => {
         to: inviteEmail,
         subject: 'You have been invited to join a group on VacaPal!',
         html: `<h1>You have been invited by ${userName} to join their group on VacaPal!</h1>
-        <p>Click <a href="http://${process.env.APP_DOMAIN}/signup?groupToken=${groupToken}">here</a> to sign up and join the group!</p>`
-}
+        <p>Click <a href="http://${process.env.APP_DOMAIN}/signup?groupToken=${groupToken}">here</a> to sign up and join the group!</p>
+        <p>If you already have an account, click <a href="http://${process.env.APP_DOMAIN}/login?groupToken=${groupToken}">here</a> to join the group!</p>`
+    }
 
     transporter.sendMail(inviteMessage, (err, info) => {
         if (err) {
@@ -444,8 +474,39 @@ app.post('/invite', sessionValidation, async (req, res) => {
             console.log(info.response);
         }
     });
-    // res.redirect('/userprofile/groupdetails');
 });
+
+app.post('/removemember', sessionValidation, async (req, res) => {
+    var memberEmail = req.body.memberEmail;
+    var groupID = req.body.groupID;
+    await groupsModel.updateOne({ _id: groupID }, { $pull: { members: {email: memberEmail} } }).exec();
+    await usersModel.updateOne({ email: memberEmail }, { $set: { groupID: null, type: null } }).exec();
+    res.redirect('/userprofile/groupdetails');
+});
+
+app.post('/joingroup', sessionValidation, async (req, res) => {
+    var groupToken = req.body.groupToken;
+    var currentUser = await usersModel.findOne({email: req.session.email}).exec();
+    await groupsModel.updateOne({ _id: groupToken }, { $push: { members: 
+        {
+            email: req.session.email,
+            type: 'member',
+            firstName: currentUser.firstName,
+            lastName: currentUser.lastName,
+            profilePic: currentUser.profilePic
+        }
+    } }).exec();
+    await usersModel.updateOne({ email: req.session.email }, { $set: { groupID: groupToken, type: 'member' } }).exec();
+    res.redirect('/userprofile/groupdetails');
+});
+
+app.post('/leavegroup', sessionValidation, async (req, res) => {
+    var groupToken = req.body.groupID;
+    await groupsModel.updateOne({ _id: groupToken }, { $pull: { members: req.session.email } }).exec();
+    await usersModel.updateOne({ email: req.session.email }, { $set: { groupID: null, type: null } }).exec();
+    res.redirect('/userprofile');
+});
+
 //static images address
 app.use(express.static(__dirname + "/public"));
 // handle 404 - page not found
