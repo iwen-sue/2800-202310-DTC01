@@ -41,35 +41,33 @@
     align-items: center;
 }
 
-.chatMessage div {
+
+.chatMessageBoxOne{
+    margin-right:5px;
+    width:50px;
+    height:50px;
     display: inline-block;
 }
 
-.chatMessage div:nth-child(1){
-    margin-right:5px;
-}
-
-.chatMessage div:nth-child(2){
+.chatMessageBoxTwo{
     position:relative;
     height:70px;
+    flex:1;
     background-color: unset;
+    display: inline-block;
 }
 
-.chatMessage div p:nth-child(1){
+.chatMessageHeader{
     position:absolute;
     top:12px;
 }
 
-.chatMessage div p:nth-child(2){
+.chatMessageText{
     position:absolute;
     top:35px;
 }
 
-.chatMessage div p span{
-    display:inline-block;
-}
-
-.chatMessage div img {
+.messageImage {
     width:50px;
     height:50px;
     background-color: var(--backgroundWhite);
@@ -77,12 +75,12 @@
     border: 1px solid #34495e;
 }
 
-.chatMessage div p .messagerName {
+.messagerName {
     color:black;
     font-weight:bold;
 }
 
-.chatMessage div p .chatMessageText {
+.chatMessageText {
     font-size: 17px;
     color:black;
 }
@@ -90,4 +88,9 @@
 .chatNotification{
     margin-top:5px;
     text-align: center;
+}
+
+
+#chatRoomView::-webkit-scrollbar {
+    display:none
 }

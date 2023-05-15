@@ -27,6 +27,8 @@ const port = process.env.PORT || 3000;
 
 // socket.io dependencies
 const server = require('http').Server(app);
+const socketio = require('socket.io');
+const io = socketio(server)
 
 const Joi = require("joi");
 const { ConnectionClosedEvent } = require("mongodb");
@@ -111,7 +113,6 @@ function adminAuthorization(req, res, next) {
 // middleware function finishes
 
 app.use('/', (req, res, next) => {  // for local variables
-    console.log("req.session: " + JSON.stringify(req.session));
     next();
 });
 
@@ -135,7 +136,19 @@ app.get('/chatroom', sessionValidation, async (req, res) => {
         email: req.session.email,
     });
     query.then((docs) => {
-        res.render("chatroom", { user: docs });
+        var docs = docs
+        const groupQuery = groupsModel.findOne({
+            _id: docs.groupID
+        })
+        groupQuery.then((groupInfo) =>{
+            let userObj = new Object();
+            userObj.name = docs.firstName + ' ' + docs.lastName;
+            if(docs.profilePic){
+                userObj.profilePic = docs.profilePic
+            }
+            res.render("chatroom", { group: groupInfo, user: userObj });
+        })
+        
 
     }).catch((err) => {
         console.error(err);
@@ -304,7 +317,6 @@ app.post('/login', async (req, res) => {
         console.log("password is correct");
         req.session.authenticated = true;
         req.session.lastName = result[0].lastName;
-        console.log("req.session.lastName: " + req.session.lastName)
         req.session.firstName = result[0].firstName;
         req.session.password = result[0].password;
         req.session.email = result[0].email;
@@ -471,6 +483,26 @@ app.use(express.static(__dirname + "/public"));
 app.get("*", (req, res) => {
     res.status(404);
     res.render("404");
+})
+
+// socketio part starts
+io.on('connection', socket => {
+    console.log('new ws connection...')
+
+    //broadcast when a user connect, to everyone except the client connecting
+    //notify who enters the chatroom and who leaves the chatroom
+    socket.broadcast.emit('message', 'A user has joined the chat');
+
+    //notify the user disconnects
+    socket.on('disconnect', ()=>{
+        io.emit('message', 'A user has left the chat');
+    });
+
+    //listen for chat message
+    socket.on('chatMessage', (msg)=>{
+        //emit to everyone
+        io.emit('chatMessage', msg);
+    })
 })
 
 
