@@ -12,11 +12,6 @@ function closeNav() {
     document.getElementById("mySidenav").style.width = "0";
 }
 
-function setup() {
-    console.log("setup!");
-    
-    // for navs
-    
+function back() {
+    window.history.back();
 }
-
-$(document).ready(setup);
