@@ -17,32 +17,84 @@
         <h2>Members</h2>
         <ul>
             <% for(var i = 0; i < group.length; i++) { %>
-                <li><%- group[i] %></li>
+                <% if (group[i].firstName + " " + group[i].lastName == user.firstName + " " + user.lastName) { %>
+                    <li><%- group[i].firstName + " " + group[i].lastName %> (You)</li>
+                <% } else { %>
+                    <li><%- group[i].firstName + " " + group[i].lastName %> 
+                        <% if (user.type == "leader") { %>
+                            <button class="btn btn-danger removeMember" id="<%- group[i].email %>" memberName='<%- group[i].firstName + " " + group[i].lastName %>'data-toggle="modal" data-target="#removeMemberModal">Remove</button></li>
+                        <% } %>
+                <% } %>
             <% } %>
         </ul>
-        <button class="btn btn-primary" data-toggle="modal" data-target="#addMemberModal">Add Member</button>
-        <button class="btn btn-secondary">Remove Member</button>
-    </div>
-    <div class="modal" id="addMemberModal"tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <form class="modal-content" action="/invite" method="post">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add a Member to <%- groupName %></h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+        <% if (user.type == "leader") { %>
+            <button class="btn btn-primary" data-toggle="modal" data-target="#addMemberModal">Add Member</button>
+            <!-- <button class="btn btn-secondary" data-toggle="modal" data-target="#kickMemberModal">Remove Member</button> -->
+            <div class="modal fade" id="addMemberModal"tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <form class="modal-content" action="/invite" method="post">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Add a Member to <%- groupName %></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Enter invitee's email:</p>
+                            <input type="text" name="inviteeEmail" id="inviteeEmail">
+                            <input type="hidden" name="groupID" value="<%- groupID %>">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" id="inviteBtn" class="btn btn-primary" >Send Invite</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        </div>
+                    </form>
                 </div>
-                <div class="modal-body">
-                    <p>Enter invitee's email:</p>
-                    <input type="text" name="inviteeEmail" id="inviteeEmail">
-                    <input type="hidden" name="groupID" value="<%- groupID %>">
+            </div>
+            <div class="modal" id="removeMemberModal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <form class="modal-content" action="/removemember" method="post">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modal-title-remove">Title</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body" id="modal-body-remove">
+                        </div>
+                        <div class="modal-footer">
+                            <input type="hidden" name="groupID" value="<%- groupID %>">
+                            <button type="submit" id="removeMember" class="btn btn-primary">Remove Member</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        </div>
+                    </form>
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" id="inviteBtn" class="btn btn-primary" >Send Invite</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        <% } else { %>
+            <button class="btn btn-primary" data-toggle="modal" data-target="#leaveGroupModal">Leave Group</button>
+            <div class="modal" id="leaveGroupModal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <form class="modal-content" action="/leavegroup" method="post">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Are you sure you want to leave <%- groupName %>?</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <p>You'll lose access to the group's itinerary plan, chatroom history, and expense tracker!</p>
+                            <input type="hidden" name="groupID" value="<%- groupID %>">                            
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" id="leaveGroup" class="btn btn-primary">Leave Group</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        </div>
+                    </form>
                 </div>
-            </form>
-        </div>
+            </div>
+
+        <% } %>
+
     </div>
     <%- include('templates/bottomNav') %>
 </body>

@@ -47,6 +47,9 @@
                     <div class="form-floating">
                         <input type="password" class="form-control" id="password" name="password" placeholder="">
                         <label for="password">Password</label>
+                        <% if (groupToken != null) {%>
+                            <input type="hidden" name="groupToken" id="groupToken" value="<%- groupToken %>">
+                        <% } %>
                     </div>
                     <br>
                     <button class="btn btn-block loginBtn" type="submit" value="login">Sign in</button>
