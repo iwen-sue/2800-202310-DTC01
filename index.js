@@ -10,6 +10,7 @@ const groupsModel = require('./models/group.js');
 const ejs = require('ejs');
 const crypto = require('crypto');
 
+
 const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
     service: 'hotmail',
@@ -22,6 +23,10 @@ const transporter = nodemailer.createTransport({
 const app = express();
 
 const port = process.env.PORT || 3000;
+
+
+// socket.io dependencies
+const server = require('http').Server(app);
 
 const Joi = require("joi");
 const { ConnectionClosedEvent } = require("mongodb");
@@ -162,6 +167,7 @@ app.post('/editBucket', editBucket)
 // const memoryStorage = multer.memoryStorage(); // store the file in memory as a buffer
 // const upload = multer({ storage: memoryStorage }); // specify the storage option
 const editProfile = require('./editProfile.js');
+const { Server } = require("net");
 app.post('/editProfile', editProfile);
 
 app.get('/editBucket', (req, res) => {
@@ -468,6 +474,6 @@ app.get("*", (req, res) => {
 })
 
 
-app.listen(port, () => {
+server.listen(port, () => {
     console.log("Node application listening on port " + port);
 });

@@ -37,7 +37,6 @@
 
 .chatMessage {
     height:70px;
-    padding-top: 10px;
     display: flex;
     align-items: center;
 }
@@ -47,12 +46,27 @@
 }
 
 .chatMessage div:nth-child(1){
-    margin-right:8px;
+    margin-right:5px;
 }
 
-.chatMessage div span{
+.chatMessage div:nth-child(2){
+    position:relative;
+    height:70px;
+    background-color: unset;
+}
+
+.chatMessage div p:nth-child(1){
+    position:absolute;
+    top:12px;
+}
+
+.chatMessage div p:nth-child(2){
+    position:absolute;
+    top:35px;
+}
+
+.chatMessage div p span{
     display:inline-block;
-    line-height: 25px;
 }
 
 .chatMessage div img {
@@ -63,7 +77,17 @@
     border: 1px solid #34495e;
 }
 
-.chatMessage div .messagerName {
+.chatMessage div p .messagerName {
     color:black;
     font-weight:bold;
+}
+
+.chatMessage div p .chatMessageText {
+    font-size: 17px;
+    color:black;
+}
+
+.chatNotification{
+    margin-top:5px;
+    text-align: center;
 }
