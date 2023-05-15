@@ -326,9 +326,8 @@ app.post('/login', async (req, res) => {
         req.session.firstName = result[0].firstName;
         req.session.password = result[0].password;
         req.session.email = result[0].email;
-        // req.session.bucketlist = result[0].bucketlist[0];
         req.session.cookie.maxAge = 2147483647;
-        if (groupToken !== null) {
+        if (groupToken != null) {
             await groupsModel.updateOne({ _id: groupToken }, { $push: { members:                 
                 {                
                     email: result[0].email,
@@ -467,7 +466,6 @@ app.post('/groupconfirm', sessionValidation, async (req, res) => {
 app.get('/userprofile/groupdetails', sessionValidation, async (req, res) => {
     var currentUser = await usersModel.findOne({ email: req.session.email }).exec()
     const group = await groupsModel.findOne({ _id: currentUser.groupID }).exec()
-    console.log(group.members[0].lastName)
     try {
         var allMembers = group.members
         res.render("groupdetails", { user: currentUser, group: allMembers, groupName: group.groupName, groupID: group._id});
@@ -492,7 +490,10 @@ app.post('/invite', sessionValidation, async (req, res) => {
         subject: 'You have been invited to join a group on VacaPal!',
         html: `<h1>You have been invited by ${userName} to join their group on VacaPal!</h1>
         <p>Click <a href="http://${process.env.APP_DOMAIN}/signup?groupToken=${groupToken}">here</a> to sign up and join the group!</p>
-        <p>If you already have an account, click <a href="http://${process.env.APP_DOMAIN}/login?groupToken=${groupToken}">here</a> to join the group!</p>`
+        <p>If you already have an account, click <a href="http://${process.env.APP_DOMAIN}/login?groupToken=${groupToken}">here</a> to log in and join the group!</p>
+        <p>Or, enter this token in your profile after clicking "Join Group": <b>${groupToken}</b></p>
+        <p>Thank you for using VacaPal!</p>
+        `
     }
 
     transporter.sendMail(inviteMessage, (err, info) => {
