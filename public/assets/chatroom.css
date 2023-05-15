@@ -1,0 +1,69 @@
+#chatBackGround {
+    background-color: rgba(233, 148, 169, 0.25);
+}
+
+.chatBottomBox {
+    position: fixed;
+    bottom:0px;
+    left:0;
+    right:0;
+    height:45px;
+    background-color: var(--backgroundWhite);
+    box-shadow: 2px 2px 20px 2px rgba(0,0,0,.15);
+}
+
+.chatBottomBox{
+    display: flex;
+    align-items: center;
+}
+
+.chatIconButton{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: var(--blush);
+}
+
+.chatInput {
+    height:30px;
+    border-radius: 8px;
+    border:1px solid var(--lightTheme) !important;
+}
+
+.chatInput:focus{
+    outline: 1px solid rgba(167, 45, 139, 0.6) !important;
+}
+
+.chatMessage {
+    height:70px;
+    padding-top: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.chatMessage div {
+    display: inline-block;
+}
+
+.chatMessage div:nth-child(1){
+    margin-right:8px;
+}
+
+.chatMessage div span{
+    display:inline-block;
+    line-height: 25px;
+}
+
+.chatMessage div img {
+    width:50px;
+    height:50px;
+    background-color: var(--backgroundWhite);
+    border-radius: 50%;
+    border: 1px solid #34495e;
+}
+
+.chatMessage div .messagerName {
+    color:black;
+    font-weight:bold;
+}
