@@ -10,6 +10,7 @@ const groupsModel = require('./models/group.js');
 const ejs = require('ejs');
 const crypto = require('crypto');
 
+
 const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
     service: 'hotmail',
@@ -22,6 +23,12 @@ const transporter = nodemailer.createTransport({
 const app = express();
 
 const port = process.env.PORT || 3000;
+
+
+// socket.io dependencies
+const server = require('http').Server(app);
+const socketio = require('socket.io');
+const io = socketio(server)
 
 const Joi = require("joi");
 const { ConnectionClosedEvent } = require("mongodb");
@@ -106,7 +113,6 @@ function adminAuthorization(req, res, next) {
 // middleware function finishes
 
 app.use('/', (req, res, next) => {  // for local variables
-    console.log("req.session: " + JSON.stringify(req.session));
     next();
 });
 
@@ -123,6 +129,30 @@ app.get('/', (req, res) => {
 
 app.get('/home', sessionValidation, (req, res) => {
     res.render("home");
+});
+
+app.get('/chatroom', sessionValidation, async (req, res) => {
+    const query = usersModel.findOne({
+        email: req.session.email,
+    });
+    query.then((docs) => {
+        var docs = docs
+        const groupQuery = groupsModel.findOne({
+            _id: docs.groupID
+        })
+        groupQuery.then((groupInfo) =>{
+            let userObj = new Object();
+            userObj.name = docs.firstName + ' ' + docs.lastName;
+            if(docs.profilePic){
+                userObj.profilePic = docs.profilePic
+            }
+            res.render("chatroom", { group: groupInfo, user: userObj });
+        })
+        
+
+    }).catch((err) => {
+        console.error(err);
+    });
 });
 
 app.get('/userprofile', sessionValidation, async (req, res) => {
@@ -150,6 +180,7 @@ app.post('/editBucket', editBucket)
 // const memoryStorage = multer.memoryStorage(); // store the file in memory as a buffer
 // const upload = multer({ storage: memoryStorage }); // specify the storage option
 const editProfile = require('./editProfile.js');
+const { Server } = require("net");
 app.post('/editProfile', editProfile);
 
 app.get('/editBucket', (req, res) => {
@@ -292,7 +323,6 @@ app.post('/login', async (req, res) => {
         console.log("password is correct");
         req.session.authenticated = true;
         req.session.lastName = result[0].lastName;
-        console.log("req.session.lastName: " + req.session.lastName)
         req.session.firstName = result[0].firstName;
         req.session.password = result[0].password;
         req.session.email = result[0].email;
@@ -516,7 +546,27 @@ app.get("*", (req, res) => {
     res.render("404");
 })
 
+// socketio part starts
+io.on('connection', socket => {
+    console.log('new ws connection...')
 
-app.listen(port, () => {
+    //broadcast when a user connect, to everyone except the client connecting
+    //notify who enters the chatroom and who leaves the chatroom
+    socket.broadcast.emit('message', 'A user has joined the chat');
+
+    //notify the user disconnects
+    socket.on('disconnect', ()=>{
+        io.emit('message', 'A user has left the chat');
+    });
+
+    //listen for chat message
+    socket.on('chatMessage', (msg)=>{
+        //emit to everyone
+        io.emit('chatMessage', msg);
+    })
+})
+
+
+server.listen(port, () => {
     console.log("Node application listening on port " + port);
 });
