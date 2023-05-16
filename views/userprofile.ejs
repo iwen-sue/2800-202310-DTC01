@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="/assets/common.css" />
     <link rel="stylesheet" href="/assets/userProfile.css" />
     <link rel="stylesheet" href="/assets/bucketlist.css" />
+    <script src="/scripts/easteregg.js" defer></script>
+    <link rel="stylesheet" href="/assets/easteregg.css">
     <!-- cite css or js files here -->
     </head>
 
@@ -159,7 +161,9 @@
                     </form>
                 </div>
             </div>
-            
+            <button id="easterEggBtn">Click me!</button>
+            <div class="easterEgg"></div>
+
             <%- include("templates/bucketlist", { bucketlist: user.bucketlist}) %>
             
             <%- include("templates/bottomNav") %>
