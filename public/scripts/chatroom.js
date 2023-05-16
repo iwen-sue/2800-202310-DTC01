@@ -17,7 +17,7 @@ function setup() {
     elem.setAttribute("style", `height:${viewHeight}px`);
     const msgBtn = document.getElementById("msgBtn");
 
-
+    socket.emit('joinRoom', { userName, groupID });
 
 
     socket.emit('chatHistory', groupID);
@@ -25,21 +25,10 @@ function setup() {
     msgBtn.addEventListener('click', (e) => {
         const msg = $("#msg").val()
 
-        var today = new Date();
-        var timeStp =
-            today.getFullYear() +
-            '/' +
-            (today.getMonth() + 1) +
-            '/' +
-            today.getDate() +
-            ' ' +
-            today.getHours() +
-            ':' +
-            today.getMinutes();
-
+        var timeStp = new Date();
         console.log("timeStp: ", timeStp);
         //emit message to server
-        socket.emit('chatMessage', { msg, groupID, userID, userName, timeStp });
+        socket.emit('chatMessage', { msg, groupID, userID, userName, timeStp, profilePic });
 
 
     })
@@ -52,26 +41,50 @@ function sendNotification(message) {
     document.getElementById("chatRoomView").append(elem)
 }
 
-// function getTime() {
-//     var today = new Date();
-//     return today.getFullYear() + '/' + (Number(today.getMonth()) + 1) + '/' + today.getDate() + ' ' + today.getHours() + ":" + today.getMinutes();
-// }
+function getTime(today) {
+    return today.getFullYear() + '/' + (Number(today.getMonth()) + 1) + '/' + today.getDate() + ' ' + today.getHours() + ":" + today.getMinutes();
+}
+
+function arrayBufferToBase64(buffer) {
+    var binary = '';
+    var bytes = new Uint8Array(buffer);
+    var len = bytes.byteLength;
+    for (var i = 0; i < len; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return window.btoa(binary);
+}
 
 
-function insertMessage(msg, userName, time) {
+function insertMessage(msg, userName, time, userImg) {
+    console.log(userImg)
+    // const blob = new Blob([userImg]);
+    // const dataURL = URL.createObjectURL(blob);
+    // const binary = String.fromCharCode.apply(null, new Uint8Array(userImg));
+    // const base64 = btoa(binary);
+    // userImg = arrayBufferToBase64(userImg)
+    // const blob = new Blob([userImg]);
+    // const url = URL.createObjectURL(blob);
+
+
+
+
+
+    const dateInfo = new Date(time);
     var messageElem = document.getElementsByClassName('chatMessageBox')[0];
 
     var messageCard = messageElem.content.cloneNode(true);
-    if (profilePic) {
-        messageCard.querySelector('.messageImage').setAttribute("src", profilePic);
+    if (userImg) {
+        messageCard.querySelector('.messageImage').setAttribute("src", "data:image/png;base64," + userImg);
+        // messageCard.querySelector('.messageImage').setAttribute("src", dataURL)
     }
 
 
     messageCard.querySelector('.messagerName').innerHTML = userName;
-    messageCard.querySelector('.messagerTime').innerHTML = time;
+    messageCard.querySelector('.messagerTime').innerHTML = getTime(dateInfo);
     messageCard.querySelector('.chatMessageText').innerHTML = msg;
-    document.getElementById("chatRoomView").append(messageCard)
-    
+    document.getElementById("chatRoomView").append(messageCard);
+
 }
 
 function retrieveChatHistory(messageHistory) {
@@ -81,12 +94,9 @@ function retrieveChatHistory(messageHistory) {
         console.log(message); // Check each individual message object
 
         // Use the correct property name 'message'
-        const { message: msg, userName, timeStamp } = message;
-        console.log(msg); // Check the 'message' property
-        console.log(userName); // Check the 'userName' property
-        console.log(timeStamp); // Check the 'timeStp' property
+        const { message: msg, userName, timeStamp, profilePic } = message;
 
-        insertMessage(msg, userName, timeStamp);
+        insertMessage(msg, userName, timeStamp, profilePic);
     });
 }
 
@@ -106,9 +116,9 @@ socket.on('message', message => {
 })
 
 // show chat history
-socket.on('chatMessage', ({ userName, msg, timeStp }) => {
+socket.on('chatMessage', ({ userName, msg, timeStp, userImg }) => {
     // console.log(chatMessage);
-    insertMessage(msg, userName, timeStp);
+    insertMessage(msg, userName, timeStp, userImg);
 
 });
 

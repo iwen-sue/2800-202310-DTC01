@@ -558,12 +558,16 @@ app.get("*", (req, res) => {
 
 // socketio part starts
 io.on('connection', socket => {
-    console.log('new ws connection...')
+    socket.on('joinedRoom', ({username, groupID})=>{
+        socket.join(groupID);
 
-    //broadcast when a user connect, to everyone except the client connecting
+        //broadcast when a user connect, to everyone except the client connecting
     //notify who enters the chatroom and who leaves the chatroom
-    socket.broadcast.emit('message', 'A user has joined the chat');
+    socket.broadcast.to(groupID).emit('message', username + 'has joined the chat');
 
+    })
+
+    
     //notify the user disconnects
     socket.on('disconnect', () => {
         io.emit('message', "A user has left the chat");
@@ -573,30 +577,28 @@ io.on('connection', socket => {
     socket.on('chatHistory', async (groupID) => {
         //save message to database
         messageHistory = await showChatHistory(groupID);
-        console.log(messageHistory)
-        //emit to everyone
-        io.emit('chatHistory', messageHistory);
+        //emit to the single user
+        socket.emit('chatHistory', messageHistory);
     });
 
     //listen for chat message
-    socket.on('chatMessage', ({msg, groupID, userID, userName, timeStp}) => {
+    socket.on('chatMessage', ({msg, groupID, userID, userName, timeStp, profilePic}) => {
 
         //save message to database
-        saveMessage(msg, groupID, userID, userName, timeStp);
-        io.emit('chatMessage', {userName, msg, timeStp});
+        saveMessage(msg, groupID, userID, userName, timeStp, profilePic);
+        io.emit('chatMessage', {userName, msg, timeStp, profilePic});
 
     })
 })
 
-async function saveMessage(message, groupID, userID, userName, time) {
-    var messageObj = { message: message, userID: userID, userName: userName, timeStamp: time };
+async function saveMessage(message, groupID, userID, userName, time, profilePic) {
+    var messageObj = { message: message, userID: userID, userName: userName, timeStamp: time, userImg: profilePic };
     try {
         const group = await groupsModel.findOne({ _id: groupID });
 
         if (group) {
             group.messages.push(messageObj);
             await group.save();
-            console.log(group.messages)
             return group.messages;
         }
     } catch (error) {
@@ -608,8 +610,9 @@ async function showChatHistory(groupID) {
     try {
         const group = await groupsModel.findOne({ _id: groupID });
         if (group) {
-            console.log(group.messages)
-            return group.messages;
+            const modifyMessages = group.messages
+              
+            return modifyMessages;
         }
     } catch (error) {
         console.log(error);
