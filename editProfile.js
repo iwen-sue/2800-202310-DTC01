@@ -2,6 +2,7 @@ require("./utils.js");
 const express = require('express');
 // const session = require('express-session');
 const usersModel = require('./models/user.js');
+const groupsModel = require('./models/group.js');
 const router = express.Router();
 
 const multer = require('multer');  // npm install multer
@@ -19,6 +20,8 @@ router.post('/editProfile', upload.single('avatar'), async (req, res) => {
     const result = await usersModel.findOne({
         email: req.session.email,
     });
+    var imageBase = req.file? req.file.buffer.toString('base64'): undefined
+    
 
     const update = {
         $set: {
@@ -29,6 +32,8 @@ router.post('/editProfile', upload.single('avatar'), async (req, res) => {
             homeCity: homeCity
         }
     }
+
+    
 
     if (result) {
 
@@ -43,6 +48,18 @@ router.post('/editProfile', upload.single('avatar'), async (req, res) => {
             });
 
             query.then((docs) => {
+                if(docs.groupID){
+
+                     groupsModel.updateMany(
+                        {_id: docs.groupID },
+                        { $set: { 
+                            "members.$[element].profilePic": imageBase,
+                            "members.$[element].firstName": firstName,
+                            "members.$[element].lastName": lastName
+                         } },
+                        { arrayFilters: [{ "element.email": email }] }
+                        );
+                }
                 res.status(200);
                 res.json(docs)
                 res.end()

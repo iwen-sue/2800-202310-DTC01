@@ -30,7 +30,7 @@ function sendNotification(message){
 
 function getTime(){
     var today = new Date();
-    return today.getFullYear() + '/' + today.getMonth()+1 + '/' + today.getDate() + ' ' + today.getHours() + ":" + today.getMinutes();
+    return today.getFullYear() + '/' + Number(today.getMonth())+1 + '/' + today.getDate() + ' ' + today.getHours() + ":" + today.getMinutes();
 }
 
 //catch messages sent from backend and send it as notification in group chat
