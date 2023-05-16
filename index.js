@@ -279,7 +279,12 @@ app.post('/signup', async (req, res) => {
         var userType
         if (req.body.groupToken != null) {
             userType = 'member'
-            await groupsModel.updateOne({ _id: req.body.groupToken }, { $push: { members: req.body.email } }).exec();
+            await groupsModel.updateOne({ _id: req.body.groupToken }, { $push: { members: {
+                email: req.body.email,
+                type: 'member',
+                firstName: req.body.firstName,
+                lastName: req.body.lastName
+            } } }).exec();
         }
         const user = new usersModel({
             firstName: req.body.firstName,
