@@ -63,7 +63,7 @@ $(document).ready(function() {
         </ul>
 
         <audio id="music" autoplay="autoplay"
-            src="./Tom_Jones_-_Its_Not_Unusual_[NaijaGreen.Com]_.mp3">
+            src="/assets/Tom_Jones_-_Its_Not_Unusual_[NaijaGreen.Com]_.mp3">
         </audio>
         <script>
             var music = document.getElementById("music");
