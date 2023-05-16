@@ -45,12 +45,20 @@ function sendNotification(message) {
 
 function getTime(today){
     var month = Number(today.getMonth())+1;
-    if(month>9){
-        month = '0' + String(month)
-    }else{
-        month = String(month)
+    var mins = Number(today.getMinutes())
+    month = organiseTime(month)
+    mins = organiseTime(mins)
+
+    function organiseTime(num){
+        if(num<10){
+            num = '0' + String(num)
+        }else{
+            num = String(num)
+        }
+        return num
     }
-    return today.getFullYear() + '/' + month + '/' + today.getDate() + ' ' + today.getHours() + ":" + today.getMinutes();
+    
+    return today.getFullYear() + '/' + month + '/' + today.getDate() + ' ' + today.getHours() + ":" + mins;
 }
 
 function arrayBufferToBase64(buffer) {
