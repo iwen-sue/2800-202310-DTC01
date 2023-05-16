@@ -2,6 +2,7 @@ require("./utils.js");
 const express = require('express');
 // const session = require('express-session');
 const usersModel = require('./models/user.js');
+const groupsModel = require('./models/group.js');
 const router = express.Router();
 
 const multer = require('multer');  // npm install multer
@@ -14,6 +15,8 @@ router.post('/editProfile', upload.single('avatar'), async (req, res) => {
     var homeCity = req.body.homeCity;
     var email = req.body.email;
     console.log(req.file)
+
+    var imageBase = req.file? req.file.buffer.toString('base64'): undefined;
 
 
     const result = await usersModel.findOne({
@@ -43,6 +46,35 @@ router.post('/editProfile', upload.single('avatar'), async (req, res) => {
             });
 
             query.then((docs) => {
+                if(docs.groupID){
+
+
+                    groupsModel.findOne({ _id: docs.groupID }).then(group => {
+                        const filteredMembers = group.members.filter(member => {
+                          if (member.email === email) {
+                            member.profilePic = imageBase;
+                            member.firstName = firstName;
+                            member.lastName = lastName;
+                            return true; // Keep the object in the filtered array
+                          }
+                          return false; // Exclude the object from the filtered array
+                        });
+                      
+                        group.members = filteredMembers;
+                        return group.save(); // Call .save() on the document itself
+                      }).then(savedGroup => {
+                        // The group has been saved successfully
+                        console.log("Group saved:", savedGroup);
+                      }).catch(error => {
+                        // An error occurred
+                        console.error("Error saving group:", error);
+                      });
+
+                        
+                    
+                    
+
+               }
                 res.status(200);
                 res.json(docs)
                 res.end()
