@@ -125,3 +125,7 @@ div#landingPage {
     font-size: 18px;
     line-height: 20px;
 }
+
+.topnav{
+    z-index: 111111111;
+}
