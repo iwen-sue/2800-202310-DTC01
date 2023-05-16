@@ -38,7 +38,6 @@
 .chatMessage {
     height:70px;
     display: flex;
-    align-items: center;
 }
 
 
@@ -59,12 +58,14 @@
 
 .chatMessageHeader{
     position:absolute;
-    top:12px;
+    top:7px;
 }
 
 .chatMessageText{
     position:absolute;
-    top:35px;
+    top:28px;
+    word-wrap: break-word;
+    width:100%;
 }
 
 .messageImage {
@@ -93,4 +94,9 @@
 
 #chatRoomView::-webkit-scrollbar {
     display:none
+}
+
+#chatRoomView .chatMessage:last-child {
+    margin-bottom: 60px;
+    height: 120px;
 }

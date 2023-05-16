@@ -15,8 +15,17 @@ function setup(){
     msgBtn.addEventListener('click', (e)=>{
         const msg = $("#msg").val()
 
-        //emit message to server
-        socket.emit('chatMessage', msg);
+        //emit message object {username, image, message} to server
+        var messageObj = new Object();
+        messageObj.username = userName;
+        messageObj.image = profilePic;
+        messageObj.message = msg
+        socket.emit('chatMessage', messageObj);
+
+        //clear input after sent
+        const inputElement = document.getElementById('msg');
+        inputElement.value = '';
+        inputElement.focus();
 
     })
 }
@@ -30,7 +39,13 @@ function sendNotification(message){
 
 function getTime(){
     var today = new Date();
-    return today.getFullYear() + '/' + Number(today.getMonth())+1 + '/' + today.getDate() + ' ' + today.getHours() + ":" + today.getMinutes();
+    var month = Number(today.getMonth())+1;
+    if(month>9){
+        month = '0' + String(month)
+    }else{
+        month = String(month)
+    }
+    return today.getFullYear() + '/' + month + '/' + today.getDate() + ' ' + today.getHours() + ":" + today.getMinutes();
 }
 
 //catch messages sent from backend and send it as notification in group chat
@@ -39,20 +54,24 @@ socket.on('message',message=>{
 })
 
 socket.on('chatMessage',chatMessage=>{
-    // console.log(chatMessage);
+    // chat message object {username, image, message}
 
     var messageElem = document.getElementsByClassName('chatMessageBox')[0];
 
     var messageCard = messageElem.content.cloneNode(true);
     if(profilePic){
-        messageCard.querySelector('.messageImage').setAttribute("src", profilePic);
+        messageCard.querySelector('.messageImage').setAttribute("src", chatMessage.image);
     }
     
-    messageCard.querySelector('.messagerName').innerHTML = userName;
+    messageCard.querySelector('.messagerName').innerHTML = chatMessage.username;
     messageCard.querySelector('.messagerTime').innerHTML = getTime();
 
-    messageCard.querySelector('.chatMessageText').innerHTML = chatMessage;
-    document.getElementById("chatRoomView").append(messageCard)
+    messageCard.querySelector('.chatMessageText').innerHTML = chatMessage.message;
+    document.getElementById("chatRoomView").append(messageCard);
+
+    //set Sroll to Bottom
+    var scrollNum = document.getElementById("chatRoomView").scrollHeight
+    window.scrollTo(0, scrollNum);
 })
 
 setup()

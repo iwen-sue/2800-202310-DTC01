@@ -12,6 +12,7 @@
         <%- include("templates/nav") %>
             <div class="content">
                 <div id="chatRoomView">
+
                     <% if (group) { %>
                         <div class="chatNotification">- <%= group.groupName %> -</div>
                     <%} else { %>
@@ -32,7 +33,6 @@
                         </div>
                     </div>
                     </template>
-
                 </div>
                 
                             <from id="chatForm">
