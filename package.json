@@ -12,6 +12,7 @@
     "all": "^0.0.0",
     "bcrypt": "^5.1.0",
     "body-parser": "^1.20.2",
+    "browserify": "^17.0.0",
     "connect-mongodb-session": "^3.1.1",
     "crypto": "^1.0.1",
     "crypto-js": "^4.1.1",
@@ -26,5 +27,15 @@
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.2",
     "socket.io": "^4.6.1"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://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@github.com/iwen-sue/2800-202310-DTC01.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/iwen-sue/2800-202310-DTC01/issues"
+  },
+  "homepage": "https://github.com/iwen-sue/2800-202310-DTC01#readme"
 }

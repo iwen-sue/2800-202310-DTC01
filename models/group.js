@@ -25,7 +25,7 @@ const groupsSchema = new mongoose.Schema({
         required: true
     }, 
     messages: {
-        type: Object,
+        type: Array,
     }
 });
 
