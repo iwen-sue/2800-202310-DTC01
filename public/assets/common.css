@@ -127,5 +127,9 @@ div#landingPage {
 }
 
 .topnav{
-    z-index: 111111111;
+    z-index: 2;
+}
+
+#mySidenav{
+    z-index: 5;
 }
