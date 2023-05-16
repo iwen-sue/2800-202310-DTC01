@@ -1,13 +1,12 @@
+
 var groupName = document.currentScript.getAttribute('groupName');
 var userName = document.currentScript.getAttribute('userName');
 var profilePic = document.currentScript.getAttribute('profilePic');
 var groupID = document.currentScript.getAttribute('groupID');
 var userID = document.currentScript.getAttribute('userID');
-
-console.log("userID: " + userID);
-console.log("groupName: ", groupName)
-console.log("username", userName)
-console.log("groupID: ", groupID)
+// console.log(profilePic)
+// profilePic = compressBase64(profilePic);
+// console.log(profilePic)
 
 const socket = io();
 
@@ -17,7 +16,7 @@ function setup() {
     elem.setAttribute("style", `height:${viewHeight}px`);
     const msgBtn = document.getElementById("msgBtn");
 
-    socket.emit('joinRoom', { userName, groupID });
+    socket.emit('joinedRoom', { userName, groupID });
 
 
     socket.emit('chatHistory', groupID);
@@ -30,7 +29,10 @@ function setup() {
         //emit message to server
         socket.emit('chatMessage', { msg, groupID, userID, userName, timeStp, profilePic });
 
-
+        //clear input after sent
+        const inputElement = document.getElementById('msg');
+        inputElement.value = '';
+        inputElement.focus();
     })
 }
 
@@ -41,8 +43,14 @@ function sendNotification(message) {
     document.getElementById("chatRoomView").append(elem)
 }
 
-function getTime(today) {
-    return today.getFullYear() + '/' + (Number(today.getMonth()) + 1) + '/' + today.getDate() + ' ' + today.getHours() + ":" + today.getMinutes();
+function getTime(today){
+    var month = Number(today.getMonth())+1;
+    if(month>9){
+        month = '0' + String(month)
+    }else{
+        month = String(month)
+    }
+    return today.getFullYear() + '/' + month + '/' + today.getDate() + ' ' + today.getHours() + ":" + today.getMinutes();
 }
 
 function arrayBufferToBase64(buffer) {
@@ -57,7 +65,7 @@ function arrayBufferToBase64(buffer) {
 
 
 function insertMessage(msg, userName, time, userImg) {
-    console.log(userImg)
+    // console.log(userImg)
     // const blob = new Blob([userImg]);
     // const dataURL = URL.createObjectURL(blob);
     // const binary = String.fromCharCode.apply(null, new Uint8Array(userImg));
@@ -74,16 +82,20 @@ function insertMessage(msg, userName, time, userImg) {
     var messageElem = document.getElementsByClassName('chatMessageBox')[0];
 
     var messageCard = messageElem.content.cloneNode(true);
-    if (userImg) {
-        messageCard.querySelector('.messageImage').setAttribute("src", "data:image/png;base64," + userImg);
-        // messageCard.querySelector('.messageImage').setAttribute("src", dataURL)
-    }
+    // if (userImg) {
+    //     messageCard.querySelector('.messageImage').setAttribute("src", "data:image/png;base64," + userImg);
+    //     // messageCard.querySelector('.messageImage').setAttribute("src", dataURL)
+    // }
 
 
     messageCard.querySelector('.messagerName').innerHTML = userName;
     messageCard.querySelector('.messagerTime').innerHTML = getTime(dateInfo);
     messageCard.querySelector('.chatMessageText').innerHTML = msg;
     document.getElementById("chatRoomView").append(messageCard);
+
+    //set Sroll to Bottom
+    var scrollNum = document.getElementById("chatRoomView").scrollHeight
+    window.scrollTo(0, scrollNum);
 
 }
 
@@ -120,6 +132,7 @@ socket.on('chatMessage', ({ userName, msg, timeStp, userImg }) => {
     // console.log(chatMessage);
     insertMessage(msg, userName, timeStp, userImg);
 
+
 });
 
 
@@ -127,3 +140,51 @@ socket.on('chatMessage', ({ userName, msg, timeStp, userImg }) => {
 
 setup()
 
+
+function compressBase64(base64Image) {
+    // Assuming you have the base64 image data as 'base64Image'
+
+    // Create an HTMLImageElement
+    const img = new Image();
+
+    // Set the source of the image to the base64 data
+    img.src = 'data:image/png;base64,' + base64Image;
+
+    // Create a canvas element
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Set the desired width and height for the compressed image
+    const maxWidth = 100;
+    const maxHeight = 100;
+
+    // Ensure the image is loaded before manipulating it
+    img.onload = function () {
+        // Calculate the new dimensions while maintaining the aspect ratio
+        let newWidth = img.width;
+        let newHeight = img.height;
+
+        if (newWidth > maxWidth) {
+            newWidth = maxWidth;
+            newHeight = Math.floor((newWidth * img.height) / img.width);
+        }
+
+        if (newHeight > maxHeight) {
+            newHeight = maxHeight;
+            newWidth = Math.floor((newHeight * img.width) / img.height);
+        }
+
+        // Set the canvas dimensions to the new dimensions
+        canvas.width = newWidth;
+        canvas.height = newHeight;
+
+        // Draw the image on the canvas with the new dimensions
+        ctx.drawImage(img, 0, 0, newWidth, newHeight);
+
+        // Get the compressed base64 image data from the canvas
+        const compressedBase64 = canvas.toDataURL('image/png', 0.8);
+
+        // Use the compressed base64 data as needed
+        return compressedBase64
+    };
+}

@@ -559,19 +559,22 @@ app.get("*", (req, res) => {
 // socketio part starts
 io.on('connection', socket => {
     socket.on('joinedRoom', ({username, groupID})=>{
+        console.log("joined room " + groupID)
         socket.join(groupID);
 
         //broadcast when a user connect, to everyone except the client connecting
     //notify who enters the chatroom and who leaves the chatroom
     socket.broadcast.to(groupID).emit('message', username + 'has joined the chat');
 
+    
+
     })
 
     
     //notify the user disconnects
-    socket.on('disconnect', () => {
-        io.emit('message', "A user has left the chat");
-    });
+    // socket.on('disconnect', () => {
+    //     io.emit('message', "A user has left the chat");
+    // });
 
 
     socket.on('chatHistory', async (groupID) => {
@@ -584,9 +587,11 @@ io.on('connection', socket => {
     //listen for chat message
     socket.on('chatMessage', ({msg, groupID, userID, userName, timeStp, profilePic}) => {
 
+        console.log(groupID)
+
         //save message to database
         saveMessage(msg, groupID, userID, userName, timeStp, profilePic);
-        io.emit('chatMessage', {userName, msg, timeStp, profilePic});
+        io.to(groupID).emit('chatMessage', {userName, msg, timeStp, profilePic});
 
     })
 })
