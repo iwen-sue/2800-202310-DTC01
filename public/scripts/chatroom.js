@@ -126,6 +126,29 @@ function retrieveChatHistory(messageHistory) {
     });
 }
 
+
+var viewHeight = window.innerHeight - 130;
+var numOfScroll = 0;
+var isScrollAtTop = false;
+
+function handleScroll() {
+  const scrollThreshold = viewHeight * 0.1; // 10% of the view height
+
+  if (window.scrollY <= scrollThreshold && !isScrollAtTop) {
+    console.log("Scroll bar reached the top of the page!");
+    numOfScroll += 1;
+    isScrollAtTop = true;
+    socket.emit('moreChatHistory', groupID, numOfScroll);
+  } else if (window.scrollY > scrollThreshold) {
+    isScrollAtTop = false;
+  }
+}
+
+window.addEventListener('scroll', handleScroll);
+
+
+
+
 //Socket events
 if (groupID) {
     //show chat history
