@@ -1,3 +1,5 @@
+// JS code for easter egg from https://codepen.io/Wujek_Greg/pen/EpJwaj
+// Modifications made: animation and music show up after clicking submit button, disappears after 2 minutes and 3 seconds
 // Pure CSS dance animation (no graphics included)
 
 // Designed by Gustavo Viselner
@@ -8,22 +10,15 @@
 
 
 $(document).ready(function() {
-    $("button#inviteBtn").click(function(e) {
-        console.log("clicked");
-        console.log($("input#inviteeEmail").val());
-        if ($("input#inviteeEmail").val() === "tomjones@gmail.com") {
+    $("button.loginBtn").click(function(e) {
+        if ($("input#email").val() === "tomjones@gmail.com") {
             e.preventDefault();
-            console.log("haha")
-            $("#addMemberModal").detach();
-            $("body").toggleClass("modal-open");
-            $(".modal-backdrop").detach();
+            $("main").after(`
+                <span class="background">
+                </span>
+            `);
 
-            $(".screen").remove();
-            $(".dance-animation").remove();
-            $("audio").remove();
-            $("#volControl").remove();
-
-            $(".easterEgg").after(`
+            $(".background").append(`
                 <div class="screen stopBootstrap"></div>
                 <ul class="dance-animation stopBootstrap">
                     <li class="dance-frame dance-animation--dancer1 stopBootstrap"></li>
@@ -45,27 +40,19 @@ $(document).ready(function() {
                 <script id="volControl">
                     var music = document.getElementById("music");
                     var isPlaying = false;
-                    music.volume = 0.4;
+                    music.volume = 0.3;
 
                 </script>
             `)
-            $(".screen").focus();
+            $(document).scrollTop($(document).height());
             setTimeout(function() {
                 location.reload();
-                // $(".screen").remove();
-                // $(".dance-animation").remove();
-                // $("audio").remove();
-                // $("#volControl").remove();            
-                // $("#addMemberModal").show();
+                $(document).scrollTop();
             }, 60000*(2 + Math.floor(3/60)))
             
             $("span.background").click(function() {
-                // $(".screen").remove();
-                // $(".dance-animation").remove();
-                // $("audio").remove();
-                // $("#volControl").remove();
-                // $("#addMemberModal").show();
                 location.reload();
+                $(document).scrollTop();
             });
         }
     });
