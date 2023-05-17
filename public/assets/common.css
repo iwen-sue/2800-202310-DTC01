@@ -40,7 +40,9 @@ html, body {
     padding:0;
     text-decoration: none;
 }
-
+label {
+    z-index: 0 !important;
+}
 /* common css style start here */
 .content {
     padding-left:5vw;
