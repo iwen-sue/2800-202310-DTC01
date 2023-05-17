@@ -29,7 +29,6 @@
         </ul>
         <% if (user.type == "leader") { %>
             <button class="btn btn-primary" data-toggle="modal" data-target="#addMemberModal">Add Member</button>
-            <!-- <button class="btn btn-secondary" data-toggle="modal" data-target="#kickMemberModal">Remove Member</button> -->
             <div class="modal fade" id="addMemberModal"tabindex="-1" role="dialog">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <form class="modal-content" action="/invite" method="post">
@@ -94,7 +93,7 @@
             </div>
 
         <% } %>
-
+        
     </div>
     <%- include('templates/bottomNav') %>
 </body>
