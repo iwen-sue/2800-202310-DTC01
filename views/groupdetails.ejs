@@ -7,6 +7,8 @@
 <link rel="stylesheet" href="/assets/common.css" />
 <script src="/scripts/groupdetails.js" defer></script>
 <link rel="stylesheet" href="/assets/groupdetails.css" />
+<link rel="stylesheet" href="/assets/easteregg.css">
+<script src="/scripts/easteregg.js" defer></script>
 
 <!-- cite css or js files here -->
 </head>
@@ -29,7 +31,6 @@
         </ul>
         <% if (user.type == "leader") { %>
             <button class="btn btn-primary" data-toggle="modal" data-target="#addMemberModal">Add Member</button>
-            <!-- <button class="btn btn-secondary" data-toggle="modal" data-target="#kickMemberModal">Remove Member</button> -->
             <div class="modal fade" id="addMemberModal"tabindex="-1" role="dialog">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <form class="modal-content" action="/invite" method="post">
@@ -94,7 +95,10 @@
             </div>
 
         <% } %>
-
+        
     </div>
+    <span class="background">
+        <div class="easterEgg"></div>
+    </span>
     <%- include('templates/bottomNav') %>
 </body>
