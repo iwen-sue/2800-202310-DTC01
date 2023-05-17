@@ -4,99 +4,106 @@
 
 .chatBottomBox {
     position: fixed;
-    bottom:0px;
-    left:0;
-    right:0;
-    height:45px;
+    bottom: 0px;
+    left: 0;
+    right: 0;
+    height: 45px;
     background-color: var(--backgroundWhite);
-    box-shadow: 2px 2px 20px 2px rgba(0,0,0,.15);
+    box-shadow: 2px 2px 20px 2px rgba(0, 0, 0, .15);
 }
 
-.chatBottomBox{
+.chatBottomBox {
     display: flex;
     align-items: center;
 }
 
-.chatIconButton{
+.chatIconButton {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     color: var(--blush);
+    cursor: pointer;
 }
 
 .chatInput {
-    height:30px;
+    height: 30px;
     border-radius: 8px;
-    border:1px solid var(--lightTheme) !important;
+    border: 1px solid var(--lightTheme) !important;
 }
 
-.chatInput:focus{
+.chatInput:focus {
     outline: 1px solid rgba(167, 45, 139, 0.6) !important;
 }
 
 .chatMessage {
-    height:70px;
+    height: 70px;
     display: flex;
 }
 
 
-.chatMessageBoxOne{
-    margin-right:5px;
-    width:50px;
-    height:50px;
+.chatMessageBoxOne {
+    margin-right: 5px;
+    width: 50px;
+    height: 50px;
     display: inline-block;
 }
 
-.chatMessageBoxTwo{
-    position:relative;
-    height:70px;
-    flex:1;
+.chatMessageBoxTwo {
+    position: relative;
+    height: 70px;
+    flex: 1;
     background-color: unset;
     display: inline-block;
 }
 
-.chatMessageHeader{
-    position:absolute;
-    top:7px;
+.chatMessageHeader {
+    position: absolute;
+    top: 7px;
 }
 
-.chatMessageText{
-    position:absolute;
-    top:28px;
+.chatMessageText {
+    position: absolute;
+    top: 28px;
     word-wrap: break-word;
-    width:100%;
+    width: 100%;
 }
 
 .messageImage {
-    width:50px;
-    height:50px;
+    width: 50px;
+    height: 50px;
     background-color: var(--backgroundWhite);
     border-radius: 50%;
     border: 1px solid #34495e;
 }
 
 .messagerName {
-    color:black;
-    font-weight:bold;
+    color: black;
+    font-weight: bold;
 }
 
 .chatMessageText {
     font-size: 17px;
-    color:black;
+    color: black;
 }
 
-.chatNotification{
-    margin-top:5px;
+.chatNotification {
+    margin-top: 5px;
     text-align: center;
 }
 
 
 #chatRoomView::-webkit-scrollbar {
-    display:none
+    display: none
 }
 
 #chatRoomView .chatMessage:last-child {
     margin-bottom: 60px;
     height: 120px;
+}
+
+#imageInputHolder {
+    position:absolute;
+    opacity:0;
+    margin-bottom: 50px;
 }

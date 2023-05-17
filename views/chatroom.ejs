@@ -48,9 +48,10 @@
                 
                             <from id="chatForm">
                             <section class="chatBottomBox row" style="margin:0">
-                                <span class="material-symbols-outlined chatIconButton col-1">
+                                <input id="imageInputHolder" type="file" onchange="upload(this.files)" />
+                                <label for="imageInputHolder" class="material-symbols-outlined chatIconButton col-1">
                                     add_circle
-                                </span>
+                                </label>
                                 <input type="text" id="msg" class="chatInput col-10" />
                                 <button id="msgBtn" type="submit" class="material-symbols-outlined chatIconButton col-1" style="border:none;background-color: transparent;">
                                     send
