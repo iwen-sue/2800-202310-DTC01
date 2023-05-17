@@ -6,6 +6,8 @@ var groupID = document.currentScript.getAttribute('groupID');
 var userID = document.currentScript.getAttribute('userID');
 var userEmail = document.currentScript.getAttribute('userEmail');
 
+
+
 // profilePic = compressBase64(profilePic);
 // console.log(profilePic)
 
@@ -93,8 +95,7 @@ function arrayBufferToBase64(buffer) {
 
 function insertMessage(msg, userName, time, email) {
     console.log(time)
-
-
+ 
     const dateInfo = new Date(time);
     var messageElem = document.getElementsByClassName(email)[0];
 
@@ -111,6 +112,23 @@ function insertMessage(msg, userName, time, email) {
     //set Sroll to Bottom
     var scrollNum = document.getElementById("chatRoomView").scrollHeight
     window.scrollTo(0, scrollNum);
+}
+
+function insertMessageToTop(msg, userName, time, email) {
+    console.log(time)
+ 
+    const dateInfo = new Date(time);
+    var messageElem = document.getElementsByClassName(email)[0];
+
+    var messageCard = messageElem.content.cloneNode(true);
+    // if (userImg) {
+    //     messageCard.querySelector('.messageImage').setAttribute("src", "data:image/png;base64," + userImg);
+    //     // messageCard.querySelector('.messageImage').setAttribute("src", dataURL)
+    // }
+    messageCard.querySelector('.messagerName').innerHTML = userName;
+    messageCard.querySelector('.messagerTime').innerHTML = getTime(dateInfo);
+    messageCard.querySelector('.chatMessageText').innerHTML = msg;
+    document.getElementById("chatRoomView").prepend(messageCard);
 
 }
 
@@ -126,9 +144,17 @@ function retrieveChatHistory(messageHistory) {
     });
 }
 
+function retrieveChatHistoryToTop(messageHistory) {
+    console.log(messageHistory); // Check the entire messageHistory array
+
+    messageHistory.forEach((message) => {
+        insertMessageToTop(message.message, message.userName, message.timeStp, message.email);
+    });
+}
+
 
 var viewHeight = window.innerHeight - 130;
-var numOfScroll = 0;
+var numOfScroll = -1;
 var isScrollAtTop = false;
 
 function handleScroll() {
@@ -138,6 +164,7 @@ function handleScroll() {
     console.log("Scroll bar reached the top of the page!");
     numOfScroll += 1;
     isScrollAtTop = true;
+    console.log(numOfScroll)
     socket.emit('moreChatHistory', groupID, numOfScroll);
   } else if (window.scrollY > scrollThreshold) {
     isScrollAtTop = false;
@@ -168,8 +195,11 @@ if (groupID) {
     socket.on('chatMessage', ({ chatMessageObj }) => {
         // console.log(chatMessage);
         insertMessage(chatMessageObj.message, chatMessageObj.userName, chatMessageObj.timeStp, chatMessageObj.email);
+    });
 
-
+    socket.on('moreChatHistory', (messageHistory) => {
+        console.log("message History", messageHistory);
+        retrieveChatHistoryToTop(messageHistory);
     });
 
     setup();
