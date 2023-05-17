@@ -14,9 +14,6 @@ router.post('/editProfile', upload.single('avatar'), async (req, res) => {
     var lastName = req.body.lastName;
     var homeCity = req.body.homeCity;
     var email = req.body.email;
-    console.log(req.file)
-
-    var imageBase = req.file? req.file.buffer.toString('base64'): undefined;
 
 
     const result = await usersModel.findOne({
@@ -47,12 +44,13 @@ router.post('/editProfile', upload.single('avatar'), async (req, res) => {
 
             query.then((docs) => {
                 if(docs.groupID){
+                    console.log(docs.profilePic)
 
 
                     groupsModel.findOne({ _id: docs.groupID }).then(group => {
                         const filteredMembers = group.members.filter(member => {
                           if (member.email === email) {
-                            member.profilePic = imageBase;
+                            member.profilePic = docs.profilePic;
                             member.firstName = firstName;
                             member.lastName = lastName;
                             return true; // Keep the object in the filtered array
@@ -62,9 +60,6 @@ router.post('/editProfile', upload.single('avatar'), async (req, res) => {
                       
                         group.members = filteredMembers;
                         return group.save(); // Call .save() on the document itself
-                      }).then(savedGroup => {
-                        // The group has been saved successfully
-                        console.log("Group saved:", savedGroup);
                       }).catch(error => {
                         // An error occurred
                         console.error("Error saving group:", error);

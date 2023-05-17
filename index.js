@@ -144,6 +144,7 @@ app.get('/chatroom', sessionValidation, async (req, res) => {
         groupQuery.then((groupInfo) => {
             let userObj = new Object();
             userObj.name = docs.firstName + ' ' + docs.lastName;
+            userObj.email = docs.email
             userObj.userID = docs._id;
             if (docs.profilePic) {
                 userObj.profilePic = docs.profilePic
@@ -575,13 +576,6 @@ io.on('connection', socket => {
 
     })
 
-    
-    //notify the user disconnects
-    // socket.on('disconnect', () => {
-    //     io.emit('message', "A user has left the chat");
-    // });
-
-
     socket.on('chatHistory', async (groupID) => {
         //save message to database
         messageHistory = await showChatHistory(groupID);
@@ -590,24 +584,23 @@ io.on('connection', socket => {
     });
 
     //listen for chat message
-    socket.on('chatMessage', ({msg, groupID, userID, userName, timeStp, profilePic}) => {
+    socket.on('chatMessage', (chatMessageObj) => {
 
-        console.log(groupID)
+        console.log(chatMessageObj)
 
         //save message to database
-        saveMessage(msg, groupID, userID, userName, timeStp, profilePic);
-        io.to(groupID).emit('chatMessage', {userName, msg, timeStp, profilePic});
+        saveMessage(chatMessageObj);
+        io.to(chatMessageObj.groupID).emit('chatMessage', {chatMessageObj});
 
     })
 })
 
-async function saveMessage(message, groupID, userID, userName, time, profilePic) {
-    var messageObj = { message: message, userID: userID, userName: userName, timeStamp: time, userImg: profilePic };
+async function saveMessage(chatMessageObj) {
     try {
-        const group = await groupsModel.findOne({ _id: groupID });
+        const group = await groupsModel.findOne({ _id: chatMessageObj.groupID });
 
         if (group) {
-            group.messages.push(messageObj);
+            group.messages.push(chatMessageObj);
             await group.save();
             return group.messages;
         }

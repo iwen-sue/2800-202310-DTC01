@@ -17,11 +17,18 @@
                     <%} else { %>
                         <div class="chatNotification">- you have not joined any group yet -</div>
                     <% } %>
+                    <% if (group) { %>
 
-                    <template class="chatMessageBox">
+                    <% group.members.forEach(function(member){ %>
+
+                    <template class="<%= member.email %>">
                         <div class="chatMessage">
                         <div class="chatMessageBoxOne">
+                            <% if (member.profilePic) { %>
+                            <img style="height:50px;width:50px;" class="messageImage" src="data:image/png;base64,<%= member.profilePic %>" alt="avatar" />
+                            <%} else { %>
                             <img style="height:50px;width:50px;" class="messageImage" src="userProfileImages/avatar-default.png" alt="avatar" />
+                            <% } %>
                         </div>
                         <div class="chatMessageBoxTwo">
                             <p class="chatMessageHeader">
@@ -32,6 +39,10 @@
                         </div>
                     </div>
                     </template>
+
+                    <% }); %>
+                    <% } %>
+
 
                 </div>
                 
@@ -51,6 +62,11 @@
             </div>
     </body>
     <script src="/socket.io/socket.io.js"></script>
-    <script src="/scripts/chatroom.js" userName="<%= user.name %>" profilePic="<%= user.profilePic %>" groupID="<%= group._id %>" userID="<%= user.userID %>"></script>
+    <% if (group) { %>
+    <script src="/scripts/chatroom.js" userName="<%= user.name %>" userEmail="<%= user.email %>" profilePic="<%= user.profilePic %>" groupID="<%= group._id %>" userID="<%= user.userID %>"></script>
+    <%} else { %>
+        <script src="/scripts/chatroom.js" userName="<%= user.name %>" userEmail="<%= user.email %>" profilePic="<%= user.profilePic %>" groupID="<%= null %>" userID="<%= user.userID %>"></script>
+    <% } %>
+
 
     </html>
