@@ -5,6 +5,7 @@ var profilePic = document.currentScript.getAttribute('profilePic');
 var groupID = document.currentScript.getAttribute('groupID');
 var userID = document.currentScript.getAttribute('userID');
 var userEmail = document.currentScript.getAttribute('userEmail');
+var fileData;
 
 // profilePic = compressBase64(profilePic);
 // console.log(profilePic)
@@ -16,14 +17,14 @@ if (!groupID) {
 
 const socket = io();
 
-function generalSetUp(){
+function generalSetUp() {
     var viewHeight = window.innerHeight - 95;
     let elem = document.getElementById("chatRoomView");
     elem.setAttribute("style", `height:${viewHeight}px`);
 }
 
 function setup() {
-    
+
     const msgBtn = document.getElementById("msgBtn");
 
     socket.emit('joinedRoom', { userName, groupID });
@@ -34,24 +35,56 @@ function setup() {
     msgBtn.addEventListener('click', (e) => {
         const msg = $("#msg").val()
 
-        var timeStp = new Date();
+        if (msg) {
+            var timeStp = new Date();
 
-        //emit message to server
-        console.log(userEmail)
-        var chatMessageObj = new Object();
-        chatMessageObj.message = msg
-        chatMessageObj.groupID = groupID
-        chatMessageObj.userID = userID
-        chatMessageObj.userName = userName
-        chatMessageObj.timeStp = timeStp
-        chatMessageObj.email = userEmail
+            //emit message to server
+            console.log(userEmail)
+            var chatMessageObj = new Object();
+            chatMessageObj.message = msg
+            chatMessageObj.groupID = groupID
+            chatMessageObj.userID = userID
+            chatMessageObj.userName = userName
+            chatMessageObj.timeStp = timeStp
+            chatMessageObj.email = userEmail
 
-        socket.emit('chatMessage', chatMessageObj);
 
-        //clear input after sent
-        const inputElement = document.getElementById('msg');
-        inputElement.value = '';
-        inputElement.focus();
+
+
+            if (fileData.name == msg) {
+                console.log('ready to push file')
+                var formData = new FormData();
+                formData.append("imageData", fileData);
+                formData.append("groupID", groupID);
+
+                fetch('/uploadImage', {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => {
+                        console.log(response)
+                        return response.json()
+                    })
+                    .then(data => {
+                        // Handle the received JSON data
+                        console.log(data)
+                        chatMessageObj.message = { imageData: data.imageData }
+                        socket.emit('chatMessage', chatMessageObj);
+                    })
+
+            } else {
+                socket.emit('chatMessage', chatMessageObj);
+            }
+
+            //clear input after sent
+            const inputElement = document.getElementById('msg');
+            inputElement.value = '';
+            inputElement.focus();
+
+
+        }
+
+
     })
 }
 
@@ -105,8 +138,46 @@ function insertMessage(msg, userName, time, email) {
     // }
     messageCard.querySelector('.messagerName').innerHTML = userName;
     messageCard.querySelector('.messagerTime').innerHTML = getTime(dateInfo);
-    messageCard.querySelector('.chatMessageText').innerHTML = msg;
-    document.getElementById("chatRoomView").append(messageCard);
+    console.log(typeof msg)
+    if (typeof msg == 'string') {
+        messageCard.querySelector('.chatMessageText').innerHTML = msg;
+    } else {
+
+        var imageData = msg.imageData.data
+        console.log(imageData)
+        console.log("image data type is ", typeof imageData)
+
+        // Assuming imageData is an array of image data chunks
+
+        const blob = new Blob(imageData);
+
+        // Create a FileReader object
+        const reader = new FileReader();
+
+        // Define the onload event handler for the FileReader
+        reader.onload = function () {
+            const localURL = reader.result;
+            console.log(localURL);
+
+            // Use the local URL here or pass it to another function
+            messageCard.querySelector('.chatMessageText').innerHTML = `<img class="clientImage" src="${localURL}" />`;
+        };
+
+        // Read the Blob as Data URL
+        reader.readAsDataURL(blob);
+
+
+
+
+
+
+
+
+    }
+    
+        document.getElementById("chatRoomView").append(messageCard);
+    
+
 
     //set Sroll to Bottom
     var scrollNum = document.getElementById("chatRoomView").scrollHeight
@@ -154,6 +225,15 @@ if (groupID) {
 }
 
 generalSetUp()
+
+function upload(files) {
+    fileData = files[0]
+
+    // write file name in text input
+    document.getElementById('msg').value = fileData.name
+
+
+}
 
 
 function compressBase64(base64Image) {

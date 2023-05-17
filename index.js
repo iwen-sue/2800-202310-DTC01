@@ -11,6 +11,9 @@ const ejs = require('ejs');
 const crypto = require('crypto');
 
 
+const multer = require('multer');  // npm install multer
+const storage = multer.memoryStorage(); // store the file in memory as a buffer
+const upload = multer({ storage: storage }); // specify the storage option
 
 const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
@@ -48,6 +51,11 @@ const node_session_secret = process.env.NODE_SESSION_SECRET;
 /* END secret section */
 
 var { database } = include('databaseConnection');
+const { GridFSBucket } = require('mongodb');
+const db = database.db(mongodb_database); // Replace 'your_database_name' with the actual database name
+
+// Create a new GridFSBucket instance using the gridFSBucket() method
+const bucket = new GridFSBucket(db);
 
 const groupCollection = database.db(mongodb_database).collection('groups');
 const userCollection = database.db(mongodb_database).collection('users');
@@ -183,7 +191,6 @@ app.post('/editBucket', editBucket)
 // const memoryStorage = multer.memoryStorage(); // store the file in memory as a buffer
 // const upload = multer({ storage: memoryStorage }); // specify the storage option
 const editProfile = require('./editProfile.js');
-const { Server } = require("net");
 app.post('/editProfile', editProfile);
 
 app.get('/editBucket', (req, res) => {
@@ -280,12 +287,16 @@ app.post('/signup', async (req, res) => {
         var userType
         if (req.body.groupToken != null) {
             userType = 'member'
-            await groupsModel.updateOne({ _id: req.body.groupToken }, { $push: { members: {
-                email: req.body.email,
-                type: 'member',
-                firstName: req.body.firstName,
-                lastName: req.body.lastName
-            } } }).exec();
+            await groupsModel.updateOne({ _id: req.body.groupToken }, {
+                $push: {
+                    members: {
+                        email: req.body.email,
+                        type: 'member',
+                        firstName: req.body.firstName,
+                        lastName: req.body.lastName
+                    }
+                }
+            }).exec();
         }
         const user = new usersModel({
             firstName: req.body.firstName,
@@ -553,6 +564,45 @@ app.post('/leavegroup', sessionValidation, async (req, res) => {
     res.redirect('/userprofile');
 });
 
+
+app.post('/uploadImage', sessionValidation, upload.single('imageData'), async (req, res) => {
+    const imageData = req.file;
+
+
+    // Create a write stream to store the file in MongoDB
+    // const uploadStream = bucket.openUploadStream(imageData.originalname);
+
+
+    // // Write the file data to the stream
+    // uploadStream.write(imageData.buffer);
+    // uploadStream.end();
+
+    // // Handle the completion of the upload
+    // uploadStream.on('finish', async () => {
+    //     const fileId = uploadStream.id.toString();
+    //     // Query the fs.files collection to find the corresponding file
+    //     const file = await database.db(mongodb_database).collection('fs.chunks').findOne({ files_id: fileId });
+    //     console.log(file)
+
+
+    if (imageData) {
+
+        res.status(200).json({ message: 'Image uploaded successfully', imageData: imageData.buffer });
+    } else {
+        // Handle the case where the file was not found in fs.files collection
+        res.status(404).json({ message: 'File not found' });
+    }
+
+
+
+    // });
+
+    // // Handle any errors during the upload
+    // uploadStream.on('error', (error) => {
+    //     res.status(500).json({ error: 'An error occurred while uploading the image' });
+    // });
+})
+
 //static images address
 app.use(express.static(__dirname + "/public"));
 // handle 404 - page not found
@@ -564,15 +614,15 @@ app.get("*", (req, res) => {
 
 // socketio part starts
 io.on('connection', socket => {
-    socket.on('joinedRoom', ({username, groupID})=>{
+    socket.on('joinedRoom', ({ username, groupID }) => {
         console.log("joined room " + groupID)
         socket.join(groupID);
 
         //broadcast when a user connect, to everyone except the client connecting
-    //notify who enters the chatroom and who leaves the chatroom
-    socket.broadcast.to(groupID).emit('message', username + 'has joined the chat');
+        //notify who enters the chatroom and who leaves the chatroom
+        socket.broadcast.to(groupID).emit('message', username + 'has joined the chat');
 
-    
+
 
     })
 
@@ -584,16 +634,58 @@ io.on('connection', socket => {
     });
 
     //listen for chat message
-    socket.on('chatMessage', (chatMessageObj) => {
+    socket.on('chatMessage', async (chatMessageObj) => {
 
         console.log(chatMessageObj)
 
-        //save message to database
-        saveMessage(chatMessageObj);
-        io.to(chatMessageObj.groupID).emit('chatMessage', {chatMessageObj});
+        if (typeof chatMessageObj.message == 'string') {
+            //save message to database
+            saveMessage(chatMessageObj);
+            io.to(chatMessageObj.groupID).emit('chatMessage', { chatMessageObj });
 
+        } else {
+            //user sent image data
+
+            //find the BinaryData in GridFSBucket 
+            // const downloadStream = bucket.openDownloadStream(chatMessageObj.message.id);
+            // Handle the data from the download stream
+            // chatMessageObj.message.imageData = chatMessageObj.message.imageData.toString('base64');
+
+
+            saveMessage(chatMessageObj);
+
+            io.to(chatMessageObj.groupID).emit('chatMessage', { chatMessageObj });
+            // client.close(); // Don't forget to close the client connection
+            // });
+
+
+            // }
+
+
+
+            // })
+        }
     })
 })
+
+
+
+
+// function sendImageToMessage(fileId) {
+//     //find the right image using id in message property
+//     const downloadStream = bucket.openDownloadStream(new ObjectID(fileId));
+//     // Handle the data from the download stream
+//     let imageBinaryData = '';
+//     downloadStream.on('data', chunk => {
+//         imageBinaryData += chunk.toString('base64');
+//     });
+//     downloadStream.on('end', () => {
+//         client.close(); // Don't forget to close the client connection
+//         return imageBinaryData
+//     });
+
+
+// }
 
 async function saveMessage(chatMessageObj) {
     try {
@@ -614,7 +706,7 @@ async function showChatHistory(groupID) {
         const group = await groupsModel.findOne({ _id: groupID });
         if (group) {
             const modifyMessages = group.messages
-              
+
             return modifyMessages;
         }
     } catch (error) {
