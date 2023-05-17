@@ -10,7 +10,7 @@
 
     <body id="chatBackGround">
         <%- include("templates/nav") %>
-            <div class="content">
+            <div class="content" id="container">
                 <% if (group) { %>
                     <div class="chatNotification">- <%= group.groupName %> -</div>
                 <%} else { %>
