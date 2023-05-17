@@ -603,10 +603,14 @@ io.on('connection', socket => {
     socket.on('moreChatHistory', async (groupID, numOfScroll) => {
         const getMoreMessageHistory = await showMoreChatHistory(groupID, numOfScroll);
         console.log(numOfScroll)
-
+        if (getMoreMessageHistory.length == 0) {
+            console.log("no more history")
+            socket.emit('noMoreChatHistory', data=true);
+        }
         if(numOfScroll > 0) {
             console.log("befroe Insert", getMoreMessageHistory)
             socket.emit('moreChatHistory', getMoreMessageHistory);
+            
         }
             // socket.emit('showMoreChatHistory', getMoreMessageHistory);
             ;

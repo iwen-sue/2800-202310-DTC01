@@ -110,8 +110,8 @@ function insertMessage(msg, userName, time, email) {
     document.getElementById("chatRoomView").append(messageCard);
 
     //set Sroll to Bottom
-    var scrollNum = document.getElementById("chatRoomView").scrollHeight
-    window.scrollTo(0, scrollNum);
+    var container = document.getElementById("container");
+    container.scrollTop = container.scrollHeight;
 }
 
 function insertMessageToTop(msg, userName, time, email) {
@@ -152,26 +152,27 @@ function retrieveChatHistoryToTop(messageHistory) {
     });
 }
 
+var numOfScroll = 0;
+var container = document.getElementById('container');
 
-var viewHeight = window.innerHeight - 130;
-var numOfScroll = -1;
-var isScrollAtTop = false;
 
-function handleScroll() {
-  const scrollThreshold = viewHeight * 0.1; // 10% of the view height
+function scrollTest() {
+    console.log(container.scrollTop);
+    
+    if (container.scrollTop == 0) {
+      console.log("Scroll bar reached the top of the page!");
+      numOfScroll += 1;
+      console.log(numOfScroll);
+      socket.emit('moreChatHistory', groupID, numOfScroll);
+      container.scrollTo(0, 50);
+    }
 
-  if (window.scrollY <= scrollThreshold && !isScrollAtTop) {
-    console.log("Scroll bar reached the top of the page!");
-    numOfScroll += 1;
-    isScrollAtTop = true;
-    console.log(numOfScroll)
-    socket.emit('moreChatHistory', groupID, numOfScroll);
-  } else if (window.scrollY > scrollThreshold) {
-    isScrollAtTop = false;
   }
-}
 
-window.addEventListener('scroll', handleScroll);
+
+container.addEventListener('scroll', scrollTest);
+
+
 
 
 
@@ -182,6 +183,7 @@ if (groupID) {
     socket.on('chatHistory', (messageHistory) => {
         console.log("message History", messageHistory);
         retrieveChatHistory(messageHistory);
+        var messageCard = messageElem.content.cloneNode(true);
     });
 
 
