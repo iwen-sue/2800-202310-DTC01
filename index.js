@@ -280,12 +280,16 @@ app.post('/signup', async (req, res) => {
         var userType
         if (req.body.groupToken != null) {
             userType = 'member'
-            await groupsModel.updateOne({ _id: req.body.groupToken }, { $push: { members: {
-                email: req.body.email,
-                type: 'member',
-                firstName: req.body.firstName,
-                lastName: req.body.lastName
-            } } }).exec();
+            await groupsModel.updateOne({ _id: req.body.groupToken }, {
+                $push: {
+                    members: {
+                        email: req.body.email,
+                        type: 'member',
+                        firstName: req.body.firstName,
+                        lastName: req.body.lastName
+                    }
+                }
+            }).exec();
         }
         const user = new usersModel({
             firstName: req.body.firstName,
@@ -564,15 +568,15 @@ app.get("*", (req, res) => {
 
 // socketio part starts
 io.on('connection', socket => {
-    socket.on('joinedRoom', ({username, groupID})=>{
+    socket.on('joinedRoom', ({ username, groupID }) => {
         console.log("joined room " + groupID)
         socket.join(groupID);
 
         //broadcast when a user connect, to everyone except the client connecting
-    //notify who enters the chatroom and who leaves the chatroom
-    socket.broadcast.to(groupID).emit('message', username + 'has joined the chat');
+        //notify who enters the chatroom and who leaves the chatroom
+        socket.broadcast.to(groupID).emit('message', username + 'has joined the chat');
 
-    
+
 
     })
 
@@ -583,6 +587,7 @@ io.on('connection', socket => {
         socket.emit('chatHistory', messageHistory);
     });
 
+
     //listen for chat message
     socket.on('chatMessage', (chatMessageObj) => {
 
@@ -590,41 +595,81 @@ io.on('connection', socket => {
 
         //save message to database
         saveMessage(chatMessageObj);
-        io.to(chatMessageObj.groupID).emit('chatMessage', {chatMessageObj});
+        io.to(chatMessageObj.groupID).emit('chatMessage', { chatMessageObj });
 
     })
-})
 
-async function saveMessage(chatMessageObj) {
-    try {
-        const group = await groupsModel.findOne({ _id: chatMessageObj.groupID });
 
-        if (group) {
-            group.messages.push(chatMessageObj);
-            await group.save();
-            return group.messages;
+    socket.on('moreChatHistory', async (groupID, numOfScroll) => {
+        const getMoreMessageHistory = await showMoreChatHistory(groupID, numOfScroll);
+        console.log(numOfScroll)
+
+        if(numOfScroll > 0) {
+            console.log("befroe Insert", getMoreMessageHistory)
+            socket.emit('moreChatHistory', getMoreMessageHistory);
         }
-    } catch (error) {
-        console.log(error);
-    }
-}
-
-async function showChatHistory(groupID) {
-    try {
-        const group = await groupsModel.findOne({ _id: groupID });
-        if (group) {
-            const modifyMessages = group.messages.slice(-15);
-              
-            return modifyMessages;
-        }
-    } catch (error) {
-        console.log(error);
-    }
-}
+            // socket.emit('showMoreChatHistory', getMoreMessageHistory);
+            ;
+    })
 
 
 
 
-server.listen(port, () => {
-    console.log("Node application listening on port " + port);
+
+
 });
+
+    async function saveMessage(chatMessageObj) {
+        try {
+            const group = await groupsModel.findOne({ _id: chatMessageObj.groupID });
+
+            if (group) {
+                group.messages.push(chatMessageObj);
+                await group.save();
+                return group.messages;
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async function showMoreChatHistory(groupID, numOfScroll) {
+        try {
+            const group = await groupsModel.findOne({ _id: groupID });
+            numOfScroll -= 1;
+            const numOfMessages = group.messages.length;
+            var modifyMessages = [];
+            if (group) {
+                if (numOfMessages == 15) {
+                    modifyMessages = [];
+                    console.log("when 15 msgs", modifyMessages)
+                }else{
+                    modifyMessages = group.messages.reverse().slice(15 + 4 * numOfScroll, 15 + 4 * numOfScroll + 4);
+                    console.log("more than 15 msgs", modifyMessages)
+                }
+                return modifyMessages;
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async function showChatHistory(groupID) {
+        try {
+            const group = await groupsModel.findOne({ _id: groupID });
+            if (group) {
+                const modifyMessages = group.messages.slice(-15);
+
+                return modifyMessages;
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+
+
+
+    server.listen(port, () => {
+        console.log("Node application listening on port " + port);
+    });
