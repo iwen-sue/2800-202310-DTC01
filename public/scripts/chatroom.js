@@ -4,16 +4,26 @@ var userName = document.currentScript.getAttribute('userName');
 var profilePic = document.currentScript.getAttribute('profilePic');
 var groupID = document.currentScript.getAttribute('groupID');
 var userID = document.currentScript.getAttribute('userID');
-// console.log(profilePic)
+var userEmail = document.currentScript.getAttribute('userEmail');
+
 // profilePic = compressBase64(profilePic);
 // console.log(profilePic)
 
+if (!groupID) {
+    alert("please join a travel group to start chat!")
+    window.location.href = "/userprofile"
+}
+
 const socket = io();
 
-function setup() {
+function generalSetUp(){
     var viewHeight = window.innerHeight - 95;
     let elem = document.getElementById("chatRoomView");
     elem.setAttribute("style", `height:${viewHeight}px`);
+}
+
+function setup() {
+    
     const msgBtn = document.getElementById("msgBtn");
 
     socket.emit('joinedRoom', { userName, groupID });
@@ -25,9 +35,18 @@ function setup() {
         const msg = $("#msg").val()
 
         var timeStp = new Date();
-        console.log("timeStp: ", timeStp);
+
         //emit message to server
-        socket.emit('chatMessage', { msg, groupID, userID, userName, timeStp, profilePic });
+        console.log(userEmail)
+        var chatMessageObj = new Object();
+        chatMessageObj.message = msg
+        chatMessageObj.groupID = groupID
+        chatMessageObj.userID = userID
+        chatMessageObj.userName = userName
+        chatMessageObj.timeStp = timeStp
+        chatMessageObj.email = userEmail
+
+        socket.emit('chatMessage', chatMessageObj);
 
         //clear input after sent
         const inputElement = document.getElementById('msg');
@@ -43,21 +62,21 @@ function sendNotification(message) {
     document.getElementById("chatRoomView").append(elem)
 }
 
-function getTime(today){
-    var month = Number(today.getMonth())+1;
+function getTime(today) {
+    var month = Number(today.getMonth()) + 1;
     var mins = Number(today.getMinutes())
     month = organiseTime(month)
     mins = organiseTime(mins)
 
-    function organiseTime(num){
-        if(num<10){
+    function organiseTime(num) {
+        if (num < 10) {
             num = '0' + String(num)
-        }else{
+        } else {
             num = String(num)
         }
         return num
     }
-    
+
     return today.getFullYear() + '/' + month + '/' + today.getDate() + ' ' + today.getHours() + ":" + mins;
 }
 
@@ -72,30 +91,18 @@ function arrayBufferToBase64(buffer) {
 }
 
 
-function insertMessage(msg, userName, time, userImg) {
-    // console.log(userImg)
-    // const blob = new Blob([userImg]);
-    // const dataURL = URL.createObjectURL(blob);
-    // const binary = String.fromCharCode.apply(null, new Uint8Array(userImg));
-    // const base64 = btoa(binary);
-    // userImg = arrayBufferToBase64(userImg)
-    // const blob = new Blob([userImg]);
-    // const url = URL.createObjectURL(blob);
-
-
-
+function insertMessage(msg, userName, time, email) {
+    console.log(time)
 
 
     const dateInfo = new Date(time);
-    var messageElem = document.getElementsByClassName('chatMessageBox')[0];
+    var messageElem = document.getElementsByClassName(email)[0];
 
     var messageCard = messageElem.content.cloneNode(true);
     // if (userImg) {
     //     messageCard.querySelector('.messageImage').setAttribute("src", "data:image/png;base64," + userImg);
     //     // messageCard.querySelector('.messageImage').setAttribute("src", dataURL)
     // }
-
-
     messageCard.querySelector('.messagerName').innerHTML = userName;
     messageCard.querySelector('.messagerTime').innerHTML = getTime(dateInfo);
     messageCard.querySelector('.chatMessageText').innerHTML = msg;
@@ -113,40 +120,40 @@ function retrieveChatHistory(messageHistory) {
     messageHistory.forEach((message) => {
         console.log(message); // Check each individual message object
 
-        // Use the correct property name 'message'
-        const { message: msg, userName, timeStamp, profilePic } = message;
 
-        insertMessage(msg, userName, timeStamp, profilePic);
+
+        insertMessage(message.message, message.userName, message.timeStp, message.email);
     });
 }
 
 //Socket events
-
-//show chat history
-socket.on('chatHistory', (messageHistory) => {
-    console.log("message History", messageHistory);
-    retrieveChatHistory(messageHistory);
-});
-
-
-
-//catch messages sent from backend and send it as notification in group chat
-socket.on('message', message => {
-    sendNotification(message);
-})
-
-// show chat history
-socket.on('chatMessage', ({ userName, msg, timeStp, userImg }) => {
-    // console.log(chatMessage);
-    insertMessage(msg, userName, timeStp, userImg);
-
-
-});
+if (groupID) {
+    //show chat history
+    socket.on('chatHistory', (messageHistory) => {
+        console.log("message History", messageHistory);
+        retrieveChatHistory(messageHistory);
+    });
 
 
 
+    //catch messages sent from backend and send it as notification in group chat
+    socket.on('message', message => {
+        sendNotification(message);
+    })
 
-setup()
+    // show chat history
+    socket.on('chatMessage', ({ chatMessageObj }) => {
+        // console.log(chatMessage);
+        insertMessage(chatMessageObj.message, chatMessageObj.userName, chatMessageObj.timeStp, chatMessageObj.email);
+
+
+    });
+
+    setup();
+
+}
+
+generalSetUp()
 
 
 function compressBase64(base64Image) {
