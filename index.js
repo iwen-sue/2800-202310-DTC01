@@ -613,7 +613,7 @@ async function showChatHistory(groupID) {
     try {
         const group = await groupsModel.findOne({ _id: groupID });
         if (group) {
-            const modifyMessages = group.messages
+            const modifyMessages = group.messages.slice(-15);
               
             return modifyMessages;
         }
