@@ -628,7 +628,6 @@ io.on('connection', socket => {
     //listen for chat message
     socket.on('chatMessage', async (chatMessageObj) => {
 
-        console.log(chatMessageObj)
 
         if (typeof chatMessageObj.message == 'string') {
             //save message to database
@@ -636,6 +635,9 @@ io.on('connection', socket => {
             io.to(chatMessageObj.groupID).emit('chatMessage', { chatMessageObj });
 
         } else {
+            //user sent image data
+            //do not save the image data into messages history
+            // saveMessage(chatMessageObj);
 
             io.to(chatMessageObj.groupID).emit('chatMessage', { chatMessageObj });
 

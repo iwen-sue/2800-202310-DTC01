@@ -5,10 +5,8 @@ var profilePic = document.currentScript.getAttribute('profilePic');
 var groupID = document.currentScript.getAttribute('groupID');
 var userID = document.currentScript.getAttribute('userID');
 var userEmail = document.currentScript.getAttribute('userEmail');
-var fileData;
-
-
-
+var fileData = new Object();
+fileData.name = ""
 // profilePic = compressBase64(profilePic);
 // console.log(profilePic)
 
@@ -34,60 +32,68 @@ function setup() {
 
     socket.emit('chatHistory', groupID);
 
-    msgBtn.addEventListener('click', (e) => {
-        const msg = $("#msg").val()
+    msgBtn.addEventListener('click', () => {
+        sendMission()
+    })
 
-        if (msg) {
-            var timeStp = new Date();
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" || event.code === "Enter") {
+            sendMission()
+        }
+    });
+}
 
-            //emit message to server
-            console.log(userEmail)
-            var chatMessageObj = new Object();
-            chatMessageObj.message = msg
-            chatMessageObj.groupID = groupID
-            chatMessageObj.userID = userID
-            chatMessageObj.userName = userName
-            chatMessageObj.timeStp = timeStp
-            chatMessageObj.email = userEmail
+function sendMission() {
+    const msg = $("#msg").val()
+
+    if (msg) {
+        var timeStp = new Date();
+
+        //emit message to server
+        console.log(userEmail)
+        var chatMessageObj = new Object();
+        chatMessageObj.message = msg
+        chatMessageObj.groupID = groupID
+        chatMessageObj.userID = userID
+        chatMessageObj.userName = userName
+        chatMessageObj.timeStp = timeStp
+        chatMessageObj.email = userEmail
 
 
 
 
-            if (fileData.name == msg) {
-                console.log('ready to push file')
-                var formData = new FormData();
-                formData.append("imageData", fileData);
-                formData.append("groupID", groupID);
+        if (fileData.name == msg) {
+            console.log('ready to push file')
+            var formData = new FormData();
+            formData.append("imageData", fileData);
+            formData.append("groupID", groupID);
 
-                fetch('/uploadImage', {
-                    method: 'POST',
-                    body: formData
+            fetch('/uploadImage', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    console.log(response)
+                    return response.json()
                 })
-                    .then(response => {
-                        console.log(response)
-                        return response.json()
-                    })
-                    .then(data => {
-                        // Handle the received JSON data
-                        console.log(data)
-                        chatMessageObj.message = { imageData: data.imageData }
-                        socket.emit('chatMessage', chatMessageObj);
-                    })
+                .then(data => {
+                    // Handle the received JSON data
+                    console.log(data)
+                    chatMessageObj.message = { imageData: data.imageData }
+                    socket.emit('chatMessage', chatMessageObj);
+                })
 
-            } else {
-                socket.emit('chatMessage', chatMessageObj);
-            }
-
-            //clear input after sent
-            const inputElement = document.getElementById('msg');
-            inputElement.value = '';
-            inputElement.focus();
-
-
+        } else {
+            socket.emit('chatMessage', chatMessageObj);
         }
 
+        //clear input after sent
+        const inputElement = document.getElementById('msg');
+        inputElement.value = '';
+        inputElement.focus();
 
-    })
+
+    }
 }
 
 function sendNotification(message) {
@@ -115,15 +121,7 @@ function getTime(today) {
     return today.getFullYear() + '/' + month + '/' + today.getDate() + ' ' + today.getHours() + ":" + mins;
 }
 
-function arrayBufferToBase64(buffer) {
-    var binary = '';
-    var bytes = new Uint8Array(buffer);
-    var len = bytes.byteLength;
-    for (var i = 0; i < len; i++) {
-        binary += String.fromCharCode(bytes[i]);
-    }
-    return window.btoa(binary);
-}
+
 
 
 function insertMessage(msg, userName, time, email) {
@@ -144,45 +142,32 @@ function insertMessage(msg, userName, time, email) {
         messageCard.querySelector('.chatMessageText').innerHTML = msg;
     } else {
 
-        var imageData = msg.imageData.data
-        console.log(imageData)
-        console.log("image data type is ", typeof imageData)
-
-        // Assuming imageData is an array of image data chunks
-
-        const blob = new Blob(imageData);
-
-        // Create a FileReader object
-        const reader = new FileReader();
-
-        // Define the onload event handler for the FileReader
-        reader.onload = function () {
-            const localURL = reader.result;
-            console.log(localURL);
-
-            // Use the local URL here or pass it to another function
-            messageCard.querySelector('.chatMessageText').innerHTML = `<img class="clientImage" src="${localURL}" />`;
-        };
-
-        // Read the Blob as Data URL
-        reader.readAsDataURL(blob);
 
 
-
-
-
-
-
+        messageCard.querySelector('.chatMessageText').innerHTML = `<img class="clientImage" src="data:image/png;base64,${msg.imageData}" />`;
 
     }
-    
-        document.getElementById("chatRoomView").append(messageCard);
-    
+
+    document.getElementById("chatRoomView").append(messageCard);
+
 
 
     //set Sroll to Bottom
     var container = document.getElementById("container");
     container.scrollTop = container.scrollHeight;
+
+    //adjust parent element height when there is an image element inserted
+    setTimeout(() => {
+        if (typeof msg != 'string') {
+            var elems = document.getElementsByClassName("clientImage");
+            var elem = elems[elems.length - 1]
+            let imgHeight = elem.offsetHeight;
+            var parents = document.getElementsByClassName("chatMessage");
+            var parent = parents[parents.length - 1]
+            parent.setAttribute("style", `height:${90 + imgHeight}px`)
+        }
+
+    })
 }
 
 function insertMessageToTop(msg, userName, time, email) {
@@ -201,14 +186,21 @@ function insertMessageToTop(msg, userName, time, email) {
     messageCard.querySelector('.chatMessageText').innerHTML = msg;
     document.getElementById("chatRoomView").prepend(messageCard);
 
+    
+
+
 }
 
 function retrieveChatHistory(messageHistory) {
     console.log(messageHistory); // Check the entire messageHistory array
 
-    messageHistory.forEach((message) => {
+    messageHistory.forEach(async (message) => {
         console.log(message); // Check each individual message object
-
+        if (typeof message.message != "string") {
+            var arrImage = message.message.imageData.data
+            base64Image = await arrayBufferToBase64(arrImage);
+            message.message.imageData = base64Image
+        }
 
 
         insertMessage(message.message, message.userName, message.timeStp, message.email);
@@ -254,7 +246,7 @@ if (groupID) {
     socket.on('chatHistory', (messageHistory) => {
         console.log("message History", messageHistory);
         retrieveChatHistory(messageHistory);
-        var messageCard = messageElem.content.cloneNode(true);
+        
     });
 
 
@@ -265,27 +257,60 @@ if (groupID) {
     })
 
     // show chat history
-    socket.on('chatMessage', ({ chatMessageObj }) => {
+    socket.on('chatMessage', async ({ chatMessageObj }) => {
         // console.log(chatMessage);
+        if (typeof chatMessageObj.message != "string") {
+            var arrImg = chatMessageObj.message.imageData.data
+            base64Img = await arrayBufferToBase64(arrImg);
+            chatMessageObj.message.imageData = base64Img
+        }
         insertMessage(chatMessageObj.message, chatMessageObj.userName, chatMessageObj.timeStp, chatMessageObj.email);
     });
 
     socket.on('moreChatHistory', (messageHistory) => {
         console.log("message History", messageHistory);
         retrieveChatHistoryToTop(messageHistory);
+        
+
+
+        // insertMessage(chatMessageObj.message, chatMessageObj.userName, chatMessageObj.timeStp, chatMessageObj.email);
+
     });
 
     setup();
 
 }
 
+
+
 generalSetUp()
+
+function arrayBufferToBase64(buffer) {
+    var binary = '';
+    var bytes = new Uint8Array(buffer);
+    var len = bytes.byteLength;
+    for (var i = 0; i < len; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return window.btoa(binary);
+}
+
 
 function upload(files) {
     fileData = files[0]
+    const maxSizeInBytes = 300 * 1024; // 5 MB (adjust to your desired maximum size)
+    console.log(fileData)
+    if (fileData.size > maxSizeInBytes) {
+        // File size exceeds the maximum limit
+        alert('File size exceeds the maximum limit of 5 MB.');
+        // fileInput.value = null; // Reset the file input
+    } else {
+        // write file name in text input
+        document.getElementById('msg').value = fileData.name
 
-    // write file name in text input
-    document.getElementById('msg').value = fileData.name
+    }
+
+
 
 
 }
