@@ -569,14 +569,6 @@ app.post('/uploadImage', sessionValidation, upload.single('imageData'), async (r
     const imageData = req.file;
 
 
-    // Create a write stream to store the file in MongoDB
-    // const uploadStream = bucket.openUploadStream(imageData.originalname);
-
-
-    // // Write the file data to the stream
-    // uploadStream.write(imageData.buffer);
-    // uploadStream.end();
-
     // // Handle the completion of the upload
     // uploadStream.on('finish', async () => {
     //     const fileId = uploadStream.id.toString();
@@ -636,7 +628,6 @@ io.on('connection', socket => {
     //listen for chat message
     socket.on('chatMessage', async (chatMessageObj) => {
 
-        console.log(chatMessageObj)
 
         if (typeof chatMessageObj.message == 'string') {
             //save message to database
@@ -651,41 +642,16 @@ io.on('connection', socket => {
             // Handle the data from the download stream
             // chatMessageObj.message.imageData = chatMessageObj.message.imageData.toString('base64');
 
-
-            saveMessage(chatMessageObj);
+            //do not save the image data into messages history
+            // saveMessage(chatMessageObj);
 
             io.to(chatMessageObj.groupID).emit('chatMessage', { chatMessageObj });
-            // client.close(); // Don't forget to close the client connection
-            // });
 
-
-            // }
-
-
-
-            // })
         }
     })
 })
 
 
-
-
-// function sendImageToMessage(fileId) {
-//     //find the right image using id in message property
-//     const downloadStream = bucket.openDownloadStream(new ObjectID(fileId));
-//     // Handle the data from the download stream
-//     let imageBinaryData = '';
-//     downloadStream.on('data', chunk => {
-//         imageBinaryData += chunk.toString('base64');
-//     });
-//     downloadStream.on('end', () => {
-//         client.close(); // Don't forget to close the client connection
-//         return imageBinaryData
-//     });
-
-
-// }
 
 async function saveMessage(chatMessageObj) {
     try {
