@@ -271,10 +271,6 @@ if (groupID) {
         console.log("message History", messageHistory);
         retrieveChatHistoryToTop(messageHistory);
         
-
-
-        // insertMessage(chatMessageObj.message, chatMessageObj.userName, chatMessageObj.timeStp, chatMessageObj.email);
-
     });
 
     setup();
