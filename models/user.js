@@ -58,8 +58,6 @@ const usersSchema = new mongoose.Schema({
 
 const usersModel = mongoose.model('users', usersSchema);
 
-mongoose.connection.once('open', () => {
-    usersModel.createIndexes();
-  });
+
 
 module.exports = usersModel;

@@ -16,7 +16,7 @@ router.post('/editProfile', upload.single('avatar'), async (req, res) => {
     var email = req.body.email;
 
 
-    const result = await usersModel.findOne({
+    const result = await usersModel.updateMany({
         email: req.session.email,
     });
 
@@ -47,7 +47,7 @@ router.post('/editProfile', upload.single('avatar'), async (req, res) => {
                     console.log(docs.profilePic)
 
 
-                    groupsModel.findOne({ _id: docs.groupID }).then(group => {
+                    groupsModel.updateMany({ _id: docs.groupID, "members.email": email}, ).then(group => {
                         const filteredMembers = group.members.filter(member => {
                           if (member.email === email) {
                             member.profilePic = docs.profilePic;
@@ -57,9 +57,13 @@ router.post('/editProfile', upload.single('avatar'), async (req, res) => {
                           }
                           return true;
                         });
-                      
-                        group.members = filteredMembers;
-                        return group.save(); // Call .save() on the document itself
+
+                        setTimeout(()=>{
+                            group.members = filteredMembers;
+                            console.log(group.members)
+                            group.save(); // Call .save() on the document itself
+                        })                      
+                        
                       }).catch(error => {
                         // An error occurred
                         console.error("Error saving group:", error);
