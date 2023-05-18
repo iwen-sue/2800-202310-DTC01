@@ -664,7 +664,7 @@ io.on('connection', socket => {
         }
             
     })
-})
+}); // socketio part ends
 
 
 
