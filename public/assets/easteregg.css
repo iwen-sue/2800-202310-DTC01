@@ -35,6 +35,8 @@ button#stopEasterEggBtn {
 }
 
 .dance-animation {
+    position: relative;
+    top: 100%;
     list-style: none;
     padding: 0;
     text-align: center;
@@ -42,6 +44,21 @@ button#stopEasterEggBtn {
     display: flex;
     transform: translateX(2000px);
     animation: play 1.3s steps(11) infinite;
+}
+
+.paused {
+    animation-play-state: paused;
+    transition: transform 3s cubic-bezier(0.54, 0, 0.83, 0.33);
+    animation: floatDown 2s;
+}
+
+@keyframes floatDown {
+    0% {
+        transform: translateY(10px);
+    }
+    100% {
+        transform: translateY(1000px);
+    }
 }
 
 .screen {

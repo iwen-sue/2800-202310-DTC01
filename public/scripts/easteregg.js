@@ -20,7 +20,7 @@ $(document).ready(function() {
 
             $(".background").append(`
                 <div class="screen stopBootstrap"></div>
-                <ul class="dance-animation stopBootstrap">
+                <ul class="dance-animation stopBootstrap floatUp">
                     <li class="dance-frame dance-animation--dancer1 stopBootstrap"></li>
                     <li class="dance-frame dance-animation--dancer2 stopBootstrap"></li>
                     <li class="dance-frame dance-animation--dancer3 stopBootstrap"></li>
@@ -39,20 +39,32 @@ $(document).ready(function() {
                 </audio>
                 <script id="volControl">
                     var music = document.getElementById("music");
-                    var isPlaying = false;
-                    music.volume = 0.3;
-
+                    music.volume = 0;
+                    const timer = setInterval(function() {
+                        music.volume += 0.025;
+                    }, 500);
+                    setTimeout(function() {
+                        clearInterval(timer);
+                        console.log(music.volume)
+                    }, 2000)
                 </script>
             `)
             $(document).scrollTop($(document).height());
             setTimeout(function() {
-                location.reload();
-                $(document).scrollTop();
+                $(".dance-animation").addClass("paused");
+                setTimeout(function() {
+                    location.reload();
+                    $(document).scrollTop();
+                }, 1700)
             }, 60000*(2 + Math.floor(3/60)))
             
             $("span.background").click(function() {
-                location.reload();
-                $(document).scrollTop();
+                $(".dance-animation").addClass("paused");
+                $("audio").volume = 0;
+                setTimeout(function() {
+                    location.reload();
+                    $(document).scrollTop();
+                }, 1700)
             });
         }
     });
