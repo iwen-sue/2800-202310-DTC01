@@ -569,14 +569,6 @@ app.post('/uploadImage', sessionValidation, upload.single('imageData'), async (r
     const imageData = req.file;
 
 
-    // Create a write stream to store the file in MongoDB
-    // const uploadStream = bucket.openUploadStream(imageData.originalname);
-
-
-    // // Write the file data to the stream
-    // uploadStream.write(imageData.buffer);
-    // uploadStream.end();
-
     // // Handle the completion of the upload
     // uploadStream.on('finish', async () => {
     //     const fileId = uploadStream.id.toString();
@@ -644,48 +636,29 @@ io.on('connection', socket => {
             io.to(chatMessageObj.groupID).emit('chatMessage', { chatMessageObj });
 
         } else {
-            //user sent image data
-
-            //find the BinaryData in GridFSBucket 
-            // const downloadStream = bucket.openDownloadStream(chatMessageObj.message.id);
-            // Handle the data from the download stream
-            // chatMessageObj.message.imageData = chatMessageObj.message.imageData.toString('base64');
-
-
-            saveMessage(chatMessageObj);
 
             io.to(chatMessageObj.groupID).emit('chatMessage', { chatMessageObj });
-            // client.close(); // Don't forget to close the client connection
-            // });
 
-
-            // }
-
-
-
-            // })
         }
+    })
+
+    socket.on('moreChatHistory', async (groupID, numOfScroll) => {
+        const getMoreMessageHistory = await showMoreChatHistory(groupID, numOfScroll);
+        console.log(numOfScroll)
+        if (getMoreMessageHistory.length == 0) {
+            console.log("no more history")
+            socket.emit('noMoreChatHistory', data=true);
+        }
+        if(numOfScroll > 0) {
+            console.log("befroe Insert", getMoreMessageHistory)
+            socket.emit('moreChatHistory', getMoreMessageHistory);
+            
+        }
+            
     })
 })
 
 
-
-
-// function sendImageToMessage(fileId) {
-//     //find the right image using id in message property
-//     const downloadStream = bucket.openDownloadStream(new ObjectID(fileId));
-//     // Handle the data from the download stream
-//     let imageBinaryData = '';
-//     downloadStream.on('data', chunk => {
-//         imageBinaryData += chunk.toString('base64');
-//     });
-//     downloadStream.on('end', () => {
-//         client.close(); // Don't forget to close the client connection
-//         return imageBinaryData
-//     });
-
-
-// }
 
 async function saveMessage(chatMessageObj) {
     try {
@@ -701,11 +674,32 @@ async function saveMessage(chatMessageObj) {
     }
 }
 
+async function showMoreChatHistory(groupID, numOfScroll) {
+    try {
+        const group = await groupsModel.findOne({ _id: groupID });
+        numOfScroll -= 1;
+        const numOfMessages = group.messages.length;
+        var modifyMessages = [];
+        if (group) {
+            if (numOfMessages == 15) {
+                modifyMessages = [];
+                console.log("when 15 msgs", modifyMessages)
+            }else{
+                modifyMessages = group.messages.reverse().slice(15 + 4 * numOfScroll, 15 + 4 * numOfScroll + 4);
+                console.log("more than 15 msgs", modifyMessages)
+            }
+            return modifyMessages;
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 async function showChatHistory(groupID) {
     try {
         const group = await groupsModel.findOne({ _id: groupID });
         if (group) {
-            const modifyMessages = group.messages
+            const modifyMessages = group.messages.slice(-15);
 
             return modifyMessages;
         }
