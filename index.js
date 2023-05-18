@@ -191,6 +191,8 @@ app.post('/editBucket', editBucket)
 // const memoryStorage = multer.memoryStorage(); // store the file in memory as a buffer
 // const upload = multer({ storage: memoryStorage }); // specify the storage option
 const editProfile = require('./editProfile.js');
+const { Server } = require("net");
+const { json } = require("body-parser");
 app.post('/editProfile', editProfile);
 
 app.get('/editBucket', (req, res) => {
@@ -611,6 +613,7 @@ app.get("*", (req, res) => {
 })
 
 // socketio part starts
+let memory = [];  // store user input for AI's memory
 io.on('connection', socket => {
     socket.on('joinedRoom', ({ username, groupID }) => {
         console.log("joined room " + groupID)
@@ -639,6 +642,56 @@ io.on('connection', socket => {
             //save message to database
             saveMessage(chatMessageObj);
             io.to(chatMessageObj.groupID).emit('chatMessage', { chatMessageObj });
+
+            let userMessage = `${chatMessageObj.userName}: ${chatMessageObj.message}`;
+        console.log(userMessage);
+
+
+        const promptArgs = `Sentiment analyze this dialogue based on the dialogue you heared and provide me with only a JSON data in a format of {userName:${chatMessageObj.userName}, score:sentimentScore, email:${chatMessageObj.email} ,context: describe the context for the score, emoji: emoji unicode that fits the reason}}, nothing should be generated except for the JSON format data: \n\n` + userMessage + '\n\n';
+
+        memory.push(userMessage);
+        // console.log(memory);
+
+        // AI analysis
+        const res = await openai.createChatCompletion({
+            model: "gpt-3.5-turbo",
+            messages: [
+                { role: "assistant", content: memory.join('') },
+                { role: "user", content: promptArgs },  // user input TODO
+            ],
+            temperature: 0.3,
+        })
+        let response = res.data.choices[0].message.content;
+        // console.log(response);  // AI response
+        try {
+            jsonObj = JSON.parse(response);
+            console.log(jsonObj);  // AI response in JSON format 
+
+            //find the group
+            var group = await groupsModel.findOne({ _id: chatMessageObj.groupID });
+            var result = group.memberSentiment.find(member => member.email == jsonObj.email);
+            if (result) {
+                await groupsModel.updateOne({ _id: chatMessageObj.groupID, "memberSentiment.email": jsonObj.email },
+                    {
+                        $set: {
+                            "memberSentiment.$.score": jsonObj.score,
+                            "memberSentiment.$.context": jsonObj.context,
+                            "memberSentiment.$.emoji": jsonObj.emoji
+                        }
+                    })
+
+            } else {
+                group.memberSentiment.push(jsonObj);
+            }
+            const getSentiment = await groupsModel.findOne({ _id: chatMessageObj.groupID, "memberSentiment.email": jsonObj.email });
+            const memberResult = getSentiment.memberSentiment.find(member => member.email == jsonObj.email); 
+            console.log(memberResult);
+            socket.broadcast.to(chatMessageObj.groupID).emit('sentimentScore', { groupID: chatMessageObj.groupID, memberSentiment: memberResult });
+
+        } catch (error) {
+            console.log(error);
+            // ignore error
+        }
 
         } else {
             //user sent image data
@@ -715,9 +768,6 @@ async function showChatHistory(groupID) {
         console.log(error);
     }
 }
-
-
-
 
 server.listen(port, () => {
     console.log("Node application listening on port " + port);

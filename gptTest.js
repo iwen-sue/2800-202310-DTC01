@@ -32,18 +32,3 @@ userInterface.on("line", async (input) => {
 });
 
 // above are user prompt test
-
-
-// openai.createChatCompletion({
-//     model: "gpt-3.5-turbo",
-//     // messages: [{ role: "user", content: "hello World" }],
-//     messages: [{ role: "user", content: promptArgs + conversation }],
-//     temperature: 0.3,
-// })
-//     .then(response => {
-//         result = response.data.choices[0].message.content;
-//         console.log(result);
-//         // jsonObj = JSON.parse(result);
-//         // console.log(jsonObj);
-//     })
-
