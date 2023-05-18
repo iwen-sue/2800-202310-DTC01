@@ -635,16 +635,27 @@ io.on('connection', socket => {
         try {
             jsonObj = JSON.parse(response);
             console.log(jsonObj);  // AI response in JSON format 
+
             //find the group
             var group = await groupsModel.findOne({ _id: chatMessageObj.groupID });
             var result = group.memberSentiment.find(member => member.email == jsonObj.email);
+            if (result) {
+                await groupsModel.updateOne({ _id: chatMessageObj.groupID, "memberSentiment.email": jsonObj.email },
+                    {
+                        $set: {
+                            "memberSentiment.$.score": jsonObj.score,
+                            "memberSentiment.$.context": jsonObj.context,
+                            "memberSentiment.$.emoji": jsonObj.emoji
+                        }
+                    })
 
-            //update doesn't work
-
-            // io.to(chatMessageObj.groupID).emit('sentimentScore', { groupID: chatMessageObj.groupID, memberSentiment: group.memberSentiment });
-            // io.to(chatMessageObj.groupID).emit('chatMessage', {
-            //     chatMessageObj: { userName: name, message: jsonObj.emoji }
-            // });
+            } else {
+                group.memberSentiment.push(jsonObj);
+            }
+            const getSentiment = await groupsModel.findOne({ _id: chatMessageObj.groupID, "memberSentiment.email": jsonObj.email });
+            const memberResult = getSentiment.memberSentiment.find(member => member.email == jsonObj.email); 
+            console.log(memberResult);
+            socket.broadcast.to(chatMessageObj.groupID).emit('sentimentScore', { groupID: chatMessageObj.groupID, memberSentiment: memberResult });
 
         } catch (error) {
             console.log(error);
