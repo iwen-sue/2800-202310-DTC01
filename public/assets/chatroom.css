@@ -37,7 +37,7 @@
 }
 
 .chatMessage {
-    height: 70px;
+    min-height: 70px;
     display: flex;
 }
 
@@ -49,13 +49,6 @@
     display: inline-block;
 }
 
-.chatMessageBoxTwo {
-    position: relative;
-    height: 70px;
-    flex: 1;
-    background-color: unset;
-    display: inline-block;
-}
 
 .chatMessageHeader {
     position: absolute;
@@ -63,8 +56,7 @@
 }
 
 .chatMessageText {
-    position: absolute;
-    top: 28px;
+    margin-top: 28px;
     word-wrap: break-word;
     width: 100%;
 }
@@ -82,10 +74,6 @@
     font-weight: bold;
 }
 
-.chatMessageText {
-    font-size: 17px;
-    color: black;
-}
 
 .chatNotification {
     margin-top: 5px;
@@ -116,4 +104,23 @@
 
 #container {
     overflow-y: auto;
+}
+.chatMessageBoxTwo {
+    position: relative;
+    flex: 1;
+    background-color: unset;
+    display: inline-block;
+    height:fit-content;
+}
+.chatMessageText {
+    font-size: 17px;
+    color: black;
+    display: flex;
+    align-items: flex-start;
+}
+
+.clientImage{
+    width:200px;
+    height:auto;
+    flex-grow: 1;
 }
