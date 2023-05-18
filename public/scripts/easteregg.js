@@ -1,5 +1,6 @@
 // JS code for easter egg from https://codepen.io/Wujek_Greg/pen/EpJwaj
-// Modifications made: animation and music show up after clicking submit button, disappears after 2 minutes and 3 seconds
+// Modifications made: animation and music show up after clicking submit button, disappears after 2 minutes and 3 seconds,
+//                     ,music volume increases gradually over 2 seconds, and dance animation floats down after song ends
 // Pure CSS dance animation (no graphics included)
 
 // Designed by Gustavo Viselner
