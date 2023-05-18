@@ -559,7 +559,7 @@ app.post('/joingroup', sessionValidation, async (req, res) => {
 
 app.post('/leavegroup', sessionValidation, async (req, res) => {
     var groupToken = req.body.groupID;
-    await groupsModel.updateOne({ _id: groupToken }, { $pull: { members: req.session.email } }).exec();
+    await groupsModel.updateOne({ _id: groupToken }, { $pull: { members: {email: req.session.email} } }).exec();
     await usersModel.updateOne({ email: req.session.email }, { $set: { groupID: null, type: null } }).exec();
     res.redirect('/userprofile');
 });
