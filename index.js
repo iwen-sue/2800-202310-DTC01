@@ -9,6 +9,15 @@ const usersModel = require('./models/user.js');
 const groupsModel = require('./models/group.js');
 const ejs = require('ejs');
 const crypto = require('crypto');
+const cors = require('cors');
+
+// for AI
+const { Configuration, OpenAIApi } = require("openai");
+const configuration = new Configuration({
+    apiKey: process.env.OPENAI_API_KEY,
+});
+const openai = new OpenAIApi(configuration);
+
 
 
 
@@ -58,6 +67,8 @@ app.set('view engine', 'ejs');
 
 //false: url decode only support array or string
 app.use(express.urlencoded({ extended: true }))
+app.use(express.json());
+app.use(cors());
 
 const store = new mongoDBSession({
     // uri: 'mongodb://127.0.0.1:27017/connect_mongodb_session_test',
@@ -132,6 +143,10 @@ app.get('/home', sessionValidation, (req, res) => {
     res.render("home");
 });
 
+// AI analysis routes
+// const gptAnalysis = require('./gptAnalysis.js');
+// app.post('/completion', gptAnalysis);
+
 app.get('/chatroom', sessionValidation, async (req, res) => {
     const query = usersModel.findOne({
         email: req.session.email,
@@ -184,6 +199,7 @@ app.post('/editBucket', editBucket)
 // const upload = multer({ storage: memoryStorage }); // specify the storage option
 const editProfile = require('./editProfile.js');
 const { Server } = require("net");
+const { json } = require("body-parser");
 app.post('/editProfile', editProfile);
 
 app.get('/editBucket', (req, res) => {
@@ -280,12 +296,16 @@ app.post('/signup', async (req, res) => {
         var userType
         if (req.body.groupToken != null) {
             userType = 'member'
-            await groupsModel.updateOne({ _id: req.body.groupToken }, { $push: { members: {
-                email: req.body.email,
-                type: 'member',
-                firstName: req.body.firstName,
-                lastName: req.body.lastName
-            } } }).exec();
+            await groupsModel.updateOne({ _id: req.body.groupToken }, {
+                $push: {
+                    members: {
+                        email: req.body.email,
+                        type: 'member',
+                        firstName: req.body.firstName,
+                        lastName: req.body.lastName
+                    }
+                }
+            }).exec();
         }
         const user = new usersModel({
             firstName: req.body.firstName,
@@ -563,16 +583,15 @@ app.get("*", (req, res) => {
 })
 
 // socketio part starts
+let memory = [];  // store user input for AI's memory
 io.on('connection', socket => {
-    socket.on('joinedRoom', ({username, groupID})=>{
+    socket.on('joinedRoom', ({ username, groupID }) => {
         console.log("joined room " + groupID)
         socket.join(groupID);
 
         //broadcast when a user connect, to everyone except the client connecting
-    //notify who enters the chatroom and who leaves the chatroom
-    socket.broadcast.to(groupID).emit('message', username + 'has joined the chat');
-
-    
+        //notify who enters the chatroom and who leaves the chatroom
+        socket.broadcast.to(groupID).emit('message', username + 'has joined the chat');
 
     })
 
@@ -583,14 +602,54 @@ io.on('connection', socket => {
         socket.emit('chatHistory', messageHistory);
     });
 
+
     //listen for chat message
-    socket.on('chatMessage', (chatMessageObj) => {
+    socket.on('chatMessage', async (chatMessageObj) => {
 
         console.log(chatMessageObj)
 
         //save message to database
         saveMessage(chatMessageObj);
-        io.to(chatMessageObj.groupID).emit('chatMessage', {chatMessageObj});
+        io.to(chatMessageObj.groupID).emit('chatMessage', { chatMessageObj });
+
+        let userMessage = `${chatMessageObj.userName}: ${chatMessageObj.message}`;
+        console.log(userMessage);
+
+
+        const promptArgs = `Sentiment analyze this dialogue based on the dialogue you heared and provide me with only a JSON data in a format of {userName:${chatMessageObj.userName}, score:sentimentScore, email:${chatMessageObj.email} ,context: describe the context for the score, emoji: emoji unicode that fits the reason}}, nothing should be generated except for the JSON format data: \n\n` + userMessage + '\n\n';
+
+        memory.push(userMessage);
+        // console.log(memory);
+
+        // AI analysis
+        const res = await openai.createChatCompletion({
+            model: "gpt-3.5-turbo",
+            messages: [
+                { role: "assistant", content: memory.join('') },
+                { role: "user", content: promptArgs },  // user input TODO
+            ],
+            temperature: 0.3,
+        })
+        let response = res.data.choices[0].message.content;
+        // console.log(response);  // AI response
+        try {
+            jsonObj = JSON.parse(response);
+            console.log(jsonObj);  // AI response in JSON format 
+            //find the group
+            var group = await groupsModel.findOne({ _id: chatMessageObj.groupID });
+            var result = group.memberSentiment.find(member => member.email == jsonObj.email);
+
+            //update doesn't work
+
+            // io.to(chatMessageObj.groupID).emit('sentimentScore', { groupID: chatMessageObj.groupID, memberSentiment: group.memberSentiment });
+            // io.to(chatMessageObj.groupID).emit('chatMessage', {
+            //     chatMessageObj: { userName: name, message: jsonObj.emoji }
+            // });
+
+        } catch (error) {
+            console.log(error);
+            // ignore error
+        }
 
     })
 })
@@ -614,7 +673,7 @@ async function showChatHistory(groupID) {
         const group = await groupsModel.findOne({ _id: groupID });
         if (group) {
             const modifyMessages = group.messages
-              
+
             return modifyMessages;
         }
     } catch (error) {
