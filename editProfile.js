@@ -55,7 +55,7 @@ router.post('/editProfile', upload.single('avatar'), async (req, res) => {
                             member.lastName = lastName;
                             return true; // Keep the object in the filtered array
                           }
-                          return false; // Exclude the object from the filtered array
+                          return true;
                         });
                       
                         group.members = filteredMembers;
