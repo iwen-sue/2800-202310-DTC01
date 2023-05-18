@@ -10,14 +10,15 @@
 
     <body id="chatBackGround">
         <%- include("templates/nav") %>
-            <div class="content">
+            <div class="content" id="container">
+                <% if (group) { %>
+                    <div class="chatNotification">- <%= group.groupName %> -</div>
+                <%} else { %>
+                    <div class="chatNotification">- you have not joined any group yet -</div>
+                <% } %>
+                <% if (group) { %>
+
                 <div id="chatRoomView">
-                    <% if (group) { %>
-                        <div class="chatNotification">- <%= group.groupName %> -</div>
-                    <%} else { %>
-                        <div class="chatNotification">- you have not joined any group yet -</div>
-                    <% } %>
-                    <% if (group) { %>
 
                     <% group.members.forEach(function(member){ %>
 

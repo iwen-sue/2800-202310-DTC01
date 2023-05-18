@@ -89,6 +89,12 @@
 
 .chatNotification {
     margin-top: 5px;
+}
+
+.chatNotification{
+    height: 50px;
+    margin-top:20px;
+    margin-bottom:22px;
     text-align: center;
 }
 
@@ -106,4 +112,8 @@
     position:absolute;
     opacity:0;
     margin-bottom: 50px;
+}
+
+#container {
+    overflow-y: auto;
 }
