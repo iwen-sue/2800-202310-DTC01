@@ -347,7 +347,7 @@ app.post('/login', async (req, res) => {
                     members:
                     {
                         email: result[0].email,
-                        type: 'leader',
+                        type: 'member',
                         firstName: result[0].firstName,
                         lastName: result[0].lastName,
                         profilePic: result[0].profilePic
