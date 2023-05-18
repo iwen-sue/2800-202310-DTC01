@@ -663,7 +663,7 @@ io.on('connection', socket => {
         }
 
     })
-})
+}); // socketio part ends
 
 async function saveMessage(chatMessageObj) {
     try {
@@ -691,9 +691,6 @@ async function showChatHistory(groupID) {
         console.log(error);
     }
 }
-
-
-
 
 server.listen(port, () => {
     console.log("Node application listening on port " + port);
