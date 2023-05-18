@@ -561,7 +561,7 @@ app.post('/joingroup', sessionValidation, async (req, res) => {
 
 app.post('/leavegroup', sessionValidation, async (req, res) => {
     var groupToken = req.body.groupID;
-    await groupsModel.updateOne({ _id: groupToken }, { $pull: { members: {email: req.session.email} } }).exec();
+    await groupsModel.updateOne({ _id: groupToken }, { $pull: { members: { email: req.session.email } } }).exec();
     await usersModel.updateOne({ email: req.session.email }, { $set: { groupID: null, type: null } }).exec();
     res.redirect('/userprofile');
 });
@@ -644,54 +644,54 @@ io.on('connection', socket => {
             io.to(chatMessageObj.groupID).emit('chatMessage', { chatMessageObj });
 
             let userMessage = `${chatMessageObj.userName}: ${chatMessageObj.message}`;
-        console.log(userMessage);
+            console.log(userMessage);
 
 
-        const promptArgs = `Sentiment analyze this dialogue based on the dialogue you heared and provide me with only a JSON data in a format of {userName:${chatMessageObj.userName}, score:sentimentScore, email:${chatMessageObj.email} ,context: describe the context for the score, emoji: emoji unicode that fits the reason}}, nothing should be generated except for the JSON format data: \n\n` + userMessage + '\n\n';
+            const promptArgs = `Sentiment analyze this dialogue based on the dialogue you heared and provide me with only a JSON data in a format of {userName:${chatMessageObj.userName}, score:sentimentScore, email:${chatMessageObj.email} ,context: describe the context for the score, emoji: emoji unicode that fits the reason}}, nothing should be generated except for the JSON format data: \n\n` + userMessage + '\n\n';
 
-        memory.push(userMessage);
-        // console.log(memory);
+            memory.push(userMessage);
+            // console.log(memory);
 
-        // AI analysis
-        const res = await openai.createChatCompletion({
-            model: "gpt-3.5-turbo",
-            messages: [
-                { role: "assistant", content: memory.join('') },
-                { role: "user", content: promptArgs },  // user input TODO
-            ],
-            temperature: 0.3,
-        })
-        let response = res.data.choices[0].message.content;
-        // console.log(response);  // AI response
-        try {
-            jsonObj = JSON.parse(response);
-            console.log(jsonObj);  // AI response in JSON format 
+            // AI analysis
+            const res = await openai.createChatCompletion({
+                model: "gpt-3.5-turbo",
+                messages: [
+                    { role: "assistant", content: memory.join('') },
+                    { role: "user", content: promptArgs },  // user input TODO
+                ],
+                temperature: 0.3,
+            })
+            let response = res.data.choices[0].message.content;
+            // console.log(response);  // AI response
+            try {
+                jsonObj = JSON.parse(response);
+                console.log(jsonObj);  // AI response in JSON format 
 
-            //find the group
-            var group = await groupsModel.findOne({ _id: chatMessageObj.groupID });
-            var result = group.memberSentiment.find(member => member.email == jsonObj.email);
-            if (result) {
-                await groupsModel.updateOne({ _id: chatMessageObj.groupID, "memberSentiment.email": jsonObj.email },
-                    {
-                        $set: {
-                            "memberSentiment.$.score": jsonObj.score,
-                            "memberSentiment.$.context": jsonObj.context,
-                            "memberSentiment.$.emoji": jsonObj.emoji
-                        }
-                    })
+                //find the group
+                var group = await groupsModel.findOne({ _id: chatMessageObj.groupID });
+                var result = group.memberSentiment.find(member => member.email == jsonObj.email);
+                if (result) {
+                    await groupsModel.updateOne({ _id: chatMessageObj.groupID, "memberSentiment.email": jsonObj.email },
+                        {
+                            $set: {
+                                "memberSentiment.$.score": jsonObj.score,
+                                "memberSentiment.$.context": jsonObj.context,
+                                "memberSentiment.$.emoji": jsonObj.emoji
+                            }
+                        })
 
-            } else {
-                group.memberSentiment.push(jsonObj);
+                } else {
+                    group.memberSentiment.push(jsonObj);
+                }
+                const getSentiment = await groupsModel.findOne({ _id: chatMessageObj.groupID, "memberSentiment.email": jsonObj.email });
+                const memberResult = getSentiment.memberSentiment.find(member => member.email == jsonObj.email);
+                console.log(memberResult);
+                socket.broadcast.to(chatMessageObj.groupID).emit('sentimentScore', { groupID: chatMessageObj.groupID, memberSentiment: memberResult });
+
+            } catch (error) {
+                console.log(error);
+                // ignore error
             }
-            const getSentiment = await groupsModel.findOne({ _id: chatMessageObj.groupID, "memberSentiment.email": jsonObj.email });
-            const memberResult = getSentiment.memberSentiment.find(member => member.email == jsonObj.email); 
-            console.log(memberResult);
-            socket.broadcast.to(chatMessageObj.groupID).emit('sentimentScore', { groupID: chatMessageObj.groupID, memberSentiment: memberResult });
-
-        } catch (error) {
-            console.log(error);
-            // ignore error
-        }
 
         } else {
             //user sent image data
@@ -708,14 +708,14 @@ io.on('connection', socket => {
         console.log(numOfScroll)
         if (getMoreMessageHistory.length == 0) {
             console.log("no more history")
-            socket.emit('noMoreChatHistory', data=true);
+            socket.emit('noMoreChatHistory', data = true);
         }
-        if(numOfScroll > 0) {
+        if (numOfScroll > 0) {
             console.log("befroe Insert", getMoreMessageHistory)
             socket.emit('moreChatHistory', getMoreMessageHistory);
-            
+
         }
-            
+
     })
 }); // socketio part ends
 
@@ -745,7 +745,7 @@ async function showMoreChatHistory(groupID, numOfScroll) {
             if (numOfMessages == 15) {
                 modifyMessages = [];
                 console.log("when 15 msgs", modifyMessages)
-            }else{
+            } else {
                 modifyMessages = group.messages.reverse().slice(15 + 4 * numOfScroll, 15 + 4 * numOfScroll + 4);
                 console.log("more than 15 msgs", modifyMessages)
             }
