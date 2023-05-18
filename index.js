@@ -2,6 +2,7 @@ require("./utils.js");
 require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
+const mongoose = require('mongoose');
 const mongoDBSession = require('connect-mongodb-session')(session);
 // const MongoStore = require('connect-mongo');
 const bcrypt = require('bcrypt');
@@ -9,6 +10,11 @@ const usersModel = require('./models/user.js');
 const groupsModel = require('./models/group.js');
 const ejs = require('ejs');
 const crypto = require('crypto');
+
+mongoose.connection.once('open', () => {
+    usersModel.createIndexes();
+    groupsModel.createIndexes();
+  });
 
 
 const multer = require('multer');  // npm install multer
