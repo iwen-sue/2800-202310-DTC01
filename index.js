@@ -354,7 +354,7 @@ app.post('/login', async (req, res) => {
                     members:
                     {
                         email: result[0].email,
-                        type: 'leader',
+                        type: 'member',
                         firstName: result[0].firstName,
                         lastName: result[0].lastName,
                         profilePic: result[0].profilePic
@@ -559,11 +559,17 @@ app.post('/joingroup', sessionValidation, async (req, res) => {
 
 app.post('/leavegroup', sessionValidation, async (req, res) => {
     var groupToken = req.body.groupID;
-    await groupsModel.updateOne({ _id: groupToken }, { $pull: { members: req.session.email } }).exec();
+    await groupsModel.updateOne({ _id: groupToken }, { $pull: { members: {email: req.session.email} } }).exec();
     await usersModel.updateOne({ email: req.session.email }, { $set: { groupID: null, type: null } }).exec();
     res.redirect('/userprofile');
 });
 
+app.post('/deletegroup', sessionValidation, async (req, res) => {
+    var groupID = req.body.groupID;
+    await groupsModel.deleteOne({ _id: groupID }).exec();
+    await usersModel.updateMany({ groupID: groupID }, { $set: { groupID: null, type: null } }).exec();
+    res.redirect('/userprofile');
+});
 
 app.post('/uploadImage', sessionValidation, upload.single('imageData'), async (req, res) => {
     const imageData = req.file;
