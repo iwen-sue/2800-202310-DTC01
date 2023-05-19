@@ -13,51 +13,58 @@
             <div class="content" id="container">
                 <% if (group) { %>
                     <div class="chatNotification">- <%= group.groupName %> -</div>
-                <%} else { %>
-                    <div class="chatNotification">- you have not joined any group yet -</div>
-                <% } %>
-                <% if (group) { %>
+                    <%} else { %>
+                        <div class="chatNotification">- you have not joined any group yet -</div>
+                        <% } %>
+                            <% if (group) { %>
 
-                <div id="chatRoomView">
+                                <div id="chatRoomView">
 
-                    <% group.members.forEach(function(member){ %>
+                                    <% group.members.forEach(function(member){ %>
 
-                    <template class="<%= member.email %>">
-                        <div class="chatMessage">
-                        <div class="chatMessageBoxOne">
-                            <% if (member.profilePic) { %>
-                            <img style="height:50px;width:50px;" class="messageImage" src="data:image/png;base64,<%= member.profilePic %>" alt="avatar" />
-                            <%} else { %>
-                            <img style="height:50px;width:50px;" class="messageImage" src="userProfileImages/avatar-default.png" alt="avatar" />
-                            <% } %>
-                            <span class="<%= member.email %>emoji emojiIcon"></span>
-                        </div>
-                        <div class="chatMessageBoxTwo">
-                            <p class="chatMessageHeader">
-                                <span class="messagerName">Muyang Li</span>
-                                <span class="messagerTime">timestamp</span>
-                            </p>
-                            <p class="chatMessageText">Hi</p>
-                        </div>
-                    </div>
-                    </template>
+                                        <template class="<%= member.email %>">
+                                            <div class="chatMessage">
+                                                <div class="chatMessageBoxOne">
+                                                    <% if (member.profilePic) { %>
+                                                        <img style="height:50px;width:50px;" class="messageImage"
+                                                            src="data:image/png;base64,<%= member.profilePic %>"
+                                                            alt="avatar" />
+                                                        <%} else { %>
+                                                            <img style="height:50px;width:50px;" class="messageImage"
+                                                                src="userProfileImages/avatar-default.png"
+                                                                alt="avatar" />
+                                                            <% } %>
+                                                        <span class="<%= member.email %>emoji emojiIcon"></span>
+                                                </div>
+                                                <div class="chatMessageBoxTwo">
+                                                    <p class="chatMessageHeader">
+                                                        <span class="messagerName">Muyang Li</span>
+                                                        <span class="messagerTime">timestamp</span>
+                                                        <button class="btn btn-outline-light btn-xs delete-button">Delete</button>
+                                                    <p class="messageID">ID</p>
+                                                    </p>
+                                                    <p class="chatMessageText">Hi</p>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        <% }) %>
+                                        <% } %>
 
-                    <% }); %>
-                    <% } %>
+                                </div>
 
-
-                </div>
-                
-                            <from id="chatForm">
-                            <section class="chatBottomBox row" style="margin:0">
-                                <input id="imageInputHolder" type="file" onchange="upload(this.files)" />
-                                <label for="imageInputHolder" class="material-symbols-outlined chatIconButton col-1">
-                                    add_circle
-                                </label>
-                                <input type="text" id="msg" class="chatInput col-10" />
-                                <button id="msgBtn" type="submit" class="material-symbols-outlined chatIconButton col-1" style="border:none;background-color: transparent;">
-                                    send
-                                </button>
+                                <from id="chatForm">
+                                    <section class="chatBottomBox row" style="margin:0">
+                                        <input id="imageInputHolder" type="file" onchange="upload(this.files)" />
+                                        <label for="imageInputHolder"
+                                            class="material-symbols-outlined chatIconButton col-1">
+                                            add_circle
+                                        </label>
+                                        <input type="text" id="msg" class="chatInput col-10" />
+                                        <button id="msgBtn" type="submit"
+                                            class="material-symbols-outlined chatIconButton col-1"
+                                            style="border:none;background-color: transparent;">
+                                            send
+                                        </button>
 
                             </section>
                         </from>
@@ -68,10 +75,12 @@
     </body>
     <script src="/socket.io/socket.io.js"></script>
     <% if (group) { %>
-    <script src="/scripts/chatroom.js" userName="<%= user.name %>" userEmail="<%= user.email %>" profilePic="<%= user.profilePic %>" groupID="<%= group._id %>" userID="<%= user.userID %>"></script>
-    <%} else { %>
-        <script src="/scripts/chatroom.js" userName="<%= user.name %>" userEmail="<%= user.email %>" profilePic="<%= user.profilePic %>" groupID="<%= null %>" userID="<%= user.userID %>"></script>
-    <% } %>
+        <script src="/scripts/chatroom.js" userName="<%= user.name %>" userEmail="<%= user.email %>"
+            profilePic="<%= user.profilePic %>" groupID="<%= group._id %>" userID="<%= user.userID %>"></script>
+        <%} else { %>
+            <script src="/scripts/chatroom.js" userName="<%= user.name %>" userEmail="<%= user.email %>"
+                profilePic="<%= user.profilePic %>" groupID="<%= null %>" userID="<%= user.userID %>"></script>
+            <% } %>
 
 
-    </html>
+                </html>
