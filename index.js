@@ -342,14 +342,14 @@ app.post('/login', async (req, res) => {
     const validationResult = schema.validate(email);
     if (validationResult.error != null) {
         var error = "Invalid email format. Please enter a valid email address.";
-        return res.render("login", { error: error, errorType: 'InvalidEmailFormat' });
+        return res.render("login", { error: error, errorType: 'InvalidEmailFormat', groupToken: groupToken });
     }
 
     const result = await usersModel.find({ email: email }).select('email type firstName lastName password profilePic _id').exec();
 
     if (result.length == 0) {
         var error = "User is not found";
-        return res.render("login", { error: error, errorType: 'UserNotFound' });
+        return res.render("login", { error: error, errorType: 'UserNotFound', groupToken: groupToken });
     }
     if (await bcrypt.compare(password, result[0].password)) {
         console.log("password is correct");
@@ -378,7 +378,7 @@ app.post('/login', async (req, res) => {
     }
     else {
         var error = "Password is not correct";
-        return res.render("login", { error: error, errorType: 'IncorrectPassword' });
+        return res.render("login", { error: error, errorType: 'IncorrectPassword', groupToken: groupToken });
     }
 });
 
