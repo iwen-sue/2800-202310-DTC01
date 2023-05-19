@@ -3,6 +3,9 @@ const express = require('express');
 // const session = require('express-session');
 const usersModel = require('./models/user.js');
 const groupsModel = require('./models/group.js');
+var { database } = include('databaseConnection');
+const mongodb_database = process.env.MONGODB_DATABASE;
+const groupCollection = database.db(mongodb_database).collection('groups');
 const router = express.Router();
 
 const multer = require('multer');  // npm install multer
@@ -15,61 +18,52 @@ router.post('/editProfile', upload.single('avatar'), async (req, res) => {
     var homeCity = req.body.homeCity;
     var email = req.body.email;
 
-
-    const result = await usersModel.findOne({
-        email: req.session.email,
-    });
-
     const update = {
         $set: {
             firstName: firstName,
             lastName: lastName,
             email: email,
-            profilePic:  req.file? req.file.buffer.toString('base64'): undefined,
+            profilePic: req.file ? req.file.buffer.toString('base64') : undefined,
             homeCity: homeCity
         }
     }
 
+
+    const result = await usersModel.updateOne({
+        email: req.session.email,
+    }, update);
+
+
+
     if (result) {
 
         try {
-            await usersModel.updateMany({ email: req.session.email }, update);
-            req.session.email = email;
-            req.session.firstName = firstName;
-            req.session.lastName = lastName;
+
 
             const query = usersModel.findOne({
                 email: req.session.email,
             });
 
-            query.then((docs) => {
-                if(docs.groupID){
-                    console.log(docs.profilePic)
-
-
-                    groupsModel.findOne({ _id: docs.groupID }).then(group => {
-                        const filteredMembers = group.members.filter(member => {
-                          if (member.email === email) {
-                            member.profilePic = docs.profilePic;
-                            member.firstName = firstName;
-                            member.lastName = lastName;
-                            return true; // Keep the object in the filtered array
+            query.then(async (docs) => {
+                console.log(docs.groupID)
+                if (docs.groupID) {
+                    await groupsModel.updateOne(
+                        { _id: docs.groupID, "members.email": email },
+                        {
+                          $set: {
+                            "members.$.firstName": firstName,
+                            "members.$.lastName": lastName,
+                            "members.$.profilePic": req.file ? req.file.buffer.toString('base64') : undefined,
                           }
-                          return true;
-                        });
-                      
-                        group.members = filteredMembers;
-                        return group.save(); // Call .save() on the document itself
-                      }).catch(error => {
-                        // An error occurred
-                        console.error("Error saving group:", error);
-                      });
+                        }
+                      );
+                }
+                req.session.email = email;
+                req.session.firstName = firstName;
+                req.session.lastName = lastName;
 
-                        
-                    
-                    
 
-               }
+
                 res.status(200);
                 res.json(docs)
                 res.end()

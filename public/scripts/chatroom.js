@@ -7,8 +7,8 @@ var userID = document.currentScript.getAttribute('userID');
 var userEmail = document.currentScript.getAttribute('userEmail');
 var fileData = new Object();
 fileData.name = ""
-// profilePic = compressBase64(profilePic);
-// console.log(profilePic)
+
+console.log(userName)
 
 if (!groupID) {
     alert("please join a travel group to start chat!")
@@ -129,6 +129,7 @@ function insertMessage(msg, userName, time, email) {
  
     const dateInfo = new Date(time);
     var messageElem = document.getElementsByClassName(email)[0];
+    console.log(messageElem)
 
     var messageCard = messageElem.content.cloneNode(true);
     // if (userImg) {
@@ -195,7 +196,6 @@ function retrieveChatHistory(messageHistory) {
     console.log(messageHistory); // Check the entire messageHistory array
 
     messageHistory.forEach(async (message) => {
-        console.log(message); // Check each individual message object
         if (typeof message.message != "string") {
             var arrImage = message.message.imageData.data
             base64Image = await arrayBufferToBase64(arrImage);
