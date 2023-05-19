@@ -8,6 +8,7 @@ var userEmail = document.currentScript.getAttribute('userEmail');
 var fileData = new Object();
 fileData.name = ""
 
+
 console.log(userName)
 
 if (!groupID) {
@@ -25,6 +26,9 @@ function generalSetUp() {
 
 function setup() {
     console.log(window.userName)
+
+    
+
 
     const msgBtn = document.getElementById("msgBtn");
     setTimeout(()=>{
@@ -145,6 +149,7 @@ function insertMessage(msg, userName, time, email) {
     // }
     messageCard.querySelector('.messagerName').innerHTML = userName;
     messageCard.querySelector('.messagerTime').innerHTML = getTime(dateInfo);
+    
     console.log(typeof msg)
     if (typeof msg == 'string') {
         messageCard.querySelector('.chatMessageText').innerHTML = msg;
@@ -192,6 +197,7 @@ function insertMessageToTop(msg, userName, time, email) {
     messageCard.querySelector('.messagerName').innerHTML = userName;
     messageCard.querySelector('.messagerTime').innerHTML = getTime(dateInfo);
     messageCard.querySelector('.chatMessageText').innerHTML = msg;
+
     document.getElementById("chatRoomView").prepend(messageCard);
 
     
@@ -283,6 +289,37 @@ if (groupID) {
     setup();
 
 }
+
+//delete message
+
+
+const chatRoomView = document.getElementById('chatRoomView');
+chatRoomView.addEventListener('click', function(event) {
+  // Check if the clicked element has the delete-button class
+  if (event.target.classList.contains('delete-button')) {
+    const deleteButton = event.target;
+    const chatMessageBoxTwo = deleteButton.closest('.chatMessageBoxTwo');
+    const chatMessage = deleteButton.closest('.chatMessage');
+    const messagerNameElement = chatMessageBoxTwo.querySelector('.messagerName');
+    const messagerName = messagerNameElement.textContent.trim();
+    const deleteBtn = chatMessageBoxTwo.querySelector('.delete-button');
+    if (userName != messagerName) {
+        alert("You can only delete your own message!")
+        deleteBtn.style.display = 'none';
+    }
+    // Compare the userName and messagerName
+    if (userName === messagerName && confirm('Are you sure you want to delete this message?')) {
+      // Code to handle the delete action
+      chatMessage.remove(); // Remove the entire chat message container
+      
+
+    } 
+  }
+});
+
+
+
+
 
 
 
