@@ -48,6 +48,35 @@ function setup() {
             sendMission()
         }
     });
+
+    fetch('/chatroom/sentimentScores?id='+ groupID, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      })
+        .then(response => {
+          return response.json()
+        })
+        .then(data => {
+            // Process the response data
+            console.log(data);
+            const filteredSentiments = data.data.filter(memberSentiment => {
+                return memberSentiment.userName !== userName
+            })
+            console.log(filteredSentiments)
+            filteredSentiments.forEach(memberSentiment =>{
+                setTimeout(()=>{
+                    insertEmoji(memberSentiment)
+                }, 2000)
+                
+            })
+            // insertEmoji(memberSentiment)
+          })
+        .catch(error => {
+          // Handle any errors
+          console.error('Error:', error);
+        });
 }
 
 function sendMission() {
@@ -263,6 +292,11 @@ if (groupID) {
         sendNotification(message);
     })
 
+    socket.on("sentimentScore", ({memberSentiment})=>{
+        console.log(memberSentiment)
+        insertEmoji(memberSentiment)
+    })
+
     // show chat history
     socket.on('chatMessage', async ({ chatMessageObj }) => {
         // console.log(chatMessage);
@@ -287,6 +321,28 @@ if (groupID) {
 
 
 generalSetUp()
+
+function insertEmoji(memberSentiment){
+    //add the animated Emoji to the latest message icon
+    
+    var classStr = memberSentiment.email + "emoji";
+    var elems = document.getElementsByClassName(classStr);
+    for(var i=0; i<elems.length; i++){
+        if(i == elems.length-1){
+            if(memberSentiment.emoji == ""){
+                elems[i].innerHTML = "&#x1F610;"
+            }else{
+                elems[i].innerHTML = memberSentiment.emoji;
+            }
+            elems[i].setAttribute("class", `${memberSentiment.email}emoji emojiIcon emojiAnimate`);
+
+        }else{
+            elems[i].innerHTML = ""
+            elems[i].setAttribute("class", `${memberSentiment.email}emoji emojiIcon`);
+        }
+    }
+    
+}
 
 function arrayBufferToBase64(buffer) {
     var binary = '';
