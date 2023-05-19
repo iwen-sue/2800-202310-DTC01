@@ -730,14 +730,14 @@ io.on('connection', socket => {
 
     })
 
-    socket.on('deleteMessage', async (groupID, messageName) => {
-        await deleteMessageDB(groupID, messageName);
-        socket.emit('deleteMessage', { groupID, messageName });
+    socket.on('deleteMessage', async (groupID, timeStp) => {
+        await deleteMessageDB(groupID, timeStp);
+        socket.emit('deleteMessage', { groupID, timeStp });
     });
 
 }); // socketio part ends
 
-async function deleteMessageDB(groupID, msgNM) {
+async function deleteMessageDB(groupID, timeStp) {
     try {
         const group = await groupsModel.findOne({ _id: groupID });
 
@@ -747,12 +747,13 @@ async function deleteMessageDB(groupID, msgNM) {
         }
 
         // Find the index of the message with the given messageName
-        const messageIndex = group.messages.findIndex((message) => message.messageName === msgNM);
+        // const messageIndex = group.messages.findIndex((message) => message.messageName === msgNM);
 
+        await groupsModel.updateOne({ _id: groupID }, { $pull: {messages: { timeStp: timeStp } }}).exec();
         // Check if the message was found
         if (messageIndex !== -1) {
             // Remove the message from the messages array
-            group.messages.splice(messageIndex, 1);
+            group.messages.time
             await group.save();
             console.log('Message deleted.');
         } else {
@@ -771,14 +772,20 @@ async function saveMessage(chatMessageObj) {
 
         if (group) {
             console.log(chatMessageObj)
-            group.messages.push(chatMessageObj);
-            await group.save();
+
+            // chatMessageObj._id = mongoose.
+            var msg = await groupsModel.findOne({ _id: chatMessageObj.groupID })
+            const update = { $push: { messages: chatMessageObj } };
+            await groupsModel.updateOne({ _id: chatMessageObj.groupID }, update)
+            // await msg.insertOne(chatMessageObj);
+            // await group.save();
             return group.messages;
         }
     } catch (error) {
         console.log(error);
     }
 }
+
 
 async function showMoreChatHistory(groupID, numOfScroll) {
     try {
@@ -805,6 +812,7 @@ async function showChatHistory(groupID) {
     try {
         const group = await groupsModel.findOne({ _id: groupID });
         if (group) {
+            console.log(Array.isArray(group.messages))
             const modifyMessages = group.messages.slice(-15);
 
             return modifyMessages;
