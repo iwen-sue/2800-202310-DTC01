@@ -659,7 +659,7 @@ io.on('connection', socket => {
 
         // set inactive threshold
         lastActivityTimeSTP = Date.now();
-        const inactiveThreshold = 1000 * 60 * 30;  // 5 minutes
+        const inactiveThreshold = 1000 * 60 * 30;  // 30 minutes
         setInterval( async () => {
             if (lastActivityTimeSTP && Date.now() - lastActivityTimeSTP > inactiveThreshold) {
                 // user is inactive
