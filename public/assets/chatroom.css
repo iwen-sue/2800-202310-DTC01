@@ -2,12 +2,24 @@
     background-color: rgba(233, 148, 169, 0.25);
 }
 
+
+#imageInputHolder {
+    padding:0;
+    opacity:1;
+    position:fixed;
+    left:2vw;
+    bottom:10px;
+    z-index:0;
+    width:20px;
+}
+
 .chatBottomBox {
     position: fixed;
     bottom: 0px;
     left: 0;
     right: 0;
     height: 45px;
+    z-index:5;
     background-color: var(--backgroundWhite);
     box-shadow: 2px 2px 20px 2px rgba(0, 0, 0, .15);
 }
@@ -119,14 +131,6 @@
     height: 120px;
 }
 
-#imageInputHolder {
-    padding:0;
-    opacity:0;
-    position:fixed;
-    left:0;
-    bottom:0;
-    z-index:-1;
-}
 
 #container {
     overflow-y: auto;
