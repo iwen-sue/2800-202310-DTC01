@@ -120,9 +120,12 @@
 }
 
 #imageInputHolder {
-    position:absolute;
+    padding:0;
     opacity:0;
-    margin-bottom: 50px;
+    position:fixed;
+    left:0;
+    bottom:0;
+    z-index:-1;
 }
 
 #container {
