@@ -341,15 +341,17 @@ function insertEmoji(memberSentiment){
             elems[i].setAttribute("class", `${memberSentiment.email}emoji emojiIcon`);
         }
     }
+    
     if(memberSentiment.suggestion){
         console.log("notification triggered")
         var elem = document.getElementsByClassName("aiSuggestion")[0]
         elem.innerHTML = memberSentiment.suggestion
+        elem.setAttribute("class", "aiSuggestion");
         setTimeout(()=>{
             elem.setAttribute("class", "aiSuggestion aiSuggestionShow");
             setTimeout(()=>{
                 elem.setAttribute("class", "aiSuggestion");
-            }, 3500)
+            }, 9500)
         }, 1500)
     }
     
