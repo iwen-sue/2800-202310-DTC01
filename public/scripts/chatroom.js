@@ -24,10 +24,17 @@ function generalSetUp() {
 }
 
 function setup() {
+    console.log(window.userName)
 
     const msgBtn = document.getElementById("msgBtn");
+    setTimeout(()=>{
+        var joinedRoomObj = new Object()
+        joinedRoomObj.name = window.userName
+        joinedRoomObj.groupID = window.groupID
 
-    socket.emit('joinedRoom', { userName, groupID });
+        socket.emit('joinedRoom',  joinedRoomObj);
+    })
+    
 
 
     socket.emit('chatHistory', groupID);
