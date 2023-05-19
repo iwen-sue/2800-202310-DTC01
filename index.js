@@ -624,13 +624,14 @@ app.get("*", (req, res) => {
 // socketio part starts
 let memory = [];  // store user input for AI's memory
 io.on('connection', socket => {
-    socket.on('joinedRoom', ({ username, groupID }) => {
-        console.log(username, " joined room ")
-        socket.join(groupID);
+    socket.on('joinedRoom', (joinedRoomObj) => {
+        console.log(joinedRoomObj.name, " joined room ")
+        socket.join(joinedRoomObj.groupID);
+        let message = joinedRoomObj.name + ' has joined the chat'
 
         //broadcast when a user connect, to everyone except the client connecting
         //notify who enters the chatroom and who leaves the chatroom
-        socket.broadcast.to(groupID).emit('message', username + ' has joined the chat');
+        socket.broadcast.to(joinedRoomObj.groupID).emit('message', message);
 
 
 
