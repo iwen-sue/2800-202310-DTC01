@@ -14,7 +14,7 @@ const groupsSchema = new mongoose.Schema({
     members: {
         type: Array,
         required: true
-    }, 
+    },
     messages: {
         type: Array,
     },

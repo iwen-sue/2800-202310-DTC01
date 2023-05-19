@@ -117,7 +117,9 @@
   visibility: hidden;
 }
 
-
+.messageID {
+    visibility: hidden;
+}
 
 .chatMessageBoxTwo:hover .delete-button {
   visibility: visible;
