@@ -135,6 +135,22 @@
     display: inline-block;
     height:fit-content;
 }
+
+.delete-button {
+  visibility: hidden;
+}
+
+.messageID {
+    display: none;
+}
+
+.chatMessageBoxTwo:hover .delete-button {
+  visibility: visible;
+  color: red;
+  cursor: pointer;
+}
+
+
 .chatMessageText {
     font-size: 17px;
     color: black;
