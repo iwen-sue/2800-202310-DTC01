@@ -398,7 +398,7 @@ function insertEmoji(memberSentiment, ifNote){
         }
     }
     
-    if(memberSentiment.suggestion && ifNote=="on"){
+    if(memberSentiment.suggestion!="" && ifNote=="on"){
         console.log("notification triggered")
         var elem = document.getElementsByClassName("aiSuggestion")[0]
         elem.innerHTML = memberSentiment.suggestion
