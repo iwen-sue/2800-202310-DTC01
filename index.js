@@ -647,14 +647,19 @@ io.on('connection', socket => {
     //listen for chat message
     socket.on('chatMessage', async (chatMessageObj) => {
         var group = await groupsModel.findOne({ _id: chatMessageObj.groupID });
+        const maxMessageHistory = 20;
 
         // set inactive threshold
         lastActivityTimeSTP = Date.now();
-        const inactiveThreshold = 1000 * 60 * 5;  // 5 minutes
-        setInterval(() => {
+        const inactiveThreshold = 1000 * 60 * 1;  // 5 minutes
+        setInterval( async () => {
             if (lastActivityTimeSTP && Date.now() - lastActivityTimeSTP > inactiveThreshold) {
                 // user is inactive
-                console.log("user is inactive");                
+                // console.log("user is inactive");
+                if (memory.length > maxMessageHistory) {
+                    memory = memory.slice(-maxMessageHistory);
+                }
+                await groupsModel.updateOne({ _id: chatMessageObj.groupID }, { $set: { chatContext: memory } });
             }
         }, 10000);  //Check every 10 seconds
 
@@ -666,7 +671,13 @@ io.on('connection', socket => {
             let userMessage = `${chatMessageObj.userName}: ${chatMessageObj.message}`;
             console.log(userMessage);
 
-            const promptArgs = `Sentiment analyze this dialogue based on the dialogue you heared and provide me with only a JSON data in a format of {userName:${chatMessageObj.userName}, score:sentimentScore, email:${chatMessageObj.email} ,suggestion: give suggestion of how I can help out as a friend if the score is lower than 0, context: describe the context for the score, emoji: emoji unicode that fits the reason}}, nothing should be generated except for the JSON format data: \n\n` + userMessage + '\n\n';
+            // check if there is chat log in the database
+            if (group.chatContext.length > 0 && memory.length == 0) {
+                console.log("chat log in the database");
+                memory.push(...group.chatContext);  //need to be an array
+            }
+
+            const promptArgs = `Sentiment analyze this dialogue based on the dialogue you heared and provide me with only a JSON data in a format of {userName:${chatMessageObj.userName}, score:sentimentScore, email:${chatMessageObj.email} ,suggestion: give suggestion of how I can help out as a friend if the score is lower than 0.1, context: describe the context for the score, emoji: emoji unicode that fits the reason}}, nothing should be generated except for the JSON format data: \n\n` + userMessage + '\n\n';
 
             memory.push(userMessage);
             // console.log(memory);
@@ -681,6 +692,7 @@ io.on('connection', socket => {
                 temperature: 0.3,
             })
             let response = res.data.choices[0].message.content;
+
             // console.log(response);  // AI response
             try {
                 jsonObj = JSON.parse(response);
