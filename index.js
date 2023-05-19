@@ -2,6 +2,7 @@ require("./utils.js");
 require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
+const mongoose = require('mongoose');
 const mongoDBSession = require('connect-mongodb-session')(session);
 // const MongoStore = require('connect-mongo');
 const bcrypt = require('bcrypt');
@@ -9,6 +10,8 @@ const usersModel = require('./models/user.js');
 const groupsModel = require('./models/group.js');
 const ejs = require('ejs');
 const crypto = require('crypto');
+
+
 
 const { Configuration, OpenAIApi } = require("openai");
 const configuration = new Configuration({
@@ -623,12 +626,12 @@ let memory = [];  // store user input for AI's memory
 let lastActivityTimeSTP = null;  // last activity time stamp
 io.on('connection', socket => {
     socket.on('joinedRoom', ({ username, groupID }) => {
-        console.log("joined room " + groupID)
+        console.log(username, " joined room ")
         socket.join(groupID);
 
         //broadcast when a user connect, to everyone except the client connecting
         //notify who enters the chatroom and who leaves the chatroom
-        socket.broadcast.to(groupID).emit('message', username + 'has joined the chat');
+        socket.broadcast.to(groupID).emit('message', username + ' has joined the chat');
 
 
 
@@ -699,6 +702,7 @@ io.on('connection', socket => {
 
                 } else {
                     group.memberSentiment.push(jsonObj);
+                    await group.save();
                 }
                 const getSentiment = await groupsModel.findOne({ _id: chatMessageObj.groupID, "memberSentiment.email": jsonObj.email });
                 const memberResult = getSentiment.memberSentiment.find(member => member.email == jsonObj.email);
