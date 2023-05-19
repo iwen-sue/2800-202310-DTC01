@@ -67,7 +67,7 @@ function setup() {
             console.log(filteredSentiments)
             filteredSentiments.forEach(memberSentiment =>{
                 setTimeout(()=>{
-                    insertEmoji(memberSentiment)
+                    insertEmoji(memberSentiment, "off")
                 }, 2000)
                 
             })
@@ -294,7 +294,7 @@ if (groupID) {
 
     socket.on("sentimentScore", ({memberSentiment})=>{
         console.log(memberSentiment)
-        insertEmoji(memberSentiment)
+        insertEmoji(memberSentiment, "on")
     })
 
     // show chat history
@@ -322,7 +322,7 @@ if (groupID) {
 
 generalSetUp()
 
-function insertEmoji(memberSentiment){
+function insertEmoji(memberSentiment, ifNote){
     //add the animated Emoji to the latest message icon
     
     var classStr = memberSentiment.email + "emoji";
@@ -342,7 +342,7 @@ function insertEmoji(memberSentiment){
         }
     }
     
-    if(memberSentiment.suggestion){
+    if(memberSentiment.suggestion && ifNote=="on"){
         console.log("notification triggered")
         var elem = document.getElementsByClassName("aiSuggestion")[0]
         elem.innerHTML = memberSentiment.suggestion
