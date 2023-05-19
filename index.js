@@ -582,6 +582,13 @@ app.post('/deletegroup', sessionValidation, async (req, res) => {
     res.redirect('/userprofile');
 });
 
+app.get('/chatroom/sentimentScores', sessionValidation, async (req, res)=>{
+    var groupID = req.query.id
+    groupsModel.findOne({_id: groupID}).then((docs)=>{
+        res.status(200).json({ data: docs.memberSentiment });
+    })
+})
+
 app.post('/uploadImage', sessionValidation, upload.single('imageData'), async (req, res) => {
     const imageData = req.file;
 
@@ -719,8 +726,8 @@ io.on('connection', socket => {
                 }
                 const getSentiment = await groupsModel.findOne({ _id: chatMessageObj.groupID, "memberSentiment.email": jsonObj.email });
                 const memberResult = getSentiment.memberSentiment.find(member => member.email == jsonObj.email);
-                // console.log(memberResult);
-                socket.broadcast.to(chatMessageObj.groupID).emit('sentimentScore', { groupID: chatMessageObj.groupID, memberSentiment: memberResult });
+                console.log(memberResult);
+                socket.broadcast.to(chatMessageObj.groupID).emit('sentimentScore', { memberSentiment: memberResult });
 
             } catch (error) {
                 console.log(error);
