@@ -730,31 +730,21 @@ io.on('connection', socket => {
 
     })
 
-    socket.on('deleteMessage', async (groupID, timeStp) => {
-        await deleteMessageDB(groupID, timeStp);
-        socket.emit('deleteMessage', { groupID, timeStp });
+    socket.on('deleteMessage', async (groupID, timeStp, chatMessageText) => {
+        await deleteMessageDB(groupID, timeStp, chatMessageText);
+        socket.emit('deleteMessage', { groupID, timeStp, chatMessageText });
     });
 
 }); // socketio part ends
 
-async function deleteMessageDB(groupID, timeStp) {
+async function deleteMessageDB(groupID, messagerName, chatMessageText) {
     try {
-        const group = await groupsModel.findOne({ _id: groupID });
+        const updateResult = await groupsModel.updateOne(
+            { _id: groupID },
+            { $pull: { messages: { message: chatMessageText, userName: messagerName} } }
+        ).exec();
 
-        if (!group) {
-            console.log('Group not found.');
-            return;
-        }
-
-        // Find the index of the message with the given messageName
-        // const messageIndex = group.messages.findIndex((message) => message.messageName === msgNM);
-
-        await groupsModel.updateOne({ _id: groupID }, { $pull: {messages: { timeStp: timeStp } }}).exec();
-        // Check if the message was found
-        if (messageIndex !== -1) {
-            // Remove the message from the messages array
-            group.messages.time
-            await group.save();
+        if (updateResult.modifiedCount > 0) {
             console.log('Message deleted.');
         } else {
             console.log('Message not found.');
@@ -763,6 +753,10 @@ async function deleteMessageDB(groupID, timeStp) {
         console.log(err);
     }
 }
+
+
+
+
 
 
 

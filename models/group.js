@@ -17,10 +17,6 @@ const groupsSchema = new mongoose.Schema({
     },
     messages: [
         {
-          _id: {
-            type: mongoose.Schema.Types.ObjectId,
-            required: true
-          },
           messageName: mongoose.Schema.Types.Mixed,
           message: mongoose.Schema.Types.Mixed,
           groupID: mongoose.Schema.Types.Mixed,

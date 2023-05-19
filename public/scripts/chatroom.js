@@ -309,7 +309,7 @@ if (groupID) {
 
 
 const chatRoomView = document.getElementById('chatRoomView');
-chatRoomView.addEventListener('click', function (event) {
+chatRoomView.addEventListener('click', function(event) {
     // Check if the clicked element has the delete-button class
     if (event.target.classList.contains('delete-button')) {
         const deleteButton = event.target;
@@ -318,19 +318,20 @@ chatRoomView.addEventListener('click', function (event) {
         const messagerNameElement = chatMessageBoxTwo.querySelector('.messagerName');
         const messagerName = messagerNameElement.textContent.trim();
         const deleteBtn = chatMessageBoxTwo.querySelector('.delete-button');
-        const timeStpElement = chatMessageBoxTwo.querySelector('.messagerTime')
+        const timeStpElement = chatMessageBoxTwo.querySelector('.messagerTime');
         const timeStp = timeStpElement.textContent.trim();
+        const chatMessageTextElement = chatMessageBoxTwo.querySelector('.chatMessageText');
+        const chatMessageText = chatMessageTextElement.textContent.trim();
+        console.log(timeStp);
+        console.log(chatMessageText);
+
         if (userName != messagerName) {
-            alert("You can only delete your own message!")
+            alert("You can only delete your own message!");
             deleteBtn.style.display = 'none';
-        }
-        // Compare the userName and messagerName
-        if (userName === messagerName && confirm('Are you sure you want to delete this message?')) {
+        } else if (confirm('Are you sure you want to delete this message?')) {
             // Code to handle the delete action
             chatMessage.remove(); // Remove the entire chat message container
-            socket.emit('deleteMessage', groupID, timeStp);
-
-
+            socket.emit('deleteMessage', groupID, messagerName, chatMessageText);
         }
     }
 });
