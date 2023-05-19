@@ -1,4 +1,3 @@
-
 var groupName = document.currentScript.getAttribute('groupName');
 var userName = document.currentScript.getAttribute('userName');
 var profilePic = document.currentScript.getAttribute('profilePic');
@@ -7,6 +6,7 @@ var userID = document.currentScript.getAttribute('userID');
 var userEmail = document.currentScript.getAttribute('userEmail');
 var fileData = new Object();
 fileData.name = ""
+
 
 console.log(userName)
 
@@ -26,15 +26,18 @@ function generalSetUp() {
 function setup() {
     console.log(window.userName)
 
+
+
+
     const msgBtn = document.getElementById("msgBtn");
-    setTimeout(()=>{
+    setTimeout(() => {
         var joinedRoomObj = new Object()
         joinedRoomObj.name = window.userName
         joinedRoomObj.groupID = window.groupID
 
-        socket.emit('joinedRoom',  joinedRoomObj);
+        socket.emit('joinedRoom', joinedRoomObj);
     })
-    
+
 
 
     socket.emit('chatHistory', groupID);
@@ -79,8 +82,21 @@ function setup() {
         });
 }
 
+function generateUniqueID() {
+    const randomNum = Math.floor(Math.random() * 10000); // Generate random number as a string
+    // Combine timestamp and random number
+    return randomNum;
+}
+
+// Example usage
+
+
+
+
 function sendMission() {
     const msg = $("#msg").val()
+    const messageNM = generateUniqueID()
+
 
     if (msg) {
         var timeStp = new Date();
@@ -88,6 +104,7 @@ function sendMission() {
         //emit message to server
         console.log(userEmail)
         var chatMessageObj = new Object();
+        chatMessageObj.messageName = messageNM
         chatMessageObj.message = msg
         chatMessageObj.groupID = groupID
         chatMessageObj.userID = userID
@@ -160,9 +177,9 @@ function getTime(today) {
 
 
 
-function insertMessage(msg, userName, time, email) {
+function insertMessage(msg, userName, time, email, msgName) {
     console.log(time)
- 
+
     const dateInfo = new Date(time);
     var messageElem = document.getElementsByClassName(email)[0];
     console.log(messageElem)
@@ -174,6 +191,8 @@ function insertMessage(msg, userName, time, email) {
     // }
     messageCard.querySelector('.messagerName').innerHTML = userName;
     messageCard.querySelector('.messagerTime').innerHTML = getTime(dateInfo);
+    messageCard.querySelector('.messageID').innerHTML = msgName;
+
     console.log(typeof msg)
     if (typeof msg == 'string') {
         messageCard.querySelector('.chatMessageText').innerHTML = msg;
@@ -207,9 +226,9 @@ function insertMessage(msg, userName, time, email) {
     })
 }
 
-function insertMessageToTop(msg, userName, time, email) {
+function insertMessageToTop(msg, userName, time, email, msgName) {
     console.log(time)
- 
+
     const dateInfo = new Date(time);
     var messageElem = document.getElementsByClassName(email)[0];
 
@@ -221,9 +240,11 @@ function insertMessageToTop(msg, userName, time, email) {
     messageCard.querySelector('.messagerName').innerHTML = userName;
     messageCard.querySelector('.messagerTime').innerHTML = getTime(dateInfo);
     messageCard.querySelector('.chatMessageText').innerHTML = msg;
+    messageCard.querySelector('.messageID').innerHTML = msgName;
+
     document.getElementById("chatRoomView").prepend(messageCard);
 
-    
+
 
 
 }
@@ -239,7 +260,7 @@ function retrieveChatHistory(messageHistory) {
         }
 
 
-        insertMessage(message.message, message.userName, message.timeStp, message.email);
+        insertMessage(message.message, message.userName, message.timeStp, message.email, message.messageName);
     });
 }
 
@@ -247,7 +268,7 @@ function retrieveChatHistoryToTop(messageHistory) {
     console.log(messageHistory); // Check the entire messageHistory array
 
     messageHistory.forEach((message) => {
-        insertMessageToTop(message.message, message.userName, message.timeStp, message.email);
+        insertMessageToTop(message.message, message.userName, message.timeStp, message.email, message.messageName);
     });
 }
 
@@ -257,16 +278,16 @@ var container = document.getElementById('container');
 
 function scrollTest() {
     console.log(container.scrollTop);
-    
+
     if (container.scrollTop == 0) {
-      console.log("Scroll bar reached the top of the page!");
-      numOfScroll += 1;
-      console.log(numOfScroll);
-      socket.emit('moreChatHistory', groupID, numOfScroll);
-      container.scrollTo(0, 50);
+        console.log("Scroll bar reached the top of the page!");
+        numOfScroll += 1;
+        console.log(numOfScroll);
+        socket.emit('moreChatHistory', groupID, numOfScroll);
+        container.scrollTo(0, 50);
     }
 
-  }
+}
 
 
 container.addEventListener('scroll', scrollTest);
@@ -282,7 +303,7 @@ if (groupID) {
     socket.on('chatHistory', (messageHistory) => {
         console.log("message History", messageHistory);
         retrieveChatHistory(messageHistory);
-        
+
     });
 
 
@@ -305,18 +326,53 @@ if (groupID) {
             base64Img = await arrayBufferToBase64(arrImg);
             chatMessageObj.message.imageData = base64Img
         }
-        insertMessage(chatMessageObj.message, chatMessageObj.userName, chatMessageObj.timeStp, chatMessageObj.email);
+        insertMessage(chatMessageObj.message, chatMessageObj.userName, chatMessageObj.timeStp, chatMessageObj.email, chatMessageObj.messageName);
     });
 
     socket.on('moreChatHistory', (messageHistory) => {
         console.log("message History", messageHistory);
         retrieveChatHistoryToTop(messageHistory);
-        
+
     });
 
     setup();
 
 }
+
+//delete message
+
+
+const chatRoomView = document.getElementById('chatRoomView');
+chatRoomView.addEventListener('click', function(event) {
+    // Check if the clicked element has the delete-button class
+    if (event.target.classList.contains('delete-button')) {
+        const deleteButton = event.target;
+        const chatMessageBoxTwo = deleteButton.closest('.chatMessageBoxTwo');
+        const chatMessage = deleteButton.closest('.chatMessage');
+        const messagerNameElement = chatMessageBoxTwo.querySelector('.messagerName');
+        const messagerName = messagerNameElement.textContent.trim();
+        const deleteBtn = chatMessageBoxTwo.querySelector('.delete-button');
+        const timeStpElement = chatMessageBoxTwo.querySelector('.messagerTime');
+        const timeStp = timeStpElement.textContent.trim();
+        const chatMessageTextElement = chatMessageBoxTwo.querySelector('.chatMessageText');
+        const chatMessageText = chatMessageTextElement.textContent.trim();
+        console.log(timeStp);
+        console.log(chatMessageText);
+
+        if (userName != messagerName) {
+            alert("You can only delete your own message!");
+            deleteBtn.style.display = 'none';
+        } else if (confirm('Are you sure you want to delete this message?')) {
+            // Code to handle the delete action
+            chatMessage.remove(); // Remove the entire chat message container
+            socket.emit('deleteMessage', groupID, messagerName, chatMessageText);
+        }
+    }
+});
+
+
+
+
 
 
 
