@@ -691,6 +691,7 @@ io.on('connection', socket => {
 
                 } else {
                     group.memberSentiment.push(jsonObj);
+                    await group.save();
                 }
                 const getSentiment = await groupsModel.findOne({ _id: chatMessageObj.groupID, "memberSentiment.email": jsonObj.email });
                 const memberResult = getSentiment.memberSentiment.find(member => member.email == jsonObj.email);
