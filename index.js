@@ -13,6 +13,7 @@ const crypto = require('crypto');
 
 
 
+
 const { Configuration, OpenAIApi } = require("openai");
 const configuration = new Configuration({
     apiKey: process.env.OPENAI_API_KEY,
@@ -728,7 +729,39 @@ io.on('connection', socket => {
         }
 
     })
+
+    socket.on('deleteMessage', async (groupID, messageName) => {
+        await deleteMessageDB(groupID, messageName);
+        socket.emit('deleteMessage', { groupID, messageName });
+    });
+
 }); // socketio part ends
+
+async function deleteMessageDB(groupID, msgNM) {
+    try {
+        const group = await groupsModel.findOne({ _id: groupID });
+
+        if (!group) {
+            console.log('Group not found.');
+            return;
+        }
+
+        // Find the index of the message with the given messageName
+        const messageIndex = group.messages.findIndex((message) => message.messageName === msgNM);
+
+        // Check if the message was found
+        if (messageIndex !== -1) {
+            // Remove the message from the messages array
+            group.messages.splice(messageIndex, 1);
+            await group.save();
+            console.log('Message deleted.');
+        } else {
+            console.log('Message not found.');
+        }
+    } catch (err) {
+        console.log(err);
+    }
+}
 
 
 
@@ -737,6 +770,7 @@ async function saveMessage(chatMessageObj) {
         const group = await groupsModel.findOne({ _id: chatMessageObj.groupID });
 
         if (group) {
+            console.log(chatMessageObj)
             group.messages.push(chatMessageObj);
             await group.save();
             return group.messages;
