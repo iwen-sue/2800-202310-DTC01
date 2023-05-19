@@ -342,14 +342,14 @@ app.post('/login', async (req, res) => {
     const validationResult = schema.validate(email);
     if (validationResult.error != null) {
         var error = "Invalid email format. Please enter a valid email address.";
-        return res.render("login", { error: error, errorType: 'InvalidEmailFormat' });
+        return res.render("login", { error: error, errorType: 'InvalidEmailFormat', groupToken: groupToken });
     }
 
     const result = await usersModel.find({ email: email }).select('email type firstName lastName password profilePic _id').exec();
 
     if (result.length == 0) {
         var error = "User is not found";
-        return res.render("login", { error: error, errorType: 'UserNotFound' });
+        return res.render("login", { error: error, errorType: 'UserNotFound', groupToken: groupToken });
     }
     if (await bcrypt.compare(password, result[0].password)) {
         console.log("password is correct");
@@ -378,7 +378,7 @@ app.post('/login', async (req, res) => {
     }
     else {
         var error = "Password is not correct";
-        return res.render("login", { error: error, errorType: 'IncorrectPassword' });
+        return res.render("login", { error: error, errorType: 'IncorrectPassword', groupToken: groupToken });
     }
 });
 
@@ -655,11 +655,11 @@ io.on('connection', socket => {
     //listen for chat message
     socket.on('chatMessage', async (chatMessageObj) => {
         var group = await groupsModel.findOne({ _id: chatMessageObj.groupID });
-        const maxMessageHistory = 20;
+        const maxMessageHistory = 10;
 
         // set inactive threshold
         lastActivityTimeSTP = Date.now();
-        const inactiveThreshold = 1000 * 60 * 30;  // 5 minutes
+        const inactiveThreshold = 1000 * 60 * 5;  // 5 minutes
         setInterval( async () => {
             if (lastActivityTimeSTP && Date.now() - lastActivityTimeSTP > inactiveThreshold) {
                 // user is inactive
@@ -688,7 +688,7 @@ io.on('connection', socket => {
             const promptArgs = `Sentiment analyze this dialogue based on the dialogue you heared and provide me with only a JSON data in a format of {userName:${chatMessageObj.userName}, score:sentimentScore, email:${chatMessageObj.email} ,suggestion: give suggestion of how I can help out as a friend if the score is lower than 0.1, context: describe the context for the score, emoji: emoji in numeric character reference that fits the reason}}, nothing should be generated except for the JSON format data: \n\n` + userMessage + '\n\n';
 
             memory.push(userMessage);
-            // console.log(memory);
+            console.log(memory);
 
             // AI analysis
             const res = await openai.createChatCompletion({
