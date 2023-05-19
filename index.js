@@ -655,11 +655,11 @@ io.on('connection', socket => {
     //listen for chat message
     socket.on('chatMessage', async (chatMessageObj) => {
         var group = await groupsModel.findOne({ _id: chatMessageObj.groupID });
-        const maxMessageHistory = 20;
+        const maxMessageHistory = 10;
 
         // set inactive threshold
         lastActivityTimeSTP = Date.now();
-        const inactiveThreshold = 1000 * 60 * 30;  // 5 minutes
+        const inactiveThreshold = 1000 * 60 * 5;  // 5 minutes
         setInterval( async () => {
             if (lastActivityTimeSTP && Date.now() - lastActivityTimeSTP > inactiveThreshold) {
                 // user is inactive
@@ -688,7 +688,7 @@ io.on('connection', socket => {
             const promptArgs = `Sentiment analyze this dialogue based on the dialogue you heared and provide me with only a JSON data in a format of {userName:${chatMessageObj.userName}, score:sentimentScore, email:${chatMessageObj.email} ,suggestion: give suggestion of how I can help out as a friend if the score is lower than 0.1, context: describe the context for the score, emoji: emoji in numeric character reference that fits the reason}}, nothing should be generated except for the JSON format data: \n\n` + userMessage + '\n\n';
 
             memory.push(userMessage);
-            // console.log(memory);
+            console.log(memory);
 
             // AI analysis
             const res = await openai.createChatCompletion({
