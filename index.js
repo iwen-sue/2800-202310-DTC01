@@ -620,6 +620,7 @@ app.get("*", (req, res) => {
 
 // socketio part starts
 let memory = [];  // store user input for AI's memory
+let lastActivityTimeSTP = null;  // last activity time stamp
 io.on('connection', socket => {
     socket.on('joinedRoom', ({ username, groupID }) => {
         console.log("joined room " + groupID)
@@ -642,7 +643,17 @@ io.on('connection', socket => {
 
     //listen for chat message
     socket.on('chatMessage', async (chatMessageObj) => {
+        var group = await groupsModel.findOne({ _id: chatMessageObj.groupID });
 
+        // set inactive threshold
+        lastActivityTimeSTP = Date.now();
+        const inactiveThreshold = 1000 * 60 * 5;  // 5 minutes
+        setInterval(() => {
+            if (lastActivityTimeSTP && Date.now() - lastActivityTimeSTP > inactiveThreshold) {
+                // user is inactive
+                console.log("user is inactive");                
+            }
+        }, 10000);  //Check every 10 seconds
 
         if (typeof chatMessageObj.message == 'string') {
             //save message to database
@@ -652,8 +663,7 @@ io.on('connection', socket => {
             let userMessage = `${chatMessageObj.userName}: ${chatMessageObj.message}`;
             console.log(userMessage);
 
-
-            const promptArgs = `Sentiment analyze this dialogue based on the dialogue you heared and provide me with only a JSON data in a format of {userName:${chatMessageObj.userName}, score:sentimentScore, email:${chatMessageObj.email} ,context: describe the context for the score, emoji: emoji unicode that fits the reason}}, nothing should be generated except for the JSON format data: \n\n` + userMessage + '\n\n';
+            const promptArgs = `Sentiment analyze this dialogue based on the dialogue you heared and provide me with only a JSON data in a format of {userName:${chatMessageObj.userName}, score:sentimentScore, email:${chatMessageObj.email} ,suggestion: give suggestion of how I can help out as a friend if the score is lower than 0, context: describe the context for the score, emoji: emoji unicode that fits the reason}}, nothing should be generated except for the JSON format data: \n\n` + userMessage + '\n\n';
 
             memory.push(userMessage);
             // console.log(memory);
@@ -681,6 +691,7 @@ io.on('connection', socket => {
                         {
                             $set: {
                                 "memberSentiment.$.score": jsonObj.score,
+                                "memberSentiment.$.suggestion": jsonObj.suggestion,
                                 "memberSentiment.$.context": jsonObj.context,
                                 "memberSentiment.$.emoji": jsonObj.emoji
                             }
@@ -691,7 +702,7 @@ io.on('connection', socket => {
                 }
                 const getSentiment = await groupsModel.findOne({ _id: chatMessageObj.groupID, "memberSentiment.email": jsonObj.email });
                 const memberResult = getSentiment.memberSentiment.find(member => member.email == jsonObj.email);
-                console.log(memberResult);
+                // console.log(memberResult);
                 socket.broadcast.to(chatMessageObj.groupID).emit('sentimentScore', { groupID: chatMessageObj.groupID, memberSentiment: memberResult });
 
             } catch (error) {

@@ -21,6 +21,9 @@ const groupsSchema = new mongoose.Schema({
     memberSentiment: {
         type: Array,  // username, sentiment score, emoji, timestmp
     },
+    chatContext: {
+        type: Array, 
+    }
 });
 
 const groupsModel = mongoose.model('groups', groupsSchema);
