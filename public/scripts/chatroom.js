@@ -318,6 +318,8 @@ chatRoomView.addEventListener('click', function (event) {
         const messagerNameElement = chatMessageBoxTwo.querySelector('.messagerName');
         const messagerName = messagerNameElement.textContent.trim();
         const deleteBtn = chatMessageBoxTwo.querySelector('.delete-button');
+        const timeStpElement = chatMessageBoxTwo.querySelector('.messagerTime')
+        const timeStp = timeStpElement.textContent.trim();
         if (userName != messagerName) {
             alert("You can only delete your own message!")
             deleteBtn.style.display = 'none';
@@ -326,7 +328,7 @@ chatRoomView.addEventListener('click', function (event) {
         if (userName === messagerName && confirm('Are you sure you want to delete this message?')) {
             // Code to handle the delete action
             chatMessage.remove(); // Remove the entire chat message container
-            socket.emit('deleteMessage', chatMessage.querySelector('.messageID').textContent.trim(), groupID);
+            socket.emit('deleteMessage', groupID, timeStp);
 
 
         }
