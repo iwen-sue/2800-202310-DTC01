@@ -685,7 +685,7 @@ io.on('connection', socket => {
                 memory.push(...group.chatContext);  //need to be an array
             }
 
-            const promptArgs = `Sentiment analyze this dialogue based on the dialogue you heared and provide me with only a JSON data in a format of {userName:${chatMessageObj.userName}, score:sentimentScore, email:${chatMessageObj.email} ,suggestion: give suggestion of how I can help out as a friend if the score is lower than 0.1, context: describe the context for the score, emoji: emoji in numeric character reference that fits the reason}}, nothing should be generated except for the JSON format data: \n\n` + userMessage + '\n\n';
+            const promptArgs = `Sentiment analyze this dialogue based on the dialogue you heard and provide me with only a JSON data in a format of {userName:${chatMessageObj.userName}, score:sentimentScore, email:${chatMessageObj.email} ,suggestion: give suggestion of how I can help out as a friend if the score is lower than 0.1, context: describe the context for the score, emoji: emoji in numeric character reference that fits the reason}}, nothing should be generated except for the JSON format data: \n\n` + userMessage + '\n\n';
 
             memory.push(userMessage);
             console.log(memory);
