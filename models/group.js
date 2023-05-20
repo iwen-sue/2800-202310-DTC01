@@ -14,10 +14,18 @@ const groupsSchema = new mongoose.Schema({
     members: {
         type: Array,
         required: true
-    }, 
-    messages: {
-        type: Array,
     },
+    messages: [
+        {
+          messageName: mongoose.Schema.Types.Mixed,
+          message: mongoose.Schema.Types.Mixed,
+          groupID: mongoose.Schema.Types.Mixed,
+          userID: mongoose.Schema.Types.Mixed,
+          userName: String,
+          timeStp: mongoose.Schema.Types.Mixed,
+          email: mongoose.Schema.Types.Mixed
+        }
+      ],
     memberSentiment: {
         type: Array,  // username, sentiment score, emoji, timestmp
     },

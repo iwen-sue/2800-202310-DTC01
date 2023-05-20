@@ -13,6 +13,7 @@ const crypto = require('crypto');
 
 
 
+
 const { Configuration, OpenAIApi } = require("openai");
 const configuration = new Configuration({
     apiKey: process.env.OPENAI_API_KEY,
@@ -342,14 +343,14 @@ app.post('/login', async (req, res) => {
     const validationResult = schema.validate(email);
     if (validationResult.error != null) {
         var error = "Invalid email format. Please enter a valid email address.";
-        return res.render("login", { error: error, errorType: 'InvalidEmailFormat' });
+        return res.render("login", { error: error, errorType: 'InvalidEmailFormat', groupToken: groupToken });
     }
 
     const result = await usersModel.find({ email: email }).select('email type firstName lastName password profilePic _id').exec();
 
     if (result.length == 0) {
         var error = "User is not found";
-        return res.render("login", { error: error, errorType: 'UserNotFound' });
+        return res.render("login", { error: error, errorType: 'UserNotFound', groupToken: groupToken });
     }
     if (await bcrypt.compare(password, result[0].password)) {
         console.log("password is correct");
@@ -378,7 +379,7 @@ app.post('/login', async (req, res) => {
     }
     else {
         var error = "Password is not correct";
-        return res.render("login", { error: error, errorType: 'IncorrectPassword' });
+        return res.render("login", { error: error, errorType: 'IncorrectPassword', groupToken: groupToken });
     }
 });
 
@@ -671,6 +672,7 @@ io.on('connection', socket => {
             }
         }, 10000);  //Check every 10 seconds
 
+
         if (typeof chatMessageObj.message == 'string') {
             //save message to database
             saveMessage(chatMessageObj);
@@ -758,7 +760,34 @@ io.on('connection', socket => {
         }
 
     })
+
+    socket.on('deleteMessage', async (groupID, timeStp, chatMessageText) => {
+        await deleteMessageDB(groupID, timeStp, chatMessageText);
+        socket.emit('deleteMessage', { groupID, timeStp, chatMessageText });
+    });
+
 }); // socketio part ends
+
+async function deleteMessageDB(groupID, messagerName, chatMessageText) {
+    try {
+        const updateResult = await groupsModel.updateOne(
+            { _id: groupID },
+            { $pull: { messages: { message: chatMessageText, userName: messagerName} } }
+        ).exec();
+
+        if (updateResult.modifiedCount > 0) {
+            console.log('Message deleted.');
+        } else {
+            console.log('Message not found.');
+        }
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+
+
+
 
 
 
@@ -767,14 +796,21 @@ async function saveMessage(chatMessageObj) {
         const group = await groupsModel.findOne({ _id: chatMessageObj.groupID });
 
         if (group) {
-            group.messages.push(chatMessageObj);
-            await group.save();
+            console.log(chatMessageObj)
+
+            // chatMessageObj._id = mongoose.
+            var msg = await groupsModel.findOne({ _id: chatMessageObj.groupID })
+            const update = { $push: { messages: chatMessageObj } };
+            await groupsModel.updateOne({ _id: chatMessageObj.groupID }, update)
+            // await msg.insertOne(chatMessageObj);
+            // await group.save();
             return group.messages;
         }
     } catch (error) {
         console.log(error);
     }
 }
+
 
 async function showMoreChatHistory(groupID, numOfScroll) {
     try {
@@ -801,6 +837,7 @@ async function showChatHistory(groupID) {
     try {
         const group = await groupsModel.findOne({ _id: groupID });
         if (group) {
+            console.log(Array.isArray(group.messages))
             const modifyMessages = group.messages.slice(-15);
 
             return modifyMessages;
