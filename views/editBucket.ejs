@@ -36,7 +36,7 @@
     <body>
         <%- include("templates/subNav") %>
 
-            <container>
+            <div>
                 <% if (card.travelImg) { %>
                     <img src="data:image/png;base64,<%= card.travelImg %>" alt="cover" class="img-fluid mt-5 pt-4" style="width:100%">
                 <% } else { %>
@@ -69,11 +69,18 @@
                                 rows="10"><%= card.description %></textarea>
                         </div>
 
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="submit" class="submitBtn btn btn-primary mr-2">Submit</button>
+                        <span><label for="deletePost" class="pt-1">Delete</label></span>
                     </form>
+                    <!-- delete post -->
+                    <form action="/deleteBucket" method="POST" class="deleteForm">
+                        <input type="hidden" class="form-control" name="cardID" value="<%= card._id %>">
+                        <button id="deletePost" type="submit" class="deleteBtn btn btn-danger" style="display: none">Delete</button>
+                    </form>
+                    
                 </div>
 
-            </container>
+            </div>
 
             <%- include("templates/bottomNav") %>
     </body>

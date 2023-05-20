@@ -191,10 +191,12 @@ app.get('/userprofile', sessionValidation, async (req, res) => {
 const bucketlist = require('./enterBucket.js');
 const toHistory = require('./toHistory.js');
 const editBucket = require('./editBucket.js');
+const deleteBucket = require('./deleteBucket.js');
 
 app.post('/enterBucket', bucketlist)
 app.post('/toHistory', toHistory)
 app.post('/editBucket', editBucket)
+app.post('/deleteBucket', deleteBucket)
 
 
 // const multer = require('multer');  // npm install multer
