@@ -595,31 +595,18 @@ app.get('/chatroom/sentimentScores', sessionValidation, async (req, res)=>{
 app.post('/uploadImage', sessionValidation, upload.single('imageData'), async (req, res) => {
     const imageData = req.file;
 
-
-    // // Handle the completion of the upload
-    // uploadStream.on('finish', async () => {
-    //     const fileId = uploadStream.id.toString();
-    //     // Query the fs.files collection to find the corresponding file
-    //     const file = await database.db(mongodb_database).collection('fs.chunks').findOne({ files_id: fileId });
-    //     console.log(file)
-
-
     if (imageData) {
 
         res.status(200).json({ message: 'Image uploaded successfully', imageData: imageData.buffer });
     } else {
-        // Handle the case where the file was not found in fs.files collection
         res.status(404).json({ message: 'File not found' });
     }
 
+})
 
-
-    // });
-
-    // // Handle any errors during the upload
-    // uploadStream.on('error', (error) => {
-    //     res.status(500).json({ error: 'An error occurred while uploading the image' });
-    // });
+app.get('/itinerary', sessionValidation, (req, res)=>{
+    res.render('itinerary');
+    // res.render('emailconfirmation', { error: err });
 })
 
 //static images address
@@ -786,12 +773,6 @@ async function deleteMessageDB(groupID, messagerName, chatMessageText) {
         console.log(err);
     }
 }
-
-
-
-
-
-
 
 async function saveMessage(chatMessageObj) {
     try {

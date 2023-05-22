@@ -1,0 +1,85 @@
+.dateTrigger{
+    width:100%;
+    line-height: 30px;
+    font-size: 18px;
+    text-align: left;
+    border:none;
+    padding:0 5vw;
+    background-color: var(--beige);
+    color:rgb(187, 98, 95);
+}
+
+button[aria-expanded="true"] {
+    background-color:rgb(233, 149, 107);
+    color:rgb(129, 71, 69);
+}
+
+.itineraryName{
+    padding:0 5vw;
+}
+
+.itineraryBlockContainer{
+    margin:10px 5vw;
+}
+
+.itineraryBlock{
+    display:flex;
+}
+
+.itineraryTime{
+    width:80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.itineraryTimeText{
+    width:40px;
+    text-align: center;
+}
+
+.itineraryTimeText p {
+    margin:0;
+}
+
+.itineraryTimeDecorator{
+    width:4px;
+    height:100%;
+    background-color: var(--lightTheme);
+    overflow: visible;
+    position: relative;
+    margin-top:10px;
+    border-radius: 2px;
+    margin-right:20px;
+}
+
+.itineraryTimeDecorator .decoratorCircle{
+    position: absolute;
+    top:50%;
+    left:50%;
+    margin-top:-5px;
+    margin-left:-5px;
+    display: inline-block;
+    width:10px;
+    height:10px;
+    border-radius: 50%;
+    background-color: var(--lightTheme);
+}
+
+.itineraryActivity{
+    min-height: 70px;;
+    display: flex;
+    align-items: center;
+    flex:1;
+    position: relative;
+}
+
+.itineraryBlockEdit{
+    position:absolute;
+    right:0;
+    font-size: 28px;
+}
+
+.itineraryBlockEdit:hover{
+    color: var(--theme);
+}
