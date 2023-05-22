@@ -298,16 +298,35 @@ app.post('/signup', async (req, res) => {
         var userType
         if (req.body.groupToken != null) {
             userType = 'member'
-            await groupsModel.updateOne({ _id: req.body.groupToken }, {
-                $push: {
-                    members: {
-                        email: req.body.email,
-                        type: 'member',
-                        firstName: req.body.firstName,
-                        lastName: req.body.lastName
+            var group = await groupsModel.find({ _id: req.body.groupToken }).exec();
+            var currentMembers = group[0].members;
+            var memberHasJoinedPreviously = false;
+            for (var i = 0; i < currentMembers.length; i++) {
+                if (currentMembers[i].email == req.body.email) {
+                    memberHasJoinedPreviously = true;
+                }
+            }
+            if (memberHasJoinedPreviously) {
+                for(var i = 0; i < currentMembers.length; i++){
+                    if(currentMembers[i].email == req.body.email){
+                        currentMembers[i].active = true;
                     }
                 }
-            }).exec();
+                await groupsModel.updateOne({ _id: groupID }, { $set: { members: currentMembers[0].members } }).exec();
+            }
+            else {
+                await groupsModel.updateOne({ _id: req.body.groupToken }, {
+                    $push: {
+                        members: {
+                            email: req.body.email,
+                            type: 'member',
+                            firstName: req.body.firstName,
+                            lastName: req.body.lastName,
+                            active: true
+                        }
+                    }
+                }).exec();
+            }
         }
         const user = new usersModel({
             firstName: req.body.firstName,
@@ -360,18 +379,35 @@ app.post('/login', async (req, res) => {
         req.session.email = result[0].email;
         req.session.cookie.maxAge = 2147483647;
         if (groupToken != null) {
-            await groupsModel.updateOne({ _id: groupToken }, {
-                $push: {
-                    members:
-                    {
-                        email: result[0].email,
-                        type: 'member',
-                        firstName: result[0].firstName,
-                        lastName: result[0].lastName,
-                        profilePic: result[0].profilePic
+            var group = await groupsModel.find({ _id: req.body.groupToken }).exec();
+            var currentMembers = group[0].members;
+            var memberHasJoinedPreviously = false;
+            for (var i = 0; i < currentMembers.length; i++) {
+                if (currentMembers[i].email == req.body.email) {
+                    memberHasJoinedPreviously = true;
+                }
+            }
+            if (memberHasJoinedPreviously) {
+                for(var i = 0; i < currentMembers.length; i++){
+                    if(currentMembers[i].email == email){
+                        currentMembers[i].active = true;
                     }
                 }
-            }).exec();
+                await groupsModel.updateOne({ _id: groupToken }, { $set: { members: currentMembers } }).exec();
+            }
+            else {
+                await groupsModel.updateOne({ _id: groupToken }, {
+                    $push: {
+                        members: {
+                            email: result[0].email,
+                            type: 'member',
+                            firstName: result[0].firstName,
+                            lastName: result[0].lastName,
+                            active: true
+                        }
+                    }
+                }).exec();
+            }
             await usersModel.updateOne({ email: result[0].email }, { $set: { groupID: groupToken, type: 'member' } }).exec();
         }
         res.redirect('/home');
@@ -487,7 +523,8 @@ app.post('/groupconfirm', sessionValidation, async (req, res) => {
                 type: 'leader',
                 firstName: currentUser.firstName,
                 lastName: currentUser.lastName,
-                profilePic: currentUser.profilePic
+                profilePic: currentUser.profilePic,
+                active: true
             }
         ]
     });
@@ -512,10 +549,6 @@ app.get('/userprofile/groupdetails', sessionValidation, async (req, res) => {
 
 app.post('/invite', sessionValidation, async (req, res) => {
     var inviteEmail = req.body.inviteeEmail;
-    // if (inviteEmail == "rickastley@gmail.com") {
-    //     res.redirect("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
-    //     return
-    // }
     const userName = req.session.firstName + " " + req.session.lastName;
     const groupToken = req.body.groupID
     const inviteMessage = {
@@ -544,7 +577,14 @@ app.post('/invite', sessionValidation, async (req, res) => {
 app.post('/removemember', sessionValidation, async (req, res) => {
     var memberEmail = req.body.memberEmail;
     var groupID = req.body.groupID;
-    await groupsModel.updateOne({ _id: groupID }, { $pull: { members: { email: memberEmail } } }).exec();
+    // await groupsModel.updateOne({ _id: groupID }, { $pull: { members: { email: memberEmail } } }).exec();
+    var currentMembers = await groupsModel.find({ _id: groupID }).exec();
+    for(var i = 0; i < currentMembers[0].members.length; i++){
+        if(currentMembers[0].members[i].email == memberEmail){
+            currentMembers[0].members[i].active = false;
+        }
+    }
+    await groupsModel.updateOne({ _id: groupID }, { $set: { members: currentMembers[0].members } }).exec();
     await usersModel.updateOne({ email: memberEmail }, { $set: { groupID: null, type: null } }).exec();
     res.redirect('/userprofile/groupdetails');
 });
@@ -552,25 +592,50 @@ app.post('/removemember', sessionValidation, async (req, res) => {
 app.post('/joingroup', sessionValidation, async (req, res) => {
     var groupToken = req.body.groupToken;
     var currentUser = await usersModel.findOne({ email: req.session.email }).exec();
-    await groupsModel.updateOne({ _id: groupToken }, {
-        $push: {
-            members:
-            {
-                email: req.session.email,
-                type: 'member',
-                firstName: currentUser.firstName,
-                lastName: currentUser.lastName,
-                profilePic: currentUser.profilePic
+    var group = await groupsModel.find({ _id: req.body.groupToken }).exec();
+    var currentMembers = group[0].members;
+    var memberHasJoinedPreviously = false;
+    for (var i = 0; i < currentMembers.length; i++) {
+        if (currentMembers[i].email == req.session.email) {
+            memberHasJoinedPreviously = true;
+        }
+    }
+    if (memberHasJoinedPreviously) {
+        for(var i = 0; i < currentMembers.length; i++){
+            if(currentMembers[i].email == req.session.email){
+                currentMembers[i].active = true;
             }
         }
-    }).exec();
+        await groupsModel.updateOne({ _id: groupToken }, { $set: { members: currentMembers } }).exec();
+    }
+    else {
+        await groupsModel.updateOne({ _id: groupToken }, {
+            $push: {
+                members: {
+                    email: currentUser.email,
+                    type: 'member',
+                    firstName: currentUser.firstName,
+                    lastName: currentUser.lastName,
+                    profilePic: currentUser.profilePic,
+                    active: true
+                }
+            }
+        }).exec();
+    }
+
     await usersModel.updateOne({ email: req.session.email }, { $set: { groupID: groupToken, type: 'member' } }).exec();
     res.redirect('/userprofile/groupdetails');
 });
 
 app.post('/leavegroup', sessionValidation, async (req, res) => {
-    var groupToken = req.body.groupID;
-    await groupsModel.updateOne({ _id: groupToken }, { $pull: { members: { email: req.session.email } } }).exec();
+    var groupID = req.body.groupID;
+    var currentMembers = await groupsModel.find({ _id: groupID }).exec();
+    for(var i = 0; i < currentMembers[0].members.length; i++){
+        if(currentMembers[0].members[i].email == req.session.email){
+            currentMembers[0].members[i].active = false;
+        }
+    }
+    await groupsModel.updateOne({ _id: groupID }, { $set: { members: currentMembers[0].members } }).exec();
     await usersModel.updateOne({ email: req.session.email }, { $set: { groupID: null, type: null } }).exec();
     res.redirect('/userprofile');
 });
