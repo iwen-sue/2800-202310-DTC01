@@ -1,0 +1,50 @@
+<%- include("templates/header") %>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <!-- google icons -->
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <link rel="stylesheet" href="/assets/common.css" />
+    <link rel="stylesheet" href="/assets/itinerary.css" />
+
+    <!-- cite css or js files here -->
+    </head>
+
+    <body>
+        <%- include("templates/subNav") %>
+            <div style="padding-top:50px;">
+                <h3 class="itineraryName">Group name's Itinerary</h3>
+                <div class="itineraryPlan">
+                    <button type="button" class="dateTrigger" data-toggle="collapse" data-target="#demo">
+                        May 21, 2023</button>
+                    <div id="demo" class="collapse itineraryBlockContainer">
+                        <div class="itineraryBlock">
+                            <div class="itineraryTime">
+                                <div class="itineraryTimeText">
+                                    <p>9:00</p>
+                                    <p>|</p>
+                                    <p>12:00</p>
+                                </div>
+                                <p class="itineraryTimeDecorator">
+                                    <span class="decoratorCircle"></span>
+                                </p>
+                            </div>
+                            <div class="itineraryActivity">some activity texts
+                                <span class="material-symbols-outlined itineraryBlockEdit">
+                                    edit_note
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+            </div>
+
+            <%- include("templates/bottomNav") %>
+
+    </body>
+
+    </html>
