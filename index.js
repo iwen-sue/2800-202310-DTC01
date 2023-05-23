@@ -611,6 +611,10 @@ app.post('/itinerary/submitNew', sessionValidation, (req, res)=>{
     var citiesArray = JSON.parse(req.body.cities);
 })
 
+app.post('/itinerary/getRecommendation', sessionValidation, (req, res)=>{
+    console.log(req.body)
+})
+
 //static images address
 app.use(express.static(__dirname + "/public"));
 // handle 404 - page not found

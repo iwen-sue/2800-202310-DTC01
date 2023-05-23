@@ -144,3 +144,7 @@ button[aria-expanded="true"] {
     border-radius: 8px;
     padding:0 5px;
 }
+
+.modal-footer{
+    position: relative;
+}
