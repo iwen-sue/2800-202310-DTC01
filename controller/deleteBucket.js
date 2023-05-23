@@ -1,6 +1,6 @@
-require("./utils.js");
+require("../utils.js");
 const express = require('express');
-const usersModel = require('./models/user.js');
+const usersModel = require('../models/user.js');
 const router = express.Router();
 
 router.post('/deleteBucket', async (req, res) => {

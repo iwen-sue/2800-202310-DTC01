@@ -203,10 +203,10 @@ app.get('/userprofile', sessionValidation, async (req, res) => {
     });
 });
 
-const bucketlist = require('./enterBucket.js');
-const toHistory = require('./toHistory.js');
-const editBucket = require('./editBucket.js');
-const deleteBucket = require('./deleteBucket.js');
+const bucketlist = require('./controller/enterBucket.js');
+const toHistory = require('./controller/toHistory.js');
+const editBucket = require('./controller/editBucket.js');
+const deleteBucket = require('./controller/deleteBucket.js');
 
 app.post('/enterBucket', bucketlist)
 app.post('/toHistory', toHistory)
@@ -217,7 +217,7 @@ app.post('/deleteBucket', deleteBucket)
 // const multer = require('multer');  // npm install multer
 // const memoryStorage = multer.memoryStorage(); // store the file in memory as a buffer
 // const upload = multer({ storage: memoryStorage }); // specify the storage option
-const editProfile = require('./editProfile.js');
+const editProfile = require('./controller/editProfile.js');
 const { Server } = require("net");
 const { json } = require("body-parser");
 app.post('/editProfile', editProfile);
