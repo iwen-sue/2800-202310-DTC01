@@ -4,18 +4,18 @@
 }
 
 .loginBtn{
-    background-color: #2f164f;
+    background-color: var(--theme);
     color: white;
     padding: 10px 20px;
     margin: 0;
     border: none;
     cursor: pointer;
-    width: 60%;
+    width: 50%;
     font-size: small;
 }
 
 .resetBtn{
-    background-color: #2f164f;
+    background-color: var(--theme);
     color: white;
     padding: 10px 20px;
     margin: 0;
@@ -25,12 +25,12 @@
 }
 
 .resetBtn:hover {
-    background-color: #2f164f;
+    background-color: var(--theme);
     color: white;
 }
 
 .resetConfirmBtn {
-    background-color: #2f164f;
+    background-color: var(--theme);
     color: white;
     padding: 10px 20px;
     margin: 0;
@@ -40,9 +40,18 @@
 }
 
 .resetConfirmBtn:hover {
-    background-color: #2f164f;
+    background-color: var(--theme);
     color: white;
 }
 
-
+.signupBtn{
+    background-color: var(--theme);
+    color: white;
+    padding: 10px 20px;
+    margin: 0;
+    border: none;
+    cursor: pointer;
+    width: 60%;
+    font-size: small;
+}
 

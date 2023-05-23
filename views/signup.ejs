@@ -4,7 +4,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="/assets/common.css" />
-
+    <link rel="stylesheet" href="/assets/login.css" />  
     </head>
 
     <body>
@@ -23,7 +23,7 @@
                     </div>
                     <% } %>
             <main class="form-signin w-auto m-auto">
-                <div class="d-flex gap-2 justify-content-center pb-5 pt-2">
+                <div class="d-flex gap-2 justify-content-center pb-5 pt-5 mt-5">
                     <form class="text-center" action="/signup" method="post">
                         <img class="mb-3" src="https://getbootstrap.com/docs/4.0/assets/brand/bootstrap-solid.svg"
                             alt="" width="72" height="72">
@@ -52,8 +52,7 @@
                             <input type='hidden' name='groupToken' id='groupToken' value="<%- groupToken %>">
                             <% } %>
                                 <br>
-                                <button class="btn btn-block" type="submit" value="signup"
-                                    style="background-color: #2f164f; color: white;">Sign up</button>
+                                <button class="btn btn-block signupBtn" type="submit" value="signup">Sign up</button>
                     </form>
                 </div>
             </main>
