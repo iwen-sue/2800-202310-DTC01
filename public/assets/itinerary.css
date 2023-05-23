@@ -83,3 +83,64 @@ button[aria-expanded="true"] {
 .itineraryBlockEdit:hover{
     color: var(--theme);
 }
+
+.bottomContent{
+    padding:20px 5vw;
+    display: flex;
+    justify-content: space-between;
+}
+
+.fade{
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-dialog{
+    margin-top:180px;
+}
+
+.formText{
+    margin:0;
+}
+
+.formItem{
+    margin-bottom:10px;
+}
+
+#country, #city{
+    height:300px;
+    width:200px;
+    overflow-y: scroll;
+    padding: 8px;
+}
+
+#country input, #city input {
+    margin-bottom:10px;
+    width: 180px;
+}
+
+#country li, #city li{
+    padding: 5px 0;
+}
+
+#country li:hover, #city li:hover{
+    background-color: #f1f2f6;
+}
+
+.filterSelection{
+    position: relative;
+    margin-top:25px;
+}
+
+.filterButton{
+    position: absolute;
+    right:0;
+    top:-5px;
+}
+
+.cityItem{
+    background-color: var(--pink);
+    color: var(--theme);
+    line-height: 20px;
+    border-radius: 8px;
+    padding:0 5px;
+}
