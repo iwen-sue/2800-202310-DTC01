@@ -45,6 +45,7 @@ $(document).ready(function () {
                 option.addEventListener('click', function (e) {
                     // Code to be executed when the li element is clicked
                     selectedCountry = e.target.innerHTML;
+                    $("#city").empty();
                     renderCities();
                     document.getElementById("selectedCountry").innerHTML = selectedCountry;
                 });
