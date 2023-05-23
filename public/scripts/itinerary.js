@@ -9,6 +9,14 @@ $(document).ready(function () {
         format: "yyyy-mm-dd"
     });
 
+    $('#startPickerAdjust').datepicker({
+        format: "yyyy-mm-dd"
+    });
+
+    $('#endPickerAdjust').datepicker({
+        format: "yyyy-mm-dd"
+    });
+
     $('.timepicker').timepicker({
         format: "HH:mm",
         showMeridian: false
@@ -161,5 +169,35 @@ function getRecommendations(){
     }else{
         alert("please select a startDate to get advices from AI!")
     }
+}
+
+function submitAdjustDates(){
+    var startDate = document.getElementById("startPickerAdjustValue").value
+    var endDate = document.getElementById("endPickerAdjustValue").value
+    if(startDate!="" && endDate!=""){
+        var postData = {
+            'startDate': startDate,
+            'endDate':endDate
+        }
+        fetch('/itinerary/adjustment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+              },
+            body: new URLSearchParams(postData)
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the response from the backend
+                console.log(data);
+            })
+            .catch(error => {
+                // Handle any errors
+                console.error(error);
+            });
+    }else{
+        alert("please select all fields!")
+    }
     
+
 }
