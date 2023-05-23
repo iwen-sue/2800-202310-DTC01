@@ -1,0 +1,79 @@
+<!-- Modal -->
+<div class="modal fade" id="makeNewModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Make New Itinerary</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="formItem">
+                <p class="formText">start date:</p>
+                <div class='input-group date' id='startPicker'>
+
+                    <input type='text' class="form-control" id="startDateValue"/>
+                    <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                  </div>
+            </div>
+
+            <div class="formItem">
+                <p class="formText">end date:</p>
+                <div class='input-group date' id='endPicker'>
+                    <input type='text' class="form-control" id="endDateValue"/>
+                    <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                  </div>
+            </div>
+
+            <div class="formItem">
+                <p class="formText">start planning time:</p>
+                <div class='input-group date' id='startTimePicker'>
+
+                    <input type='text' class="form-control timepicker" id="startTimeValue"/>
+                    </span>
+                  </div>
+            </div>
+
+            <div class="formItem">
+                <p class="formText">finish planning time:</p>
+                <div class='input-group date' id='finishTimePicker'>
+
+                    <input type='text' class="form-control timepicker" id="endTimeValue"/>
+  
+                    </span>
+                  </div>
+            </div>
+
+            <div class="formItem filterSelection">
+                <p class="formText">country:<span id="selectedCountry"></span></p>
+                <button class="btn btn-primary filterButton" type="button" data-toggle="dropdown">Select destination country
+                    <span class="caret"></span></button>
+                    <ul class="dropdown-menu" id="country">
+                      <input class="form-control" id="myInput" type="text" placeholder="Select country">
+                    </ul>
+                <!-- <select type="country" id="country" name="country" class="form-select" aria-label="Select country">
+                    <option selected>Select your destination country</option>
+                </select> -->
+            </div>
+
+            <div class="formItem"  style="margin-top:20px;">
+                <p class="formText">cities:<p id="selectedCities"></p></p>
+                <button class="btn btn-primary" style="float:right;" type="button" data-toggle="dropdown">Select destination cities
+                    <span class="caret"></span></button>
+                    <ul class="dropdown-menu dropdown-city" id="city">
+                      <input class="form-control" id="myCityInput" type="text" placeholder="Select city">
+                    </ul>
+                
+            </div>
+            
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="submitForm()">Submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
