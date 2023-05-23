@@ -149,20 +149,49 @@ app.get('/', (req, res) => {
 app.get('/home', sessionValidation, async (req, res) => {
     const userEmail = req.session.email;
     try {
-        const query = await usersModel.findOne({ email: userEmail });
-        const groupID = query.groupID;
-        const groupQuery = await groupsModel.findOne({ _id: groupID });
+      const query = await usersModel.findOne({ email: userEmail });
+      const groupID = query.groupID;
+      const groupQuery = await groupsModel.findOne({ _id: groupID });
+  
+      if (groupQuery) {
+        const groupName = groupQuery.groupName;
+  
 
-        if (groupQuery) {
-            const groupName = groupQuery.groupName;
-            res.render('itinerary', { groupName: groupName + "'s Itinerary" });
-        } else {
-            res.render('itinerary', { groupName: "Join a group First!" });
-        }
+        const itineraryQuery = await groupsModel.findById(groupID, 'itinerary');
+        const itinerary = itineraryQuery.itinerary;
+
+        res.render('itinerary', { groupName: groupName + "'s Itinerary", itinerary: JSON.stringify(itinerary) });
+      } else {
+        res.render('itinerary', { groupName: "Join a group First!" });
+      }
     } catch (err) {
-        console.error(err);
+      console.error(err);
+      res.status(500).json({ error: 'An error occurred.' });
     }
-});
+  });
+  
+// This is to pass the itinerary data to the client side 
+app.get('/itineraryData', sessionValidation, async (req, res) => {
+    const userEmail = req.session.email;
+    try {
+      const query = await usersModel.findOne({ email: userEmail });
+      const groupID = query.groupID;
+      const groupQuery = await groupsModel.findOne({ _id: groupID });
+  
+      if (groupQuery) {
+        const itineraryQuery = await groupsModel.findById(groupID, 'itinerary');
+        const itinerary = itineraryQuery.itinerary;
+  
+        res.json({ itinerary }); // Send the itinerary data as JSON response
+      } else {
+        res.status(404).json({ error: "Group not found" });
+      }
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'An error occurred.' });
+    }
+  });
+  
 
 
 app.get('/chatroom', sessionValidation, async (req, res) => {
@@ -660,11 +689,13 @@ app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
     }
     
     async function saveItinerary(itineraryJSON, groupID) {
-      for (let i = 0; i < itineraryJSON.length; i++) {
-        const update = { $push: { itinerary: itineraryJSON[i] } };
+        // Delete the existing itinerary array
+        await groupsModel.updateOne({ _id: groupID }, { $unset: { itinerary: 1 } }).exec();
+      
+        // Create a new itinerary array and push the new itinerary into it
+        const update = { $push: { itinerary: itineraryJSON } };
         await groupsModel.updateOne({ _id: groupID }, update).exec();
       }
-    }
     
     async function generateItinerary(promptArgs) {
       const res = await openai.createChatCompletion({
