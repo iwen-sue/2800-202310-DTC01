@@ -125,8 +125,13 @@ function submitForm() {
     })
         .then(response => response.json())
         .then(data => {
+            console.log("data", data.itinerary)
             // Handle the response from the backend
-            console.log(data);
+            // const itineraryJSON = data.itinerary;
+            // console.log("data.itinerary", itineraryJSON)
+            insertItinerary(data.itinerary);
+
+
         })
         .catch(error => {
             // Handle any errors
@@ -134,6 +139,65 @@ function submitForm() {
         });
 
 }
+
+function insertItinerary(itineraryJSON) {
+    const itineraryContainer = document.querySelector('.itineraryPlan');
+    itineraryContainer.innerHTML = '';
+    for (let i = 0; i < itineraryJSON.length; i++) {
+      const itinerary = itineraryJSON[i];
+      const dateButton = document.createElement('button');
+      dateButton.type = 'button';
+      dateButton.classList.add('dateTrigger');
+      dateButton.setAttribute('data-toggle', 'collapse');
+      dateButton.setAttribute('data-target', `#demo${i + 1}`);
+      dateButton.innerText = itinerary.date;
+  
+      const collapseContainer = document.createElement('div');
+      collapseContainer.id = `demo${i + 1}`;
+      collapseContainer.classList.add('collapse', 'itineraryBlockContainer');
+  
+      itinerary.schedule.forEach((schedule) => {
+        const itineraryBlock = document.createElement('div');
+        itineraryBlock.classList.add('itineraryBlock');
+  
+        const itineraryTime = document.createElement('div');
+        itineraryTime.classList.add('itineraryTime');
+  
+        const itineraryTimeText = document.createElement('div');
+        itineraryTimeText.classList.add('itineraryTimeText');
+        itineraryTimeText.innerHTML = `
+          <p>${schedule.startTime}</p>
+          <p>|</p>
+          <p>${schedule.endTime}</p>
+        `;
+  
+        const itineraryTimeDecorator = document.createElement('p');
+        itineraryTimeDecorator.classList.add('itineraryTimeDecorator');
+  
+        const decoratorCircle = document.createElement('span');
+        decoratorCircle.classList.add('decoratorCircle');
+  
+        itineraryTimeDecorator.appendChild(decoratorCircle);
+        itineraryTime.appendChild(itineraryTimeText);
+        itineraryTime.appendChild(itineraryTimeDecorator);
+  
+        const itineraryActivity = document.createElement('div');
+        itineraryActivity.classList.add('itineraryActivity');
+        itineraryActivity.innerHTML = `
+          ${schedule.activity}<br>
+          ${schedule.transportation}<span class="material-symbols-outlined itineraryBlockEdit">edit_note</span>
+        `;
+  
+        itineraryBlock.appendChild(itineraryTime);
+        itineraryBlock.appendChild(itineraryActivity);
+        collapseContainer.appendChild(itineraryBlock);
+      });
+  
+      itineraryContainer.appendChild(dateButton);
+      itineraryContainer.appendChild(collapseContainer);
+    }
+  }
+  
 
 function getRecommendations(){
     var startDate = document.getElementById("startDateValue").value
