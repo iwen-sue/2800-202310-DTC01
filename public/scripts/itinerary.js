@@ -86,6 +86,31 @@ $(document).ready(function () {
     }
 
 
+// Client-side code
+fetch('/itineraryData')
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not OK');
+    }
+    return response.json(); 
+  })
+  .then(data => {
+    console.log(data); 
+
+    if (data && data.itinerary) {
+      const itinerary = data.itinerary;
+
+      console.log(itinerary);
+
+      insertItinerary(itinerary);
+    } else {
+      console.log('Invalid itinerary data');
+    }
+  })
+  .catch(error => {
+    console.error(error);
+  });
+
 
 
 
@@ -135,6 +160,7 @@ function submitForm() {
             console.error(error);
         });
 
+        // Client-side JavaScript
 }
 
 function insertItinerary(itineraryJSON) {
