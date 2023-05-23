@@ -615,6 +615,10 @@ app.post('/itinerary/getRecommendation', sessionValidation, (req, res)=>{
     console.log(req.body)
 })
 
+app.post('/itinerary/adjustment', sessionValidation, (req, res)=>{
+    console.log(req.body)
+})
+
 //static images address
 app.use(express.static(__dirname + "/public"));
 // handle 404 - page not found
