@@ -1,10 +1,24 @@
+body#auth-background {
+    color: #FFFFFF;
+    height: 100vh;
+    background-color: var(--theme);
+    background-image: linear-gradient(to bottom right, var(--lightTheme), var(--theme));
+}
+
 .forgotId{
     font-size: small;
 
 }
 
+.form-area {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
 .loginBtn{
-    background-color: var(--theme);
+    background-color: var(--pink);
     color: white;
     padding: 10px 20px;
     margin: 0;
@@ -15,7 +29,7 @@
 }
 
 .resetBtn{
-    background-color: var(--theme);
+    background-color: var(--pink);
     color: white;
     padding: 10px 20px;
     margin: 0;
@@ -25,12 +39,12 @@
 }
 
 .resetBtn:hover {
-    background-color: var(--theme);
+    background-color: var(--pink);
     color: white;
 }
 
 .resetConfirmBtn {
-    background-color: var(--theme);
+    background-color: var(--pink);
     color: white;
     padding: 10px 20px;
     margin: 0;
@@ -40,12 +54,12 @@
 }
 
 .resetConfirmBtn:hover {
-    background-color: var(--theme);
+    background-color: var(--pink);
     color: white;
 }
 
 .signupBtn{
-    background-color: var(--theme);
+    background-color: var(--pink);
     color: white;
     padding: 10px 20px;
     margin: 0;
