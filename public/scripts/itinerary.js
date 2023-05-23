@@ -107,8 +107,8 @@ function handleCity(city) {
 }
 
 function submitForm() {
-    var startDate = document.getElementById("startDateValue").value
-    var endDate = document.getElementById("endDateValue").value
+    var startDate = document.getElementById("startDateValue").value;
+    var endDate = document.getElementById("endDateValue").value;
     var startTime = document.getElementById("startTimeValue").value;
     var endTime = document.getElementById("endTimeValue").value;
     console.log(selectedCities)

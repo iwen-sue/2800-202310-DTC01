@@ -146,9 +146,24 @@ app.get('/', (req, res) => {
 
 // app.use('/', sessionValidation)
 
-app.get('/home', sessionValidation, (req, res) => {
-    res.render('itinerary');
+app.get('/home', sessionValidation, async (req, res) => {
+    const userEmail = req.session.email;
+    try {
+        const query = await usersModel.findOne({ email: userEmail });
+        const groupID = query.groupID;
+        const groupQuery = await groupsModel.findOne({ _id: groupID });
+
+        if (groupQuery) {
+            const groupName = groupQuery.groupName;
+            res.render('itinerary', { groupName: groupName + "'s Itinerary" });
+        } else {
+            res.render('itinerary', { groupName: "Join a group First!" });
+        }
+    } catch (err) {
+        console.error(err);
+    }
 });
+
 
 app.get('/chatroom', sessionValidation, async (req, res) => {
     const query = usersModel.findOne({
@@ -606,9 +621,10 @@ app.post('/uploadImage', sessionValidation, upload.single('imageData'), async (r
 
 
 
-app.post('/itinerary/submitNew', sessionValidation, (req, res)=>{
+app.post('/itinerary/submitNew', sessionValidation, async (req, res)=>{
     console.log(req.body)
     var citiesArray = JSON.parse(req.body.cities);
+
 })
 
 app.post('/itinerary/getRecommendation', sessionValidation, (req, res)=>{
