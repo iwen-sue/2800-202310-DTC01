@@ -1,4 +1,4 @@
-var selectedCountry, selectedCities = [];
+var selectedCountry, selectedCities = [], readyToRemove;
 
 $(document).ready(function () {
     $('#startPicker').datepicker({
@@ -75,11 +75,17 @@ $(document).ready(function () {
                             option.innerHTML = city;
                             option.addEventListener('click', function (e) {
                                 // Code to be executed when the li element is clicked
+                                var span = document.createElement('span');
+                                span.classList.add('cityItem');
+                                span.textContent = e.target.innerHTML;
+
+                                span.addEventListener('click', handleCityClick);
+
                                 console.log(e.target.innerHTML);
                                 selectedCities.push(e.target.innerHTML)
-                                var html = document.getElementById("selectedCities").innerHTML;
-                                html += `<span class="cityItem" onclick="handleCity(${e.target.innerHTML})">${e.target.innerHTML}</span>`
-                                document.getElementById("selectedCities").innerHTML = html;
+                                document.getElementById("selectedCities").appendChild(span);
+                                
+                                
                             });
                             citySelect.appendChild(option);
                         });
@@ -99,11 +105,26 @@ $(document).ready(function () {
 
 });
 
-function handleCity(city) {
+function handleCityClick(e) {
+    readyToRemove = e.target
+    console.log(readyToRemove)
 
-    //delete city element if user click
-    //remove that city in array
-    console.log(city)
+    $("#confirmModal").modal("show")
+}
+
+function deleteFromArray(arr, value) {
+    const index = arr.indexOf(value);
+    if (index > -1) {
+      arr.splice(index, 1);
+    }
+  }
+
+function deleteCity(){
+    readyToRemove.remove();
+    var text = readyToRemove.innerHTML;
+    deleteFromArray(selectedCities, text);
+    console.log(selectedCities)
+    $("#confirmModal").modal("hide");
 }
 
 function submitForm() {
@@ -114,21 +135,21 @@ function submitForm() {
     console.log(selectedCities)
     var postData = {
         'startDate': startDate,
-        'endDate': endDate, 
+        'endDate': endDate,
         'startTime': startTime,
         'endTime': endTime,
         'country': selectedCountry,
         'cities': JSON.stringify(selectedCities)
     }
 
-        
-    
+
+
 
     fetch('/itinerary/submitNew', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
-          },
+        },
         body: new URLSearchParams(postData)
     })
         .then(response => response.json())
@@ -143,9 +164,9 @@ function submitForm() {
 
 }
 
-function getRecommendations(){
+function getRecommendations() {
     var startDate = document.getElementById("startDateValue").value
-    if(startDate){
+    if (startDate) {
         var postData = {
             'startDate': startDate
         }
@@ -153,7 +174,7 @@ function getRecommendations(){
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
-              },
+            },
             body: new URLSearchParams(postData)
         })
             .then(response => response.json())
@@ -166,24 +187,24 @@ function getRecommendations(){
                 console.error(error);
             });
 
-    }else{
+    } else {
         alert("please select a startDate to get advices from AI!")
     }
 }
 
-function submitAdjustDates(){
+function submitAdjustDates() {
     var startDate = document.getElementById("startPickerAdjustValue").value
     var endDate = document.getElementById("endPickerAdjustValue").value
-    if(startDate!="" && endDate!=""){
+    if (startDate != "" && endDate != "") {
         var postData = {
             'startDate': startDate,
-            'endDate':endDate
+            'endDate': endDate
         }
         fetch('/itinerary/adjustment', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
-              },
+            },
             body: new URLSearchParams(postData)
         })
             .then(response => response.json())
@@ -195,9 +216,9 @@ function submitAdjustDates(){
                 // Handle any errors
                 console.error(error);
             });
-    }else{
+    } else {
         alert("please select all fields!")
     }
-    
+
 
 }
