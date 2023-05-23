@@ -1,8 +1,8 @@
-require("./utils.js");
+require("../utils.js");
 const express = require('express');
 // const session = require('express-session');
-const usersModel = require('./models/user.js');
-const groupsModel = require('./models/group.js');
+const usersModel = require('../models/user.js');
+const groupsModel = require('../models/group.js');
 var { database } = include('databaseConnection');
 const mongodb_database = process.env.MONGODB_DATABASE;
 const groupCollection = database.db(mongodb_database).collection('groups');
