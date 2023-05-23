@@ -1,5 +1,33 @@
 var selectedCountry, selectedCities = [];
-
+const recommendedTrips = [
+    { Place: "London, United Kingdom", AverageDuration: 7 },
+    { Place: "Phuket, Thailand", AverageDuration: 6 },
+    { Place: "Bali, Indonesia", AverageDuration: 8 },
+    { Place: "New York City, United States", AverageDuration: 7 },
+    { Place: "Tokyo, Japan", AverageDuration: 8 },
+    { Place: "Paris, France", AverageDuration: 7 },
+    { Place: "Sydney, Australia", AverageDuration: 9 },
+    { Place: "Rio de Janeiro, Brazil", AverageDuration: 8 },
+    { Place: "Amsterdam, Netherlands", AverageDuration: 7 },
+    { Place: "Dubai, United Arab Emirates", AverageDuration: 7 },
+    { Place: "Cancun, Mexico", AverageDuration: 8 },
+    { Place: "Barcelona, Spain", AverageDuration: 7 },
+    { Place: "Honolulu, Hawaii", AverageDuration: 9 },
+    { Place: "Berlin, Germany", AverageDuration: 9 },
+    { Place: "Marrakech, Morocco", AverageDuration: 7 },
+    { Place: "Edinburgh, Scotland", AverageDuration: 7 },
+    { Place: "Rome, Italy", AverageDuration: 7 },
+    { Place: "Bangkok, Thailand", AverageDuration: 7 },
+    { Place: "Athens, Greece", AverageDuration: 9 },
+    { Place: "Cairo, Egypt", AverageDuration: 7 },
+    { Place: "Vancouver, Canada", AverageDuration: 7 },
+    { Place: "Seoul, South Korea", AverageDuration: 9 },
+    { Place: "Los Angeles, United States", AverageDuration: 7 },
+    { Place: "Cape Town, South Africa", AverageDuration: 9 },
+    { Place: "Santorini, Greece", AverageDuration: 7 },
+    { Place: "Phnom Penh, Cambodia", AverageDuration: 5 },
+    { Place: "Auckland, New Zealand", AverageDuration: 7 },
+];
 $(document).ready(function () {
     $('#startPicker').datepicker({
         format: "yyyy-mm-dd"
@@ -53,6 +81,7 @@ $(document).ready(function () {
                 option.addEventListener('click', function (e) {
                     // Code to be executed when the li element is clicked
                     selectedCountry = e.target.innerHTML;
+                    $("#city").empty();
                     renderCities();
                     document.getElementById("selectedCountry").innerHTML = selectedCountry;
                 });
@@ -84,19 +113,12 @@ $(document).ready(function () {
                             citySelect.appendChild(option);
                         });
                     }
-
                 });
             })
             .catch(error => {
                 console.log('Error:', error);
             });
-
     }
-
-
-
-
-
 });
 
 function handleCity(city) {
@@ -120,7 +142,7 @@ function submitForm() {
         'country': selectedCountry,
         'cities': JSON.stringify(selectedCities)
     }
-
+    console.log(postData)
         
     
 
@@ -143,61 +165,79 @@ function submitForm() {
 
 }
 
-function getRecommendations(){
-    var startDate = document.getElementById("startDateValue").value
-    if(startDate){
-        var postData = {
-            'startDate': startDate
-        }
-        fetch('/itinerary/getRecommendation', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-              },
-            body: new URLSearchParams(postData)
-        })
-            .then(response => response.json())
-            .then(data => {
-                // Handle the response from the backend
-                console.log(data);
-            })
-            .catch(error => {
-                // Handle any errors
-                console.error(error);
-            });
+function calculateEndDate(days, startDate) {
+  // Convert the start date to a JavaScript Date object
+    const startDateObj = new Date(startDate);
 
-    }else{
-        alert("please select a startDate to get advices from AI!")
-    }
+  // Calculate the end date by adding the number of days to the start date
+    const endDateObj = new Date(
+        startDateObj.getTime() + days * 24 * 60 * 60 * 1000
+    );
+
+  // Get the year, month, and day components of the end date
+    const year = endDateObj.getFullYear();
+    const month = String(endDateObj.getMonth() + 1).padStart(2, "0");
+    const day = String(endDateObj.getDate()).padStart(2, "0");
+
+  // Return the end date as a string in the format "YYYY-MM-DD"
+    return `${year}-${month}-${day}`;
 }
 
-function submitAdjustDates(){
-    var startDate = document.getElementById("startPickerAdjustValue").value
-    var endDate = document.getElementById("endPickerAdjustValue").value
-    if(startDate!="" && endDate!=""){
-        var postData = {
-            'startDate': startDate,
-            'endDate':endDate
-        }
-        fetch('/itinerary/adjustment', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-              },
-            body: new URLSearchParams(postData)
-        })
-            .then(response => response.json())
-            .then(data => {
-                // Handle the response from the backend
-                console.log(data);
-            })
-            .catch(error => {
-                // Handle any errors
-                console.error(error);
-            });
-    }else{
-        alert("please select all fields!")
-    }
-    
+function parseCityCountry(inputString) {
+    // Split the input string by comma and trim whitespace
+    const parts = inputString.split(",").map((part) => part.trim());
 
+    // Extract the city and country from the parts array
+    const city = parts[0];
+    const country = parts[1];
+
+    // Return the city and country as an array
+    return [city, country];
+}
+
+function getRecommendations(){
+    var startDate = $("#startDateValue").val();
+    if (startDate) {
+        var recommededTrip = recommendedTrips[Math.round(Math.random() * recommendedTrips.length)];
+        var endDate = calculateEndDate(recommededTrip.AverageDuration,startDate);
+        var recCity = parseCityCountry(recommededTrip.Place)[0];
+        var recCountry = parseCityCountry(recommededTrip.Place)[1];
+        selectedCountry = recCountry;
+        selectedCities = [recCity];
+        $("#selectedCountry").html(recCountry);
+        $("#endDateValue").val(endDate);
+        $("#startTimeValue").val("09:00");
+        $("#endTimeValue").val("18:00");
+        $("#selectedCities").empty().append(
+            `<span class="cityItem" onclick="handleCity(${recCity})">${recCity}</span>`
+        );
+        fetch("https://countriesnow.space/api/v0.1/countries")
+            .then((response) => response.json())
+            .then((data) => {
+            // Iterate over the city data and create city options
+                data.data.forEach((country) => {
+                    if (country.country === recCountry) {
+                        country.cities.forEach((city) => {
+                            var option = document.createElement("li");
+                            option.innerHTML = city;
+                            option.addEventListener("click", function (e) {
+                                // Code to be executed when the li element is clicked
+                                console.log(e.target.innerHTML);
+                                selectedCities.push(e.target.innerHTML);
+                                var html = document.getElementById("selectedCities").innerHTML;
+                                html += `<span class="cityItem" onclick="handleCity(${e.target.innerHTML})">${e.target.innerHTML}</span>`;
+                                document.getElementById("selectedCities").innerHTML = html;
+                            });
+                            $("ul#city").append(option);
+                        });
+                    }
+                });
+            })
+        .catch((error) => {
+            console.log("Error:", error);
+            });
+        } else {
+            alert("Please select a start date to get an AI recommended trip!");
+        }
+    
 }
