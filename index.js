@@ -691,11 +691,12 @@ app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
     async function saveItinerary(itineraryJSON, groupID) {
         // Delete the existing itinerary array
         await groupsModel.updateOne({ _id: groupID }, { $unset: { itinerary: 1 } }).exec();
-      
+        
         // Create a new itinerary array and push the new itinerary into it
-        const update = { $push: { itinerary: itineraryJSON } };
+        const update = { $push: { itinerary: { $each: itineraryJSON } } };
         await groupsModel.updateOne({ _id: groupID }, update).exec();
       }
+      
     
     async function generateItinerary(promptArgs) {
       const res = await openai.createChatCompletion({
