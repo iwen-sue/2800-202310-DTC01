@@ -12,8 +12,8 @@
 
 </head>
 
-    <body>
-        <%- include("templates/nav") %>
+    <body id="auth-background">
+        
         <% if (typeof success !== 'undefined') { %>
             <div class="alert alert-success" id="alertBox">
                 <%= success %>
@@ -34,19 +34,20 @@
         <% } %>
         <main class="form-signin w-100 m-auto">
             <div class="d-flex gap-2 justify-content-center pt-5 mt-5">
-                <form class="text-center" action="/login" method="post">
-                    <img class="mb-4" src="https://getbootstrap.com/docs/4.0/assets/brand/bootstrap-solid.svg" alt=""
-                        width="72" height="72">
-                    <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
+                <form class="form-area text-center" action="/login" method="post">
+                    <!-- <img class="mb-4" src="https://getbootstrap.com/docs/4.0/assets/brand/bootstrap-solid.svg" alt=""
+                        width="72" height="72"> -->
+                    <img height="72" src="/image/logo-fontless.svg" alt="logo">
+                    <h1 class="h3 mt-4 mb-3 font-weight-bold">Sign in</h1>
 
 
-                    <div class="form-floating">
+                    <div class="form-floating mb-2">
                         <input type="email" class="form-control" id="email" name="email" placeholder="">
                         <label for="email">Email address</label>
                     </div>
                     
 
-                    <div class="form-floating">
+                    <div class="form-floating mb-2">
                         <input type="password" class="form-control" id="password" name="password" placeholder="">
                         <label for="password">Password</label>
                         <% if (groupToken != null) {%>
