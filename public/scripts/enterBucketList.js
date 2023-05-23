@@ -26,11 +26,12 @@ const setup = () => {
     
     // Handle country selection change event
     countrySelect.addEventListener('change', function () {
-        var selectedCountry = countrySelect.value;
         $('#city').show();
-    
+        var selectedCountry = countrySelect.value;
+        
         // Clear previous city options
         citySelect.innerHTML = '<option selected>Select your destination city</option>';
+        
     
         // Fetch city data for the selected country from the API
         fetch('https://countriesnow.space/api/v0.1/countries')
@@ -43,14 +44,14 @@ const setup = () => {
                             var option = document.createElement('option');
                             option.value = city;
                             option.text = city;
-                            citySelect.appendChild(option);
+                            citySelect.appendChild(option);                            
                         });
                         
-                    }
-    
+                    }   
                 });
-                $('.city-select').selectpicker();
-                
+                $('.city-select').selectpicker('refresh');
+            }).then(() => {
+                document.querySelectorAll(' .filter-option-inner-inner')[1].innerHTML = "Select your destination city";
             })
             .catch(error => {
                 console.log('Error:', error);
