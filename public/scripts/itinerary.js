@@ -133,9 +133,33 @@ function submitForm() {
             console.error(error);
         });
 
+}
 
+function getRecommendations(){
+    var startDate = document.getElementById("startDateValue").value
+    if(startDate){
+        var postData = {
+            'startDate': startDate
+        }
+        fetch('/itinerary/getRecommendation', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+              },
+            body: new URLSearchParams(postData)
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the response from the backend
+                console.log(data);
+            })
+            .catch(error => {
+                // Handle any errors
+                console.error(error);
+            });
 
-
-
-    console.log(startDate)
+    }else{
+        alert("please select a startDate to get advices from AI!")
+    }
+    
 }
