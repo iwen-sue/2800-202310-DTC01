@@ -5,6 +5,38 @@ const mongodb_user = process.env.MONGODB_USER;
 const mongodb_password = process.env.MONGODB_PASSWORD;
 const mongodb_database = process.env.MONGODB_DATABASE;
 
+const itinerarySchema = new mongoose.Schema({
+    type: {
+      type: Array,
+      of: {
+        type: Object,
+        properties: {
+          date: {
+            type: String
+          },
+          schedule: {
+            type: Array,
+            of: {
+              type: Object,
+              properties: {
+                name: {
+                  type: String
+                },
+                category: {
+                  type: String
+                },
+                location: {
+                  type: String
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  });
+  
+
 const groupsSchema = new mongoose.Schema({
     groupName: {
         type: String,
@@ -31,7 +63,8 @@ const groupsSchema = new mongoose.Schema({
     },
     chatContext: {
         type: Array, 
-    }
+    },
+    itinerary: itinerarySchema
 });
 
 const groupsModel = mongoose.model('groups', groupsSchema);

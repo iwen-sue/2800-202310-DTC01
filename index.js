@@ -752,11 +752,9 @@ io.on('connection', socket => {
         const getMoreMessageHistory = await showMoreChatHistory(groupID, numOfScroll);
         console.log(numOfScroll)
         if (getMoreMessageHistory.length == 0) {
-            console.log("no more history")
             socket.emit('noMoreChatHistory', data = true);
         }
         if (numOfScroll > 0) {
-            console.log("befroe Insert", getMoreMessageHistory)
             socket.emit('moreChatHistory', getMoreMessageHistory);
 
         }
@@ -799,13 +797,9 @@ async function saveMessage(chatMessageObj) {
 
         if (group) {
             console.log(chatMessageObj)
-
-            // chatMessageObj._id = mongoose.
             var msg = await groupsModel.findOne({ _id: chatMessageObj.groupID })
             const update = { $push: { messages: chatMessageObj } };
             await groupsModel.updateOne({ _id: chatMessageObj.groupID }, update)
-            // await msg.insertOne(chatMessageObj);
-            // await group.save();
             return group.messages;
         }
     } catch (error) {
@@ -823,10 +817,8 @@ async function showMoreChatHistory(groupID, numOfScroll) {
         if (group) {
             if (numOfMessages == 15) {
                 modifyMessages = [];
-                console.log("when 15 msgs", modifyMessages)
             } else {
                 modifyMessages = group.messages.reverse().slice(15 + 4 * numOfScroll, 15 + 4 * numOfScroll + 4);
-                console.log("more than 15 msgs", modifyMessages)
             }
             return modifyMessages;
         }
