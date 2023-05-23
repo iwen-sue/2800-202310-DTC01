@@ -199,8 +199,19 @@ function submitForm() {
 }
 
 function calculateEndDate(days, startDate) {
-  // Convert the start date to a JavaScript Date object
+    // Convert the start date to a JavaScript Date object
     const startDateObj = new Date(startDate);
+
+    // Calculate the end date by adding the number of days to the start date
+    const endDateObj = new Date(startDateObj.getTime() + days * 24 * 60 * 60 * 1000);
+
+    // Get the year, month, and day components of the end date
+    const year = endDateObj.getFullYear();
+    const month = String(endDateObj.getMonth() + 1).padStart(2, "0");
+    const day = String(endDateObj.getDate()).padStart(2, "0");
+
+    // Return the end date as a string in the format "YYYY-MM-DD"
+    return `${year}-${month}-${day}`;
 }
 
 function insertItinerary(itineraryJSON) {
@@ -260,45 +271,6 @@ function insertItinerary(itineraryJSON) {
       itineraryContainer.appendChild(collapseContainer);
     }
   }
-
-  
-
-function getRecommendations(){
-    var startDate = document.getElementById("startDateValue").value
-    if(startDate){
-        var postData = {
-            'startDate': startDate
-        }
-        fetch('/itinerary/getRecommendation', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-              },
-            body: new URLSearchParams(postData)
-        })
-            .then(response => response.json())
-            .then(data => {
-                // Handle the response from the backend
-                console.log(data);
-            })
-            .catch(error => {
-                // Handle any errors
-                console.error(error);
-            });
-
-  // Calculate the end date by adding the number of days to the start date
-    const endDateObj = new Date(
-        startDateObj.getTime() + days * 24 * 60 * 60 * 1000
-    );
-
-  // Get the year, month, and day components of the end date
-    const year = endDateObj.getFullYear();
-    const month = String(endDateObj.getMonth() + 1).padStart(2, "0");
-    const day = String(endDateObj.getDate()).padStart(2, "0");
-
-  // Return the end date as a string in the format "YYYY-MM-DD"
-    return `${year}-${month}-${day}`;
-}}
 
 function parseCityCountry(inputString) {
     // Split the input string by comma and trim whitespace
