@@ -640,45 +640,131 @@ app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
     const endTime = req.body.endTime;
     const country = req.body.country;
     const cities = citiesArray
-    const promptArgs = `Make an itinerary at ${cities} in ${country} from ${startDate} to ${endDate}, around ${startTime} to ${endTime} in a format {date :, schedule: [{"time":, "category":, "activity":, "transportation":  transportation with estimated time }]}, in JSON format as an array. Assign dates properly in only one city considering distance. Include recommended transportation for each activity. Use the following categories to categorize each activity: ${categories}`;
+    const promptArgs = `Make an itinerary at ${cities} in ${country} from ${startDate} to ${endDate}, around ${startTime} to ${endTime} in a format {date :, schedule: [{"startTime":,"endTime":, "category":, "activity":, "transportation":  transportation with estimated time }]}, Make an object for each date in JSON format that is in an array. Assign dates properly in only one city considering distance. Include recommended transportation for each activity. Use the following categories to categorize each activity: ${categories}`;
     console.log("Generating itinerary...");
     const userEmail = req.session.email;
     const query = await usersModel.findOne({ email: userEmail });
     const groupID = query.groupID;
 
 
-    generateItinerary(promptArgs).then((res) => {
-        const itineraryJSON = JSON.parse(res);
-        saveItinerary(itineraryJSON, groupID).then(() => {
- 
-    });
+    let itinerary; // Declare itinerary variable outside the promise chain
 
-
-
-});
-});
-
-
-async function saveItinerary(itineraryJSON, groupID) {    
-
-    for (let i = 0; i < itineraryJSON.length; i++) {
+    try {
+      itinerary = await generateItinerary(promptArgs);
+      const parsedItinerary = JSON.parse(itinerary);
+      await saveItinerary(parsedItinerary, groupID);
+      res.json({ itinerary: parsedItinerary });
+    } catch (error) {
+      console.error("Error:", error);
+      res.status(500).json({ error: "An error occurred" });
+    }
+    
+    async function saveItinerary(itineraryJSON, groupID) {
+      for (let i = 0; i < itineraryJSON.length; i++) {
         const update = { $push: { itinerary: itineraryJSON[i] } };
         await groupsModel.updateOne({ _id: groupID }, update).exec();
+      }
     }
-
-}
-
-async function generateItinerary(promptArgs) {
-    const res = await openai.createChatCompletion({
+    
+    async function generateItinerary(promptArgs) {
+      const res = await openai.createChatCompletion({
         model: "gpt-3.5-turbo",
-        messages: [
-            { role: "user", content: promptArgs },
-        ],
+        messages: [{ role: "user", content: promptArgs }],
         temperature: 0.3,
-    });
+      });
+    
+      return res.data.choices[0].message.content; // Return the parsed object directly
+    }
+});
+  
 
-    return res.data.choices[0].message.content;
+function generateItinerary(promptArgs) {
+    let itineraryJSON = 
+    [
+        {
+          "date": "2023-06-01",
+          "schedule": [
+            {
+              "startTime": "09:00",
+              "endTime": "11:00",
+              "category": "Sightseeing",
+              "activity": "Stanley Park",
+              "transportation": "Take a taxi (estimated time: 15 minutes)"
+            },
+            {
+              "startTime": "11:30",
+              "endTime": "13:00",
+              "category": "Food and Dining",
+              "activity": "Lunch at Granville Island",
+              "transportation": "Walk (estimated time: 20 minutes)"
+            },
+            {
+              "startTime": "14:00",
+              "endTime": "16:00",
+              "category": "Outdoor Adventure",
+              "activity": "Whale Watching Tour",
+              "transportation": "Boat tour (estimated time: 2 hours)"
+            },
+            {
+              "startTime": "16:30",
+              "endTime": "18:00",
+              "category": "Shopping",
+              "activity": "Robson Street Shopping",
+              "transportation": "Walk (estimated time: 10 minutes)"
+            },
+            {
+              "startTime": "19:00",
+              "endTime": "20:00",
+              "category": "Entertainment",
+              "activity": "Evening Show at Queen Elizabeth Theatre",
+              "transportation": "Take a taxi (estimated time: 15 minutes)"
+            }
+          ]
+        },
+        {
+          "date": "2023-06-02",
+          "schedule": [
+            {
+              "startTime": "09:00",
+              "endTime": "11:00",
+              "category": "Sightseeing",
+              "activity": "Inner Harbour",
+              "transportation": "Walk (estimated time: 10 minutes)"
+            },
+            {
+              "startTime": "11:30",
+              "endTime": "13:00",
+              "category": "Food and Dining",
+              "activity": "Lunch at Fisherman's Wharf",
+              "transportation": "Walk (estimated time: 15 minutes)"
+            },
+            {
+              "startTime": "14:00",
+              "endTime": "16:00",
+              "category": "Cultural Experience",
+              "activity": "Royal BC Museum",
+              "transportation": "Take a bus (estimated time: 20 minutes)"
+            },
+            {
+              "startTime": "16:30",
+              "endTime": "18:00",
+              "category": "Nature Exploration",
+              "activity": "Butchart Gardens",
+              "transportation": "Take a taxi (estimated time: 30 minutes)"
+            },
+            {
+              "startTime": "19:00",
+              "endTime": "20:00",
+              "category": "Relaxation",
+              "activity": "Evening Walk at Beacon Hill Park",
+              "transportation": "Walk (estimated time: 10 minutes)"
+            }
+          ]
+        },
+    ]
+    return JSON.stringify(itineraryJSON);
 }
+
 
 app.post('/itinerary/getRecommendation', sessionValidation, (req, res) => {
     console.log(req.body)
