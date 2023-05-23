@@ -137,7 +137,7 @@ app.use('/', (req, res, next) => {  // for local variables
 
 app.get('/', (req, res) => {
     if (req.session.authenticated) {
-        res.render("home")
+        res.redirect('/home');
     } else {
         res.render("index");
     }
@@ -147,7 +147,7 @@ app.get('/', (req, res) => {
 // app.use('/', sessionValidation)
 
 app.get('/home', sessionValidation, (req, res) => {
-    res.render("home");
+    res.render('itinerary');
 });
 
 app.get('/chatroom', sessionValidation, async (req, res) => {
@@ -604,10 +604,7 @@ app.post('/uploadImage', sessionValidation, upload.single('imageData'), async (r
 
 })
 
-app.get('/itinerary', sessionValidation, (req, res)=>{
-    res.render('itinerary');
-    // res.render('emailconfirmation', { error: err });
-})
+
 
 app.post('/itinerary/submitNew', sessionValidation, (req, res)=>{
     console.log(req.body)
