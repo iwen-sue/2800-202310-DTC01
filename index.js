@@ -149,20 +149,49 @@ app.get('/', (req, res) => {
 app.get('/home', sessionValidation, async (req, res) => {
     const userEmail = req.session.email;
     try {
-        const query = await usersModel.findOne({ email: userEmail });
-        const groupID = query.groupID;
-        const groupQuery = await groupsModel.findOne({ _id: groupID });
+      const query = await usersModel.findOne({ email: userEmail });
+      const groupID = query.groupID;
+      const groupQuery = await groupsModel.findOne({ _id: groupID });
+  
+      if (groupQuery) {
+        const groupName = groupQuery.groupName;
+  
 
-        if (groupQuery) {
-            const groupName = groupQuery.groupName;
-            res.render('itinerary', { groupName: groupName + "'s Itinerary" });
-        } else {
-            res.render('itinerary', { groupName: "Join a group First!" });
-        }
+        const itineraryQuery = await groupsModel.findById(groupID, 'itinerary');
+        const itinerary = itineraryQuery.itinerary;
+
+        res.render('itinerary', { groupName: groupName + "'s Itinerary", itinerary: JSON.stringify(itinerary) });
+      } else {
+        res.render('itinerary', { groupName: "Join a group First!" });
+      }
     } catch (err) {
-        console.error(err);
+      console.error(err);
+      res.status(500).json({ error: 'An error occurred.' });
     }
-});
+  });
+  
+// This is to pass the itinerary data to the client side 
+app.get('/itineraryData', sessionValidation, async (req, res) => {
+    const userEmail = req.session.email;
+    try {
+      const query = await usersModel.findOne({ email: userEmail });
+      const groupID = query.groupID;
+      const groupQuery = await groupsModel.findOne({ _id: groupID });
+  
+      if (groupQuery) {
+        const itineraryQuery = await groupsModel.findById(groupID, 'itinerary');
+        const itinerary = itineraryQuery.itinerary;
+  
+        res.json({ itinerary }); // Send the itinerary data as JSON response
+      } else {
+        res.status(404).json({ error: "Group not found" });
+      }
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'An error occurred.' });
+    }
+  });
+  
 
 
 app.get('/chatroom', sessionValidation, async (req, res) => {
@@ -665,9 +694,9 @@ app.post('/deletegroup', sessionValidation, async (req, res) => {
     res.redirect('/userprofile');
 });
 
-app.get('/chatroom/sentimentScores', sessionValidation, async (req, res)=>{
+app.get('/chatroom/sentimentScores', sessionValidation, async (req, res) => {
     var groupID = req.query.id
-    groupsModel.findOne({_id: groupID}).then((docs)=>{
+    groupsModel.findOne({ _id: groupID }).then((docs) => {
         res.status(200).json({ data: docs.memberSentiment });
     })
 })
@@ -686,13 +715,68 @@ app.post('/uploadImage', sessionValidation, upload.single('imageData'), async (r
 
 
 
-app.post('/itinerary/submitNew', sessionValidation, async (req, res)=>{
-    console.log(req.body)
+app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
+    
     var citiesArray = JSON.parse(req.body.cities);
+    const categories = [
+        "Sightseeing",
+        "Outdoor Adventure",
+        "Cultural Experience",
+        "Food and Dining",
+        "Shopping",
+        "Entertainment",
+        "Nature Exploration",
+        "Relaxation"
+    ];
+    const startDate = req.body.startDate;
+    const endDate = req.body.endDate;
+    const startTime = req.body.startTime;
+    const endTime = req.body.endTime;
+    const country = req.body.country;
+    const cities = citiesArray
+    const promptArgs = `Make an itinerary at ${cities} in ${country} from ${startDate} to ${endDate}, around ${startTime} to ${endTime} in a format {date :, schedule: [{"startTime":,"endTime":, "category":, "activity":, "transportation":  transportation with estimated time }]}, Make an object for each date in JSON format that is in an array. Assign dates properly in only one city considering distance. Include recommended transportation for each activity. Use the following categories to categorize each activity: ${categories}`;
+    console.log("Generating itinerary...");
+    const userEmail = req.session.email;
+    const query = await usersModel.findOne({ email: userEmail });
+    const groupID = query.groupID;
 
-})
 
-app.post('/itinerary/getRecommendation', sessionValidation, (req, res)=>{
+    let itinerary; // Declare itinerary variable outside the promise chain
+
+    try {
+      itinerary = await generateItinerary(promptArgs);
+      const parsedItinerary = JSON.parse(itinerary);
+      await saveItinerary(parsedItinerary, groupID);
+      res.json({ itinerary: parsedItinerary });
+    } catch (error) {
+      console.error("Error:", error);
+      res.status(500).json({ error: "An error occurred" });
+    }
+    
+    async function saveItinerary(itineraryJSON, groupID) {
+        // Delete the existing itinerary array
+        await groupsModel.updateOne({ _id: groupID }, { $unset: { itinerary: 1 } }).exec();
+        
+        // Create a new itinerary array and push the new itinerary into it
+        const update = { $push: { itinerary: { $each: itineraryJSON } } };
+        await groupsModel.updateOne({ _id: groupID }, update).exec();
+      }
+      
+    
+    async function generateItinerary(promptArgs) {
+      const res = await openai.createChatCompletion({
+        model: "gpt-3.5-turbo",
+        messages: [{ role: "user", content: promptArgs }],
+        temperature: 0.3,
+      });
+    
+      return res.data.choices[0].message.content; // Return the parsed object directly
+    }
+});
+  
+
+
+app.post('/itinerary/getRecommendation', sessionValidation, (req, res) => {
     console.log(req.body)
 })
 
@@ -741,7 +825,7 @@ io.on('connection', socket => {
         // set inactive threshold
         lastActivityTimeSTP = Date.now();
         const inactiveThreshold = 1000 * 60 * 5;  // 5 minutes
-        setInterval( async () => {
+        setInterval(async () => {
             if (lastActivityTimeSTP && Date.now() - lastActivityTimeSTP > inactiveThreshold) {
                 // user is inactive
                 // console.log("user is inactive");
@@ -830,11 +914,9 @@ io.on('connection', socket => {
         const getMoreMessageHistory = await showMoreChatHistory(groupID, numOfScroll);
         console.log(numOfScroll)
         if (getMoreMessageHistory.length == 0) {
-            console.log("no more history")
             socket.emit('noMoreChatHistory', data = true);
         }
         if (numOfScroll > 0) {
-            console.log("befroe Insert", getMoreMessageHistory)
             socket.emit('moreChatHistory', getMoreMessageHistory);
 
         }
@@ -852,7 +934,7 @@ async function deleteMessageDB(groupID, messagerName, chatMessageText) {
     try {
         const updateResult = await groupsModel.updateOne(
             { _id: groupID },
-            { $pull: { messages: { message: chatMessageText, userName: messagerName} } }
+            { $pull: { messages: { message: chatMessageText, userName: messagerName } } }
         ).exec();
 
         if (updateResult.modifiedCount > 0) {
@@ -873,7 +955,7 @@ async function saveMessage(chatMessageObj) {
             console.log(chatMessageObj)
 
             // chatMessageObj._id = mongoose.
-            var msg = await groupsModel.findOne({ _id: chatMessageObj.groupID })
+
             const update = { $push: { messages: chatMessageObj } };
             await groupsModel.updateOne({ _id: chatMessageObj.groupID }, update)
             // await msg.insertOne(chatMessageObj);
