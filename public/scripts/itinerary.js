@@ -126,9 +126,6 @@ function submitForm() {
         .then(response => response.json())
         .then(data => {
             console.log("data", data.itinerary)
-            // Handle the response from the backend
-            // const itineraryJSON = data.itinerary;
-            // console.log("data.itinerary", itineraryJSON)
             insertItinerary(data.itinerary);
 
 
