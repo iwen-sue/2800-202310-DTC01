@@ -149,49 +149,49 @@ app.get('/', (req, res) => {
 app.get('/home', sessionValidation, async (req, res) => {
     const userEmail = req.session.email;
     try {
-      const query = await usersModel.findOne({ email: userEmail });
-      const groupID = query.groupID;
-      const groupQuery = await groupsModel.findOne({ _id: groupID });
-  
-      if (groupQuery) {
-        const groupName = groupQuery.groupName;
-  
+        const query = await usersModel.findOne({ email: userEmail });
+        const groupID = query.groupID;
+        const groupQuery = await groupsModel.findOne({ _id: groupID });
 
-        const itineraryQuery = await groupsModel.findById(groupID, 'itinerary');
-        const itinerary = itineraryQuery.itinerary;
+        if (groupQuery) {
+            const groupName = groupQuery.groupName;
 
-        res.render('itinerary', { groupName: groupName + "'s Itinerary", itinerary: JSON.stringify(itinerary) });
-      } else {
-        res.render('itinerary', { groupName: "Join a group First!" });
-      }
+
+            const itineraryQuery = await groupsModel.findById(groupID, 'itinerary');
+            const itinerary = itineraryQuery.itinerary;
+
+            res.render('itinerary', { groupName: groupName + "'s Itinerary", itinerary: JSON.stringify(itinerary) });
+        } else {
+            res.render('itinerary', { groupName: "Join a group First!" });
+        }
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'An error occurred.' });
+        console.error(err);
+        res.status(500).json({ error: 'An error occurred.' });
     }
-  });
-  
+});
+
 // This is to pass the itinerary data to the client side 
 app.get('/itineraryData', sessionValidation, async (req, res) => {
     const userEmail = req.session.email;
     try {
-      const query = await usersModel.findOne({ email: userEmail });
-      const groupID = query.groupID;
-      const groupQuery = await groupsModel.findOne({ _id: groupID });
-  
-      if (groupQuery) {
-        const itineraryQuery = await groupsModel.findById(groupID, 'itinerary');
-        const itinerary = itineraryQuery.itinerary;
-  
-        res.json({ itinerary }); // Send the itinerary data as JSON response
-      } else {
-        res.status(404).json({ error: "Group not found" });
-      }
+        const query = await usersModel.findOne({ email: userEmail });
+        const groupID = query.groupID;
+        const groupQuery = await groupsModel.findOne({ _id: groupID });
+
+        if (groupQuery) {
+            const itineraryQuery = await groupsModel.findById(groupID, 'itinerary');
+            const itinerary = itineraryQuery.itinerary;
+
+            res.json({ itinerary }); // Send the itinerary data as JSON response
+        } else {
+            res.status(404).json({ error: "Group not found" });
+        }
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'An error occurred.' });
+        console.error(err);
+        res.status(500).json({ error: 'An error occurred.' });
     }
-  });
-  
+});
+
 
 
 app.get('/chatroom', sessionValidation, async (req, res) => {
@@ -378,8 +378,8 @@ app.post('/signup', async (req, res) => {
                 }
             }
             if (memberHasJoinedPreviously) {
-                for(var i = 0; i < currentMembers.length; i++){
-                    if(currentMembers[i].email == req.body.email){
+                for (var i = 0; i < currentMembers.length; i++) {
+                    if (currentMembers[i].email == req.body.email) {
                         currentMembers[i].active = true;
                     }
                 }
@@ -451,8 +451,8 @@ app.post('/login', async (req, res) => {
                 }
             }
             if (memberHasJoinedPreviously) {
-                for(var i = 0; i < currentMembers.length; i++){
-                    if(currentMembers[i].email == email){
+                for (var i = 0; i < currentMembers.length; i++) {
+                    if (currentMembers[i].email == email) {
                         currentMembers[i].active = true;
                     }
                 }
@@ -660,8 +660,8 @@ app.post('/removemember', sessionValidation, async (req, res) => {
     var groupID = req.body.groupID;
     // await groupsModel.updateOne({ _id: groupID }, { $pull: { members: { email: memberEmail } } }).exec();
     var currentMembers = await groupsModel.find({ _id: groupID }).exec();
-    for(var i = 0; i < currentMembers[0].members.length; i++){
-        if(currentMembers[0].members[i].email == memberEmail){
+    for (var i = 0; i < currentMembers[0].members.length; i++) {
+        if (currentMembers[0].members[i].email == memberEmail) {
             currentMembers[0].members[i].active = false;
         }
     }
@@ -720,8 +720,8 @@ app.get('/userprofile/groupnotfound', sessionValidation, async (req, res) => {
 app.post('/leavegroup', sessionValidation, async (req, res) => {
     var groupID = req.body.groupID;
     var currentMembers = await groupsModel.find({ _id: groupID }).exec();
-    for(var i = 0; i < currentMembers[0].members.length; i++){
-        if(currentMembers[0].members[i].email == req.session.email){
+    for (var i = 0; i < currentMembers[0].members.length; i++) {
+        if (currentMembers[0].members[i].email == req.session.email) {
             currentMembers[0].members[i].active = false;
         }
     }
@@ -759,7 +759,7 @@ app.post('/uploadImage', sessionValidation, upload.single('imageData'), async (r
 
 
 app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
-    
+
     var citiesArray = JSON.parse(req.body.cities);
     const categories = [
         "Sightseeing",
@@ -787,27 +787,31 @@ app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
     let itinerary; // Declare itinerary variable outside the promise chain
 
     try {
-      itinerary = await generateItinerary(promptArgs);
-      const parsedItinerary = JSON.parse(itinerary);
-      await saveItinerary(parsedItinerary, groupID);
-      res.json({ itinerary: parsedItinerary });
+        itinerary = await generateItinerary(promptArgs);
+        const parsedItinerary = JSON.parse(itinerary);
+        await saveItinerary(parsedItinerary, groupID);
+        res.json({ itinerary: parsedItinerary });
     } catch (error) {
-      console.error("Error:", error);
-      res.status(500).json({ error: "An error occurred" });
+        console.error("Error:", error);
+        res.status(500).json({ error: "An error occurred" });
     }
-    
-    async function saveItinerary(itineraryJSON, groupID) {
-        // Delete the existing itinerary array
-        await groupsModel.updateOne({ _id: groupID }, { $unset: { itinerary: 1 } }).exec();
-        
-        // Create a new itinerary array and push the new itinerary into it
-        const update = { $push: { itinerary: { $each: itineraryJSON } } };
-        await groupsModel.updateOne({ _id: groupID }, update).exec();
-      }
-      
-    
-    async function generateItinerary(promptArgs) {
-      const res = await openai.createChatCompletion({
+
+
+});
+
+
+async function saveItinerary(itineraryJSON, groupID) {
+    // Delete the existing itinerary array
+    await groupsModel.updateOne({ _id: groupID }, { $unset: { itinerary: 1 } }).exec();
+
+    // Create a new itinerary array and push the new itinerary into it
+    const update = { $push: { itinerary: { $each: itineraryJSON } } };
+    await groupsModel.updateOne({ _id: groupID }, update).exec();
+}
+
+
+async function generateItinerary(promptArgs) {
+    const res = await openai.createChatCompletion({
         model: "gpt-3.5-turbo",
         messages: [{ role: "user", content: promptArgs }],
         temperature: 0.3,
@@ -815,28 +819,124 @@ app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
       console.log(res.data.choices[0].message.content)
     
       return res.data.choices[0].message.content; // Return the parsed object directly
-    }
-});
+    };
   
-
 
 app.post('/itinerary/getRecommendation', sessionValidation, (req, res) => {
     console.log(req.body)
 })
 
-app.post('/itinerary/adjustment', sessionValidation, (req, res)=>{
+
+app.post('/itinerary/adjustment', sessionValidation, async (req, res) => {
     console.log(req.body)
+    const userEmail = req.session.email;
+    const userQuery = await usersModel.findOne({ email: userEmail });
+    const groupID = userQuery.groupID;
+    const groupQuery = await groupsModel.findOne({ _id: groupID });
+    const preItinerary = groupQuery.itinerary;
+
+    const categories = [
+        "Sightseeing",
+        "Outdoor Adventure",
+        "Cultural Experience",
+        "Food and Dining",
+        "Shopping",
+        "Entertainment",
+        "Nature Exploration",
+        "Relaxation"
+    ];
+    const startDate = req.body.startDate;
+    const endDate = req.body.endDate;
+    const promptArgs = `Make an itinerary from ${startDate} to ${endDate}, the same country, cities, startTime, and endTime as ${preItinerary} in a format {date :, schedule: [{"startTime":,"endTime":, "category":, "activity":, "transportation":  transportation with estimated time }]}, Make an object for each date in JSON format that is in an array. Assign dates properly in only one city considering distance. Include recommended transportation for each activity. Use the following categories to categorize each activity: ${categories}`;
+    console.log("Generating itinerary...");
+
+    let itinerary; // Declare itinerary variable outside the promise chain
+    try {
+        itinerary = await generateItinerary(promptArgs);
+        const parsedItinerary = JSON.parse(itinerary);
+        console.log("itienrary is generated")
+        await saveItinerary(parsedItinerary, groupID);
+        console.log("itinerary is saved")
+        res.json({ itinerary: parsedItinerary });
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ error: "An error occurred" });
+    }
 })
 
-app.post('/itinerary/edit', sessionValidation, (req, res)=>{
-    console.log(req.body)
-    console.log(JSON.parse(req.body.schedule))
-})
+app.post('/itinerary/edit', sessionValidation, async (req, res) => {
+    const date = req.body.date;
+    const referStartTime = req.body.referStartTime;
+    const editedSchedule = JSON.parse(req.body.schedule);
+    const editedStartTime = editedSchedule.startTime;
+    const editedEndTime = editedSchedule.endTime;
+    const editedActivity = editedSchedule.activity;
+    console.log("editedSchedule", editedSchedule);
+    console.log("date", date);
+    console.log("referStartTime", referStartTime);
 
-app.post('/itinerary/delete', sessionValidation, (req, res)=>{
-    console.log(req.body)
-    console.log(JSON.parse(req.body.deleteSchedule))
-})
+    const userEmail = req.session.email;
+    const userQuery = await usersModel.findOne({ email: userEmail });
+    const groupID = userQuery.groupID;
+    console.log("GroupID:", groupID);
+
+    const filter = { _id: groupID };
+    const update = {
+      $set: {
+        "itinerary.$[itineraryObj].schedule.$[scheduleObj].startTime": editedStartTime,
+        "itinerary.$[itineraryObj].schedule.$[scheduleObj].endTime": editedEndTime,
+        "itinerary.$[itineraryObj].schedule.$[scheduleObj].activity": editedActivity
+      }
+    };
+    const options = {
+      arrayFilters: [
+        { "itineraryObj.date": date },
+        { "scheduleObj.startTime": referStartTime }
+      ],
+      new: true
+    };
+
+    const updatedDocument = await groupsModel.findOneAndUpdate(filter, update, options);
+    console.log("Successfully updated");
+  });
+
+
+
+
+app.post('/itinerary/delete', sessionValidation, async (req, res) => {
+    console.log(req.body);
+    const date = req.body.date;
+    const scheduleElem = JSON.parse(req.body.deleteSchedule);
+    const startTime = scheduleElem.startTime;
+    console.log(startTime);
+    console.log(date);
+
+    const userEmail = req.session.email;
+    const userQuery = await usersModel.findOne({ email: userEmail });
+    const groupID = userQuery.groupID;
+    console.log("groupID:", groupID);
+
+    const filter = {
+        _id: groupID,
+        'itinerary.date': date,
+        'itinerary.schedule.startTime': startTime
+    };
+
+    const update = {
+        $pull: { 'itinerary.$.schedule': { startTime: startTime } }
+    };
+
+    const result = await groupsModel.updateOne(filter, update);
+
+    if (result.modifiedCount === 0) {
+        console.log("Matching object not found in the itinerary");
+        res.status(404).json({ error: "Matching object not found in the itinerary" });
+        return;
+    }
+    console.log("Object deleted successfully")
+    res.status(200).json({ message: "Object deleted successfully" });
+});
+
 
 //static images address
 app.use(express.static(__dirname + "/public"));
