@@ -1,4 +1,3 @@
-// API_KEY = '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';
 
 async function getSuggestion(promptArgs, apiKey) {
     const option = {
