@@ -31,29 +31,10 @@
     <body>
         <%- include("templates/nav") %>
             <div>
-                <h3 class="itineraryName"><%- groupName %></h3>
+                <% if (groupName != "Join a group First!") { %>
+                <h2 class="itineraryName"><%- groupName %></h2>
                 <div class="itineraryPlan">
-                    <button type="button" class="dateTrigger" data-toggle="collapse" data-target="#demo">
-                        May 21, 2023</button>
-                    <div id="demo" class="collapse itineraryBlockContainer">
-                        <div class="itineraryBlock">
-                            <div class="itineraryTime">
-                                <div class="itineraryTimeText">
-                                    <p>9:00</p>
-                                    <p>|</p>
-                                    <p>12:00</p>
-                                </div>
-                                <p class="itineraryTimeDecorator">
-                                    <span class="decoratorCircle"></span>
-                                </p>
-                            </div>
-                            <div class="itineraryActivity">some activity texts
-                                <span class="material-symbols-outlined itineraryBlockEdit">
-                                    edit_note
-                                </span>
-                            </div>
-                        </div>
-                    </div>
+                    <p style="text-align: center;">no record to display</p>
                 </div>
                 <div class="bottomContent">
                     <% if (groupName !== "Join a group First!") { %>
@@ -62,6 +43,10 @@
                       <% } %>
 
                 </div>
+                <%} else{ %>
+                    <h3 class="itineraryName">Create or join a group to start your journey</h3>
+                    <div style="padding: 10vh 5vw; text-align: center;"><button type="button" class="btn btn-primary" style="width:100%; line-height: 35px;" onclick="window.location.href='/creategroup'">Create Group</button></div>
+                    <% } %>
 
             </div>
             <%- include("templates/makeItinerary") %>

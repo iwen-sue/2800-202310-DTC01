@@ -73,6 +73,12 @@ $(document).ready(function () {
         });
     });
 
+    function setup(){
+        var screenHeight = screen.height
+        document.getElementsByClassName("itineraryPlan")[0].setAttribute("style", `height:${screenHeight - 300}px`)
+    }
+    setup();
+
     
 
 
@@ -294,7 +300,8 @@ function calculateEndDate(days, startDate) {
 }
 
 function insertItinerary(itineraryJSON) {
-    const itineraryContainer = document.querySelector('.itineraryPlan');
+    if(itineraryJSON.length>0){
+        const itineraryContainer = document.querySelector('.itineraryPlan');
     itineraryContainer.innerHTML = '';
     for (let i = 0; i < itineraryJSON.length; i++) {
         const itinerary = itineraryJSON[i];
@@ -366,6 +373,9 @@ function insertItinerary(itineraryJSON) {
         itineraryContainer.appendChild(dateButton);
         itineraryContainer.appendChild(collapseContainer);
     }
+
+    }
+    
 }
 
 function editItinerary(passObj) {
