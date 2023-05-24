@@ -54,14 +54,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="bottomContent">
+                </div>
+                <div class="bottomContent">
+                    <% if (groupName !== "Join a group First!") { %>
                         <button type="button" id="makeItinerary" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#adjustDateModal">adjust dates</button>
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                            data-bs-target="#makeNewModal">
-                            make new
-                        </button>
-
-                    </div>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#makeNewModal">make new</button>
+                      <% } %>
 
                 </div>
 

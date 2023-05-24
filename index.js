@@ -149,20 +149,49 @@ app.get('/', (req, res) => {
 app.get('/home', sessionValidation, async (req, res) => {
     const userEmail = req.session.email;
     try {
-        const query = await usersModel.findOne({ email: userEmail });
-        const groupID = query.groupID;
-        const groupQuery = await groupsModel.findOne({ _id: groupID });
+      const query = await usersModel.findOne({ email: userEmail });
+      const groupID = query.groupID;
+      const groupQuery = await groupsModel.findOne({ _id: groupID });
+  
+      if (groupQuery) {
+        const groupName = groupQuery.groupName;
+  
 
-        if (groupQuery) {
-            const groupName = groupQuery.groupName;
-            res.render('itinerary', { groupName: groupName + "'s Itinerary" });
-        } else {
-            res.render('itinerary', { groupName: "Join a group First!" });
-        }
+        const itineraryQuery = await groupsModel.findById(groupID, 'itinerary');
+        const itinerary = itineraryQuery.itinerary;
+
+        res.render('itinerary', { groupName: groupName + "'s Itinerary", itinerary: JSON.stringify(itinerary) });
+      } else {
+        res.render('itinerary', { groupName: "Join a group First!" });
+      }
     } catch (err) {
-        console.error(err);
+      console.error(err);
+      res.status(500).json({ error: 'An error occurred.' });
     }
-});
+  });
+  
+// This is to pass the itinerary data to the client side 
+app.get('/itineraryData', sessionValidation, async (req, res) => {
+    const userEmail = req.session.email;
+    try {
+      const query = await usersModel.findOne({ email: userEmail });
+      const groupID = query.groupID;
+      const groupQuery = await groupsModel.findOne({ _id: groupID });
+  
+      if (groupQuery) {
+        const itineraryQuery = await groupsModel.findById(groupID, 'itinerary');
+        const itinerary = itineraryQuery.itinerary;
+  
+        res.json({ itinerary }); // Send the itinerary data as JSON response
+      } else {
+        res.status(404).json({ error: "Group not found" });
+      }
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'An error occurred.' });
+    }
+  });
+  
 
 
 app.get('/chatroom', sessionValidation, async (req, res) => {
@@ -203,10 +232,10 @@ app.get('/userprofile', sessionValidation, async (req, res) => {
     });
 });
 
-const bucketlist = require('./enterBucket.js');
-const toHistory = require('./toHistory.js');
-const editBucket = require('./editBucket.js');
-const deleteBucket = require('./deleteBucket.js');
+const bucketlist = require('./controller/enterBucket.js');
+const toHistory = require('./controller/toHistory.js');
+const editBucket = require('./controller/editBucket.js');
+const deleteBucket = require('./controller/deleteBucket.js');
 
 app.post('/enterBucket', bucketlist)
 app.post('/toHistory', toHistory)
@@ -217,7 +246,7 @@ app.post('/deleteBucket', deleteBucket)
 // const multer = require('multer');  // npm install multer
 // const memoryStorage = multer.memoryStorage(); // store the file in memory as a buffer
 // const upload = multer({ storage: memoryStorage }); // specify the storage option
-const editProfile = require('./editProfile.js');
+const editProfile = require('./controller/editProfile.js');
 const { Server } = require("net");
 const { json } = require("body-parser");
 app.post('/editProfile', editProfile);
@@ -316,16 +345,35 @@ app.post('/signup', async (req, res) => {
         var userType
         if (req.body.groupToken != null) {
             userType = 'member'
-            await groupsModel.updateOne({ _id: req.body.groupToken }, {
-                $push: {
-                    members: {
-                        email: req.body.email,
-                        type: 'member',
-                        firstName: req.body.firstName,
-                        lastName: req.body.lastName
+            var group = await groupsModel.find({ _id: req.body.groupToken }).exec();
+            var currentMembers = group[0].members;
+            var memberHasJoinedPreviously = false;
+            for (var i = 0; i < currentMembers.length; i++) {
+                if (currentMembers[i].email == req.body.email) {
+                    memberHasJoinedPreviously = true;
+                }
+            }
+            if (memberHasJoinedPreviously) {
+                for(var i = 0; i < currentMembers.length; i++){
+                    if(currentMembers[i].email == req.body.email){
+                        currentMembers[i].active = true;
                     }
                 }
-            }).exec();
+                await groupsModel.updateOne({ _id: groupID }, { $set: { members: currentMembers[0].members } }).exec();
+            }
+            else {
+                await groupsModel.updateOne({ _id: req.body.groupToken }, {
+                    $push: {
+                        members: {
+                            email: req.body.email,
+                            type: 'member',
+                            firstName: req.body.firstName,
+                            lastName: req.body.lastName,
+                            active: true
+                        }
+                    }
+                }).exec();
+            }
         }
         const user = new usersModel({
             firstName: req.body.firstName,
@@ -378,18 +426,36 @@ app.post('/login', async (req, res) => {
         req.session.email = result[0].email;
         req.session.cookie.maxAge = 2147483647;
         if (groupToken != null) {
-            await groupsModel.updateOne({ _id: groupToken }, {
-                $push: {
-                    members:
-                    {
-                        email: result[0].email,
-                        type: 'member',
-                        firstName: result[0].firstName,
-                        lastName: result[0].lastName,
-                        profilePic: result[0].profilePic
+            var group = await groupsModel.find({ _id: req.body.groupToken }).exec();
+            var currentMembers = group[0].members;
+            var memberHasJoinedPreviously = false;
+            for (var i = 0; i < currentMembers.length; i++) {
+                if (currentMembers[i].email == req.body.email) {
+                    memberHasJoinedPreviously = true;
+                }
+            }
+            if (memberHasJoinedPreviously) {
+                for(var i = 0; i < currentMembers.length; i++){
+                    if(currentMembers[i].email == email){
+                        currentMembers[i].active = true;
                     }
                 }
-            }).exec();
+                await groupsModel.updateOne({ _id: groupToken }, { $set: { members: currentMembers } }).exec();
+            }
+            else {
+                await groupsModel.updateOne({ _id: groupToken }, {
+                    $push: {
+                        members: {
+                            email: result[0].email,
+                            type: 'member',
+                            firstName: result[0].firstName,
+                            lastName: result[0].lastName,
+                            profilePic: result[0].profilePic,
+                            active: true
+                        }
+                    }
+                }).exec();
+            }
             await usersModel.updateOne({ email: result[0].email }, { $set: { groupID: groupToken, type: 'member' } }).exec();
         }
         res.redirect('/home');
@@ -505,7 +571,8 @@ app.post('/groupconfirm', sessionValidation, async (req, res) => {
                 type: 'leader',
                 firstName: currentUser.firstName,
                 lastName: currentUser.lastName,
-                profilePic: currentUser.profilePic
+                profilePic: currentUser.profilePic,
+                active: true
             }
         ]
     });
@@ -530,10 +597,6 @@ app.get('/userprofile/groupdetails', sessionValidation, async (req, res) => {
 
 app.post('/invite', sessionValidation, async (req, res) => {
     var inviteEmail = req.body.inviteeEmail;
-    // if (inviteEmail == "rickastley@gmail.com") {
-    //     res.redirect("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
-    //     return
-    // }
     const userName = req.session.firstName + " " + req.session.lastName;
     const groupToken = req.body.groupID
     const inviteMessage = {
@@ -562,7 +625,14 @@ app.post('/invite', sessionValidation, async (req, res) => {
 app.post('/removemember', sessionValidation, async (req, res) => {
     var memberEmail = req.body.memberEmail;
     var groupID = req.body.groupID;
-    await groupsModel.updateOne({ _id: groupID }, { $pull: { members: { email: memberEmail } } }).exec();
+    // await groupsModel.updateOne({ _id: groupID }, { $pull: { members: { email: memberEmail } } }).exec();
+    var currentMembers = await groupsModel.find({ _id: groupID }).exec();
+    for(var i = 0; i < currentMembers[0].members.length; i++){
+        if(currentMembers[0].members[i].email == memberEmail){
+            currentMembers[0].members[i].active = false;
+        }
+    }
+    await groupsModel.updateOne({ _id: groupID }, { $set: { members: currentMembers[0].members } }).exec();
     await usersModel.updateOne({ email: memberEmail }, { $set: { groupID: null, type: null } }).exec();
     res.redirect('/userprofile/groupdetails');
 });
@@ -570,25 +640,50 @@ app.post('/removemember', sessionValidation, async (req, res) => {
 app.post('/joingroup', sessionValidation, async (req, res) => {
     var groupToken = req.body.groupToken;
     var currentUser = await usersModel.findOne({ email: req.session.email }).exec();
-    await groupsModel.updateOne({ _id: groupToken }, {
-        $push: {
-            members:
-            {
-                email: req.session.email,
-                type: 'member',
-                firstName: currentUser.firstName,
-                lastName: currentUser.lastName,
-                profilePic: currentUser.profilePic
+    var group = await groupsModel.find({ _id: req.body.groupToken }).exec();
+    var currentMembers = group[0].members;
+    var memberHasJoinedPreviously = false;
+    for (var i = 0; i < currentMembers.length; i++) {
+        if (currentMembers[i].email == req.session.email) {
+            memberHasJoinedPreviously = true;
+        }
+    }
+    if (memberHasJoinedPreviously) {
+        for(var i = 0; i < currentMembers.length; i++){
+            if(currentMembers[i].email == req.session.email){
+                currentMembers[i].active = true;
             }
         }
-    }).exec();
+        await groupsModel.updateOne({ _id: groupToken }, { $set: { members: currentMembers } }).exec();
+    }
+    else {
+        await groupsModel.updateOne({ _id: groupToken }, {
+            $push: {
+                members: {
+                    email: currentUser.email,
+                    type: 'member',
+                    firstName: currentUser.firstName,
+                    lastName: currentUser.lastName,
+                    profilePic: currentUser.profilePic,
+                    active: true
+                }
+            }
+        }).exec();
+    }
+
     await usersModel.updateOne({ email: req.session.email }, { $set: { groupID: groupToken, type: 'member' } }).exec();
     res.redirect('/userprofile/groupdetails');
 });
 
 app.post('/leavegroup', sessionValidation, async (req, res) => {
-    var groupToken = req.body.groupID;
-    await groupsModel.updateOne({ _id: groupToken }, { $pull: { members: { email: req.session.email } } }).exec();
+    var groupID = req.body.groupID;
+    var currentMembers = await groupsModel.find({ _id: groupID }).exec();
+    for(var i = 0; i < currentMembers[0].members.length; i++){
+        if(currentMembers[0].members[i].email == req.session.email){
+            currentMembers[0].members[i].active = false;
+        }
+    }
+    await groupsModel.updateOne({ _id: groupID }, { $set: { members: currentMembers[0].members } }).exec();
     await usersModel.updateOne({ email: req.session.email }, { $set: { groupID: null, type: null } }).exec();
     res.redirect('/userprofile');
 });
@@ -600,9 +695,9 @@ app.post('/deletegroup', sessionValidation, async (req, res) => {
     res.redirect('/userprofile');
 });
 
-app.get('/chatroom/sentimentScores', sessionValidation, async (req, res)=>{
+app.get('/chatroom/sentimentScores', sessionValidation, async (req, res) => {
     var groupID = req.query.id
-    groupsModel.findOne({_id: groupID}).then((docs)=>{
+    groupsModel.findOne({ _id: groupID }).then((docs) => {
         res.status(200).json({ data: docs.memberSentiment });
     })
 })
@@ -621,13 +716,68 @@ app.post('/uploadImage', sessionValidation, upload.single('imageData'), async (r
 
 
 
-app.post('/itinerary/submitNew', sessionValidation, async (req, res)=>{
-    console.log(req.body)
+app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
+    
     var citiesArray = JSON.parse(req.body.cities);
+    const categories = [
+        "Sightseeing",
+        "Outdoor Adventure",
+        "Cultural Experience",
+        "Food and Dining",
+        "Shopping",
+        "Entertainment",
+        "Nature Exploration",
+        "Relaxation"
+    ];
+    const startDate = req.body.startDate;
+    const endDate = req.body.endDate;
+    const startTime = req.body.startTime;
+    const endTime = req.body.endTime;
+    const country = req.body.country;
+    const cities = citiesArray
+    const promptArgs = `Make an itinerary at ${cities} in ${country} from ${startDate} to ${endDate}, around ${startTime} to ${endTime} in a format {date :, schedule: [{"startTime":,"endTime":, "category":, "activity":, "transportation":  transportation with estimated time }]}, Make an object for each date in JSON format that is in an array. Assign dates properly in only one city considering distance. Include recommended transportation for each activity. Use the following categories to categorize each activity: ${categories}`;
+    console.log("Generating itinerary...");
+    const userEmail = req.session.email;
+    const query = await usersModel.findOne({ email: userEmail });
+    const groupID = query.groupID;
 
-})
 
-app.post('/itinerary/getRecommendation', sessionValidation, (req, res)=>{
+    let itinerary; // Declare itinerary variable outside the promise chain
+
+    try {
+      itinerary = await generateItinerary(promptArgs);
+      const parsedItinerary = JSON.parse(itinerary);
+      await saveItinerary(parsedItinerary, groupID);
+      res.json({ itinerary: parsedItinerary });
+    } catch (error) {
+      console.error("Error:", error);
+      res.status(500).json({ error: "An error occurred" });
+    }
+    
+    async function saveItinerary(itineraryJSON, groupID) {
+        // Delete the existing itinerary array
+        await groupsModel.updateOne({ _id: groupID }, { $unset: { itinerary: 1 } }).exec();
+        
+        // Create a new itinerary array and push the new itinerary into it
+        const update = { $push: { itinerary: { $each: itineraryJSON } } };
+        await groupsModel.updateOne({ _id: groupID }, update).exec();
+      }
+      
+    
+    async function generateItinerary(promptArgs) {
+      const res = await openai.createChatCompletion({
+        model: "gpt-3.5-turbo",
+        messages: [{ role: "user", content: promptArgs }],
+        temperature: 0.3,
+      });
+    
+      return res.data.choices[0].message.content; // Return the parsed object directly
+    }
+});
+  
+
+
+app.post('/itinerary/getRecommendation', sessionValidation, (req, res) => {
     console.log(req.body)
 })
 
@@ -676,7 +826,7 @@ io.on('connection', socket => {
         // set inactive threshold
         lastActivityTimeSTP = Date.now();
         const inactiveThreshold = 1000 * 60 * 5;  // 5 minutes
-        setInterval( async () => {
+        setInterval(async () => {
             if (lastActivityTimeSTP && Date.now() - lastActivityTimeSTP > inactiveThreshold) {
                 // user is inactive
                 // console.log("user is inactive");
@@ -765,11 +915,9 @@ io.on('connection', socket => {
         const getMoreMessageHistory = await showMoreChatHistory(groupID, numOfScroll);
         console.log(numOfScroll)
         if (getMoreMessageHistory.length == 0) {
-            console.log("no more history")
             socket.emit('noMoreChatHistory', data = true);
         }
         if (numOfScroll > 0) {
-            console.log("befroe Insert", getMoreMessageHistory)
             socket.emit('moreChatHistory', getMoreMessageHistory);
 
         }
@@ -787,7 +935,7 @@ async function deleteMessageDB(groupID, messagerName, chatMessageText) {
     try {
         const updateResult = await groupsModel.updateOne(
             { _id: groupID },
-            { $pull: { messages: { message: chatMessageText, userName: messagerName} } }
+            { $pull: { messages: { message: chatMessageText, userName: messagerName } } }
         ).exec();
 
         if (updateResult.modifiedCount > 0) {
@@ -808,7 +956,7 @@ async function saveMessage(chatMessageObj) {
             console.log(chatMessageObj)
 
             // chatMessageObj._id = mongoose.
-            var msg = await groupsModel.findOne({ _id: chatMessageObj.groupID })
+
             const update = { $push: { messages: chatMessageObj } };
             await groupsModel.updateOne({ _id: chatMessageObj.groupID }, update)
             // await msg.insertOne(chatMessageObj);
