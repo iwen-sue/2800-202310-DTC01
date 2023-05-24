@@ -556,30 +556,33 @@ app.get('/creategroup', sessionValidation, (req, res) => {
 
 app.post('/groupconfirm', sessionValidation, async (req, res) => {
     var groupName = req.body.groupName;
-    const schema = Joi.string().max(20).required();
+    const schema = Joi.string().trim().max(20).required();
     const validationResult = schema.validate(groupName);
     if (validationResult.error != null) {
-        var error = "Group name is too long. Please enter a group name that is 20 characters or less.";
-        return res.render("creategroup", { error: error });
+        return res.render("creategroup", { error: validationResult.error.toString() });
     }
     const currentUser = await usersModel.findOne({ email: req.session.email }).exec();
-    const newGroup = new groupsModel({
-        groupName: groupName,
-        members: [
-            {
-                email: currentUser.email,
-                type: 'leader',
-                firstName: currentUser.firstName,
-                lastName: currentUser.lastName,
-                profilePic: currentUser.profilePic,
-                active: true
-            }
-        ]
-    });
-    await newGroup.save();
-    const group = await groupsModel.findOne({ groupName: groupName }).exec();
-    await usersModel.updateOne({ email: req.session.email }, { $set: { groupID: group._id, type: 'leader' } }).exec();
-    res.render("groupconfirm", { groupName: req.body.groupName });
+    try {
+        const newGroup = new groupsModel({
+            groupName: groupName,
+            members: [
+                {
+                    email: currentUser.email,
+                    type: 'leader',
+                    firstName: currentUser.firstName,
+                    lastName: currentUser.lastName,
+                    profilePic: currentUser.profilePic,
+                    active: true
+                }
+            ]
+        });
+        await newGroup.save();
+        const group = await groupsModel.findOne({ groupName: groupName }).exec();
+        await usersModel.updateOne({ email: req.session.email }, { $set: { groupID: group._id, type: 'leader' } }).exec();
+        res.render("groupconfirm", { groupName: req.body.groupName });
+    } catch (err) {
+        res.render("creategroup", { error: "Group name is already taken. Please enter another group name." });
+    }
 });
 
 app.get('/userprofile/groupdetails', sessionValidation, async (req, res) => {
@@ -640,39 +643,48 @@ app.post('/removemember', sessionValidation, async (req, res) => {
 app.post('/joingroup', sessionValidation, async (req, res) => {
     var groupToken = req.body.groupToken;
     var currentUser = await usersModel.findOne({ email: req.session.email }).exec();
-    var group = await groupsModel.find({ _id: req.body.groupToken }).exec();
-    var currentMembers = group[0].members;
-    var memberHasJoinedPreviously = false;
-    for (var i = 0; i < currentMembers.length; i++) {
-        if (currentMembers[i].email == req.session.email) {
-            memberHasJoinedPreviously = true;
-        }
-    }
-    if (memberHasJoinedPreviously) {
-        for(var i = 0; i < currentMembers.length; i++){
-            if(currentMembers[i].email == req.session.email){
-                currentMembers[i].active = true;
+    try {
+        var group = await groupsModel.find({ _id: req.body.groupToken }).exec();
+        var currentMembers = group[0].members;
+        var memberHasJoinedPreviously = false;
+        for (var i = 0; i < currentMembers.length; i++) {
+            if (currentMembers[i].email == req.session.email) {
+                memberHasJoinedPreviously = true;
             }
         }
-        await groupsModel.updateOne({ _id: groupToken }, { $set: { members: currentMembers } }).exec();
-    }
-    else {
-        await groupsModel.updateOne({ _id: groupToken }, {
-            $push: {
-                members: {
-                    email: currentUser.email,
-                    type: 'member',
-                    firstName: currentUser.firstName,
-                    lastName: currentUser.lastName,
-                    profilePic: currentUser.profilePic,
-                    active: true
+        if (memberHasJoinedPreviously) {
+            for(var i = 0; i < currentMembers.length; i++){
+                if(currentMembers[i].email == req.session.email){
+                    currentMembers[i].active = true;
                 }
             }
-        }).exec();
-    }
+            await groupsModel.updateOne({ _id: groupToken }, { $set: { members: currentMembers } }).exec();
+        }
+        else {
+            await groupsModel.updateOne({ _id: groupToken }, {
+                $push: {
+                    members: {
+                        email: currentUser.email,
+                        type: 'member',
+                        firstName: currentUser.firstName,
+                        lastName: currentUser.lastName,
+                        profilePic: currentUser.profilePic,
+                        active: true
+                    }
+                }
+            }).exec();
+        }
+    
+        await usersModel.updateOne({ email: req.session.email }, { $set: { groupID: groupToken, type: 'member' } }).exec();
+        res.redirect('/userprofile/groupdetails');
 
-    await usersModel.updateOne({ email: req.session.email }, { $set: { groupID: groupToken, type: 'member' } }).exec();
-    res.redirect('/userprofile/groupdetails');
+    } catch (err) {
+        res.redirect("/userprofile/groupnotfound")
+    }
+});
+
+app.get('/userprofile/groupnotfound', sessionValidation, async (req, res) => {
+    res.render("groupnotfound");
 });
 
 app.post('/leavegroup', sessionValidation, async (req, res) => {
