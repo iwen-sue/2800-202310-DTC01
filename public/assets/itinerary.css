@@ -1,3 +1,7 @@
+.itineraryPlan{
+    overflow:scroll;
+}
+
 .dateTrigger{
     width:100%;
     line-height: 30px;
@@ -7,6 +11,7 @@
     padding:0 5vw;
     background-color: var(--beige);
     color:rgb(187, 98, 95);
+    font-weight: bold;
 }
 
 button[aria-expanded="true"] {
@@ -15,7 +20,9 @@ button[aria-expanded="true"] {
 }
 
 .itineraryName{
-    padding:0 5vw;
+    padding:20px 5vw;
+    padding-bottom: 30px;
+    color:black;
 }
 
 .itineraryBlockContainer{
@@ -79,7 +86,7 @@ button[aria-expanded="true"] {
     color:var(--pink);
     text-align: center;
     line-height: 28px;
-    border:2px solid #d6a2e8;
+    border:2px solid #d5b9df;
     font-size:18px;
     overflow: hidden;
 }
@@ -105,7 +112,7 @@ button[aria-expanded="true"] {
 
 .bottomContent{
     padding:20px 5vw;
-    margin-bottom: 80px;
+    margin-bottom: 60px;
     display: flex;
     justify-content: space-between;
 }
