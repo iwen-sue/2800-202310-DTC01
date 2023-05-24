@@ -1,6 +1,7 @@
 <%- include('templates/header') %>
 <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -11,27 +12,57 @@
 <!-- cite css or js files here -->
 </head>
 <body id="groupDetailsPage">
-    <%- include('templates/nav') %>
-    <div class="container text-center groupDetails">
-        <h1>Group: <%- groupName %></h1>
-        <h2>Members</h2>
-        <ul>
-            <% for(var i = 0; i < group.length; i++) { %>
-                <% if (group[i].active) {%>
-                    <% if (group[i].firstName + " " + group[i].lastName == user.firstName + " " + user.lastName) { %>
-                        <li><%- group[i].firstName + " " + group[i].lastName %> (You)</li>
-                    <% } else { %>
-                        <li><%- group[i].firstName + " " + group[i].lastName %> 
-                        <% if (user.type == "leader") { %>
-                            <button class="btn btn-danger removeMember" id="<%- group[i].email %>" memberName='<%- group[i].firstName + " " + group[i].lastName %>'data-toggle="modal" data-target="#removeMemberModal">Remove</button></li>
+    <%- include('templates/subNav') %>
+    <div class="container text-center groupDetails mt-5 pt-5">
+        <h1><%- groupName %></h1>
+        <p>Check out members in your group</p>
+        <div class="container text-left">
+            <h3>Members</h3>
+            <ul>
+                <% for(var i = 0; i < group.length; i++) { %>
+                    <% if (group[i].active) {%>
+                        <% if (group[i].firstName + " " + group[i].lastName == user.firstName + " " + user.lastName) { %>
+                            <li>
+                                <% if (group[i].type == "leader") { %>
+                                    <span class="material-symbols-rounded" data-icon="leader_icon">
+                                        star
+                                        </span>
+                                <% } else {%>
+                                    <span class="material-symbols-rounded" data-icon="member_icon">
+                                        person
+                                        </span>
+                                <% } %>
+                                <%- group[i].firstName + " " + group[i].lastName %> (You)</li>
+                        <% } else { %>
+                            <li>
+                                <% if (group[i].type == "leader") { %>
+                                    <span class="material-symbols-rounded" data-icon="leader_icon">
+                                        star
+                                        </span>
+                                <% } else {%>
+                                    <span class="material-symbols-rounded" data-icon="member_icon">
+                                        person
+                                        </span>
+                                <% } %>
+                                <%- group[i].firstName + " " + group[i].lastName %>
+                            <% if (user.type == "leader") { %>
+                                <button class="btn btn-danger removeMember" id="<%- group[i].email %>" memberName='<%- group[i].firstName + " " + group[i].lastName %>'data-toggle="modal" data-target="#removeMemberModal">Remove</button></li>
+                            <% } %>
                         <% } %>
                     <% } %>
                 <% } %>
-            <% } %>
-        </ul>
+            </ul>
+        </div>
+
         <% if (user.type == "leader") { %>
-            <button class="btn btn-primary" data-toggle="modal" data-target="#addMemberModal">Add Member</button>
-            <button class="btn btn-danger" data-toggle="modal" data-target="#deleteGroupModal">Delete Group</button>
+            <div class="container fixed-bottom leader-btn-group">
+                <button class="add-member-btn btn btn-primary" data-toggle="modal" data-target="#addMemberModal">Add Member</button>
+                <br>
+                <button class="delete-group-btn btn btn-danger" data-toggle="modal" data-target="#deleteGroupModal">Delete Group</button>
+            </div>
+
+
+            <!-- modal -->
             <div class="modal fade" id="addMemberModal"tabindex="-1" role="dialog">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <form class="modal-content" action="/invite" method="post">
@@ -53,6 +84,8 @@
                     </form>
                 </div>
             </div>
+            
+            <!-- delete group -->
             <div class="modal fade" id="deleteGroupModal"tabindex="-1" role="dialog">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <form class="modal-content" action="/deletegroup" method="post">
@@ -73,6 +106,8 @@
                     </form>
                 </div>
             </div>
+
+            <!-- remove member -->
             <div class="modal" id="removeMemberModal" tabindex="-1" role="dialog">
                 <div class="modal-dialog" role="document">
                     <form class="modal-content" action="/removemember" method="post">
@@ -93,7 +128,11 @@
                 </div>
             </div>
         <% } else { %>
-            <button class="btn btn-primary" data-toggle="modal" data-target="#leaveGroupModal">Leave Group</button>
+            <div class="container fixed-bottom member-btn-group">
+                <button class="btn btn-primary leave-group-btn" data-toggle="modal" data-target="#leaveGroupModal">Leave Group</button>
+            </div>
+
+            <!-- modal -->
             <div class="modal" id="leaveGroupModal" tabindex="-1" role="dialog">
                 <div class="modal-dialog" role="document">
                     <form class="modal-content" action="/leavegroup" method="post">
