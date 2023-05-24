@@ -5,7 +5,18 @@ const mongodb_user = process.env.MONGODB_USER;
 const mongodb_password = process.env.MONGODB_PASSWORD;
 const mongodb_database = process.env.MONGODB_DATABASE;
 
-
+const itinerarySchema = new mongoose.Schema({
+    date: mongoose.Schema.Types.Mixed,
+    schedule: [
+      {
+        startTime: mongoose.Schema.Types.Mixed,
+        endTime: mongoose.Schema.Types.Mixed,
+        category: String,
+        activity: String,
+        transportation: String
+      }
+    ]
+  });
 
 const groupsSchema = new mongoose.Schema({
     groupName: {
@@ -34,9 +45,7 @@ const groupsSchema = new mongoose.Schema({
     chatContext: {
         type: Array, 
     },
-    itinerary: {
-        type: Array
-    }
+    itinerary: [itinerarySchema]
 });
 
 const groupsModel = mongoose.model('groups', groupsSchema);

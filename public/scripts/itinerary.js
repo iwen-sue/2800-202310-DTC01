@@ -1,6 +1,6 @@
 
 
-var selectedCountry, selectedCities = [], readyToRemove, deleteSchedule, targetDate;
+var selectedCountry, selectedCities = [], readyToRemove, deleteSchedule, targetDate, referStartTime;
 const recommendedTrips = [
     { Place: "London, United Kingdom", AverageDuration: 7 },
     { Place: "Phuket, Thailand", AverageDuration: 6 },
@@ -245,7 +245,7 @@ function submitForm() {
         }
 
         if (checkBool) {
-            console.log("checkPassed")
+
 
             fetch('/itinerary/submitNew', {
                 method: 'POST',
@@ -256,7 +256,7 @@ function submitForm() {
             })
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data)
+                    console.log("data", data.itinerary)
                     insertItinerary(data.itinerary);
 
 
@@ -382,6 +382,7 @@ function editItinerary(passObj) {
     console.log(passObj);
     deleteSchedule = passObj.schedule;
     targetDate = passObj.date;
+    referStartTime = passObj.schedule.startTime;
     $("#editModal").modal("show");
     setTimeout(() => {
         document.getElementById("editActivity").setAttribute("value", passObj.schedule.activity);
@@ -477,7 +478,8 @@ function submitEdit() {
                     'endTime': endTime,
                     'activity': activity
                 }),
-                'date': targetDate
+                'date': targetDate,
+                'referStartTime': referStartTime
             }
             fetch('/itinerary/edit', {
                 method: 'POST',
@@ -546,7 +548,9 @@ function submitAdjustDates() {
                 .then(response => response.json())
                 .then(data => {
                     // Handle the response from the backend
-                    console.log(data);
+                    console.log("data", data.itinerary)
+                    insertItinerary(data.itinerary);
+
                 })
                 .catch(error => {
                     // Handle any errors
