@@ -506,7 +506,9 @@ function submitAdjustDates() {
                 .then(response => response.json())
                 .then(data => {
                     // Handle the response from the backend
-                    console.log(data);
+                    console.log("data", data.itinerary)
+                    insertItinerary(data.itinerary);
+                
                 })
                 .catch(error => {
                     // Handle any errors

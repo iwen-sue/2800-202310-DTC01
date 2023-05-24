@@ -592,7 +592,7 @@ app.get('/userprofile/groupdetails', sessionValidation, async (req, res) => {
     } catch (err) {
         console.log(err)
         res.redirect("/userprofile")
-    }
+    } 
 });
 
 app.post('/invite', sessionValidation, async (req, res) => {
@@ -754,35 +754,70 @@ app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
       res.status(500).json({ error: "An error occurred" });
     }
     
-    async function saveItinerary(itineraryJSON, groupID) {
-        // Delete the existing itinerary array
-        await groupsModel.updateOne({ _id: groupID }, { $unset: { itinerary: 1 } }).exec();
-        
-        // Create a new itinerary array and push the new itinerary into it
-        const update = { $push: { itinerary: { $each: itineraryJSON } } };
-        await groupsModel.updateOne({ _id: groupID }, update).exec();
-      }
-      
-    
-    async function generateItinerary(promptArgs) {
-      const res = await openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
-        messages: [{ role: "user", content: promptArgs }],
-        temperature: 0.3,
-      });
-    
-      return res.data.choices[0].message.content; // Return the parsed object directly
-    }
+
 });
   
 
+async function saveItinerary(itineraryJSON, groupID) {
+    // Delete the existing itinerary array
+    await groupsModel.updateOne({ _id: groupID }, { $unset: { itinerary: 1 } }).exec();
+    
+    // Create a new itinerary array and push the new itinerary into it
+    const update = { $push: { itinerary: { $each: itineraryJSON } } };
+    await groupsModel.updateOne({ _id: groupID }, update).exec();
+  }
+  
+
+async function generateItinerary(promptArgs) {
+  const res = await openai.createChatCompletion({
+    model: "gpt-3.5-turbo",
+    messages: [{ role: "user", content: promptArgs }],
+    temperature: 0.3,
+  });
+
+  return res.data.choices[0].message.content; // Return the parsed object directly
+}
 
 app.post('/itinerary/getRecommendation', sessionValidation, (req, res) => {
     console.log(req.body)
 })
 
-app.post('/itinerary/adjustment', sessionValidation, (req, res)=>{
-    console.log(req.body)
+
+app.post('/itinerary/adjustment', sessionValidation, async (req, res)=>{
+        console.log(req.body)
+        const userEmail = req.session.email;
+        const userQuery = await usersModel.findOne({ email: userEmail });
+        const groupID = userQuery.groupID;
+        const groupQuery = await groupsModel.findOne({ _id: groupID });
+        const preItinerary = groupQuery.itinerary;
+    
+        const categories = [
+            "Sightseeing",
+            "Outdoor Adventure",
+            "Cultural Experience",
+            "Food and Dining",
+            "Shopping",
+            "Entertainment",
+            "Nature Exploration",
+            "Relaxation"
+        ];
+        const startDate = req.body.startDate;
+        const endDate = req.body.endDate;
+        const promptArgs = `Make an itinerary from ${startDate} to ${endDate}, the same country, cities, startTime, and endTime as ${preItinerary} in a format {date :, schedule: [{"startTime":,"endTime":, "category":, "activity":, "transportation":  transportation with estimated time }]}, Make an object for each date in JSON format that is in an array. Assign dates properly in only one city considering distance. Include recommended transportation for each activity. Use the following categories to categorize each activity: ${categories}`;
+        console.log("Generating itinerary...");
+    
+        let itinerary; // Declare itinerary variable outside the promise chain
+        try {
+            itinerary = await generateItinerary(promptArgs);
+            const parsedItinerary = JSON.parse(itinerary);
+            console.log("itienrary is generated")
+            await saveItinerary(parsedItinerary, groupID);
+            console.log("itinerary is saved")
+            res.json({ itinerary: parsedItinerary });
+          } catch (error) {
+            console.error("Error:", error);
+            res.status(500).json({ error: "An error occurred" });
+          }
 })
 
 app.post('/itinerary/edit', sessionValidation, (req, res)=>{
@@ -790,10 +825,29 @@ app.post('/itinerary/edit', sessionValidation, (req, res)=>{
     console.log(JSON.parse(req.body.schedule))
 })
 
-app.post('/itinerary/delete', sessionValidation, (req, res)=>{
-    console.log(req.body)
-    console.log(JSON.parse(req.body.deleteSchedule))
-})
+app.post('/itinerary/delete', sessionValidation, async (req, res) => {
+    console.log(req.body);
+    const scheduleElem = JSON.parse(req.body.deleteSchedule);
+    const startTime = scheduleElem.startTime;
+    console.log(startTime);
+
+    const userEmail = req.session.email;
+    const userQuery = await usersModel.findOne({ email: userEmail });
+    const groupID = userQuery.groupID;
+
+    const updateQuery = { $pull: { schedule: { startTime: startTime } } };
+    const result = await groupsModel.updateOne({ _id: groupID }, updateQuery);
+
+    if (result.nModified > 0) {
+        console.log("Schedule deleted");
+        res.send("Schedule object deleted successfully.");
+    } else {
+        console.log("Schedule not found");
+        res.send("Schedule object not found.");
+    }
+});
+
+
 
 //static images address
 app.use(express.static(__dirname + "/public"));
