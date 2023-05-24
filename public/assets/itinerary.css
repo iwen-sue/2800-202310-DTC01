@@ -111,6 +111,8 @@ button[aria-expanded="true"] {
     width:200px;
     overflow-y: scroll;
     padding: 8px;
+    float: right;
+    margin-right:-200px;
 }
 
 #country input, #city input {
