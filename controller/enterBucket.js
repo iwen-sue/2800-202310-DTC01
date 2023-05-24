@@ -1,7 +1,7 @@
-require("./utils.js");
+require("../utils.js");
 const express = require('express');
 // const session = require('express-session');
-const usersModel = require('./models/user.js');
+const usersModel = require('../models/user.js');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 

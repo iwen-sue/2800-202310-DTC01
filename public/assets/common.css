@@ -58,12 +58,15 @@ input:focus {
 
 /* common css style end here */
 /* index page styles */
-body.theme {
+body#landing-background {
     color: #FFFFFF;
+    height: 100vh;
+    background-color: var(--theme);
+    background-image: linear-gradient(to bottom right, var(--lightTheme), var(--theme));
 }
 div#landingPage {
     position: absolute;
-    top: 50%;
+    top: 45%;
     left: 50%;
     transform: translate(-50%, -50%);
 }

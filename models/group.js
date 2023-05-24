@@ -34,16 +34,9 @@ const groupsSchema = new mongoose.Schema({
     chatContext: {
         type: Array, 
     },
-    itinerary: [
-        {
-            startDate: mongoose.Schema.Types.Mixed,
-            endDate: mongoose.Schema.Types.Mixed,
-            startTime: mongoose.Schema.Types.Mixed,
-            endTime: mongoose.Schema.Types.Mixed,
-            country: String,
-            cities: Array
-        }
-    ]
+    itinerary: {
+        type: Array
+    }
 });
 
 const groupsModel = mongoose.model('groups', groupsSchema);

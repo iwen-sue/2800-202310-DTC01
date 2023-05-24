@@ -17,13 +17,15 @@
         <h2>Members</h2>
         <ul>
             <% for(var i = 0; i < group.length; i++) { %>
-                <% if (group[i].firstName + " " + group[i].lastName == user.firstName + " " + user.lastName) { %>
-                    <li><%- group[i].firstName + " " + group[i].lastName %> (You)</li>
-                <% } else { %>
-                    <li><%- group[i].firstName + " " + group[i].lastName %> 
+                <% if (group[i].active) {%>
+                    <% if (group[i].firstName + " " + group[i].lastName == user.firstName + " " + user.lastName) { %>
+                        <li><%- group[i].firstName + " " + group[i].lastName %> (You)</li>
+                    <% } else { %>
+                        <li><%- group[i].firstName + " " + group[i].lastName %> 
                         <% if (user.type == "leader") { %>
                             <button class="btn btn-danger removeMember" id="<%- group[i].email %>" memberName='<%- group[i].firstName + " " + group[i].lastName %>'data-toggle="modal" data-target="#removeMemberModal">Remove</button></li>
                         <% } %>
+                    <% } %>
                 <% } %>
             <% } %>
         </ul>
