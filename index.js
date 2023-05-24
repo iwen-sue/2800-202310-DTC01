@@ -784,6 +784,7 @@ app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
         messages: [{ role: "user", content: promptArgs }],
         temperature: 0.3,
       });
+      console.log(res.data.choices[0].message.content)
     
       return res.data.choices[0].message.content; // Return the parsed object directly
     }
