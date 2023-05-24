@@ -602,14 +602,19 @@ app.post('/invite', sessionValidation, async (req, res) => {
     const inviteMessage = {
         from: process.env.EMAIL,
         to: inviteEmail,
-        subject: 'You have been invited to join a group on VacaPal!',
-        html: `<h1>You have been invited by ${userName} to join their group on VacaPal!</h1>
-        <p>Click <a href="http://${process.env.APP_DOMAIN}/signup?groupToken=${groupToken}">here</a> to sign up and join the group!</p>
-        <p>If you already have an account, click <a href="http://${process.env.APP_DOMAIN}/login?groupToken=${groupToken}">here</a> to log in and join the group!</p>
-        <p>Or, enter this token in your profile after clicking "Join Group": <b>${groupToken}</b></p>
-        <p>Thank you for using VacaPal!</p>
-        `
-    }
+        subject: "You have been invited to join a group on VacaPal!",
+        html: `
+            <img src="https://raw.githubusercontent.com/nicky81818/images/069cfd55e0f576147dbdb1e1dd98711b29f05677/vacapal-purple.svg" title="Vacapal logo" alt="Vacapal logo" height="100px" width="400px" style="display: block">
+            <h1>You have been invited by ${userName} to join their group on VacaPal!</h1>
+            <p>Click <a href="http://${process.env.APP_DOMAIN}/signup?groupToken=${groupToken}">here</a> to sign up and join the group!</p>
+            <p>If you already have an account, click <a href="http://${process.env.APP_DOMAIN}/login?groupToken=${groupToken}">here</a> to log in and join the group!</p>
+            <p>Or, enter this token in your profile after clicking "Join Group": <b>${groupToken}</b></p>
+            <p>If you do not recognize the inviter, please ignore this email.</p>
+            <h3>Thank you for using VacaPal!</h3>
+            <p>For our privacy policy, <a href="https://www.privacypolicies.com/live/b3c518bb-bebe-497e-9b34-4b78bcac834c">click here.</a> Provided by Privacy Policies Generator.</p>
+            <footer>VacaPal &copy</footer>
+            `,
+    };
 
     transporter.sendMail(inviteMessage, (err, info) => {
         if (err) {
