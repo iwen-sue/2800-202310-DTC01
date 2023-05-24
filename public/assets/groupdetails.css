@@ -1,13 +1,30 @@
 div.groupDetails ul li {
     list-style-type: none;
-    padding: 5px;
+    padding: 10px;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
 }
+
 ul {
     padding-left: 0px;
 }
+
 h1 {
+    color: black;
     border-bottom: 1px solid rgba(197, 194, 194, 0.5);
 }
+
+h3 {
+    color: black;
+    margin-top: 5rem;
+
+}
+
+p {
+    color: rgb(188, 188, 188)
+}
+
 .btn-cancel {
     color: #fff;
     background-color: #6c757d;
@@ -51,4 +68,47 @@ h1 {
     color: #fff;
     background-color: #6c757d;
     border-color: #6c757d;
+}
+
+/* UI styles */
+
+.add-member-btn,
+.delete-group-btn,
+.leave-group-btn {
+    height: 40px;
+    margin-top: 10px;
+    width: 80%
+}
+
+
+.removeMember {
+    margin-left: auto;
+    /* order: 2; */
+}
+
+.leader-btn-group,
+.member-btn-group {
+    margin-bottom: 10rem;
+}
+
+.material-symbols-rounded[data-icon="member_icon"] {
+    color:var(--blush);
+    padding-right: 10px;
+    font-size: 20px;
+    font-variation-settings:
+        'FILL' 1,
+        'wght' 700,
+        'GRAD' 0,
+        'opsz' 48
+}
+
+.material-symbols-rounded[data-icon="leader_icon"] {
+    color:var(--pink);
+    padding-right: 10px;
+    font-size: 20px;
+    font-variation-settings:
+        'FILL' 1,
+        'wght' 700,
+        'GRAD' 0,
+        'opsz' 48
 }
