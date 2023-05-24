@@ -785,6 +785,16 @@ app.post('/itinerary/adjustment', sessionValidation, (req, res)=>{
     console.log(req.body)
 })
 
+app.post('/itinerary/edit', sessionValidation, (req, res)=>{
+    console.log(req.body)
+    console.log(JSON.parse(req.body.schedule))
+})
+
+app.post('/itinerary/delete', sessionValidation, (req, res)=>{
+    console.log(req.body)
+    console.log(JSON.parse(req.body.deleteSchedule))
+})
+
 //static images address
 app.use(express.static(__dirname + "/public"));
 // handle 404 - page not found

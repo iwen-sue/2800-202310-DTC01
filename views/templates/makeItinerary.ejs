@@ -1,133 +1,177 @@
 <!-- Modal -->
-<div class="modal fade" id="makeNewModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">Make New Itinerary</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal fade" id="makeNewModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
+  aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Make New Itinerary</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="formItem">
+          <p class="formText">Start Date:</p>
+          <div class='input-group date' id='startPicker'>
+
+            <input type='text' class="form-control" id="startDateValue" />
+            <span class="input-group-addon">
+              <span class="glyphicon glyphicon-calendar"></span>
+            </span>
+          </div>
         </div>
-        <div class="modal-body">
-            <div class="formItem">
-                <p class="formText">Start Date:</p>
-                <div class='input-group date' id='startPicker'>
 
-                    <input type='text' class="form-control" id="startDateValue"/>
-                    <span class="input-group-addon">
-                    <span class="glyphicon glyphicon-calendar"></span>
-                    </span>
-                  </div>
-            </div>
+        <div class="formItem">
+          <p class="formText">End Date:</p>
+          <div class='input-group date' id='endPicker'>
+            <input type='text' class="form-control" id="endDateValue" />
+            <span class="input-group-addon">
+              <span class="glyphicon glyphicon-calendar"></span>
+            </span>
+          </div>
+        </div>
 
-            <div class="formItem">
-                <p class="formText">End Date:</p>
-                <div class='input-group date' id='endPicker'>
-                    <input type='text' class="form-control" id="endDateValue"/>
-                    <span class="input-group-addon">
-                    <span class="glyphicon glyphicon-calendar"></span>
-                    </span>
-                  </div>
-            </div>
+        <div class="formItem">
+          <p class="formText">Start Planning Time:</p>
+          <div class='input-group date' id='startTimePicker'>
 
-            <div class="formItem">
-                <p class="formText">Start Planning Time:</p>
-                <div class='input-group date' id='startTimePicker'>
+            <input type='text' class="form-control timepicker" id="startTimeValue" />
+            </span>
+          </div>
+        </div>
 
-                    <input type='text' class="form-control timepicker" id="startTimeValue"/>
-                    </span>
-                  </div>
-            </div>
+        <div class="formItem">
+          <p class="formText">Finish Planning Time:</p>
+          <div class='input-group date' id='finishTimePicker'>
 
-            <div class="formItem">
-                <p class="formText">Finish Planning Time:</p>
-                <div class='input-group date' id='finishTimePicker'>
+            <input type='text' class="form-control timepicker" id="endTimeValue" />
 
-                    <input type='text' class="form-control timepicker" id="endTimeValue"/>
-  
-                    </span>
-                  </div>
-            </div>
+            </span>
+          </div>
+        </div>
 
-            <div class="formItem filterSelection">
-                <p class="formText">Country:<span id="selectedCountry"></span></p>
-                <button class="btn btn-primary filterButton" type="button" data-toggle="dropdown">Select destination country
-                    <span class="caret"></span></button>
-                    <ul class="dropdown-menu" id="country">
-                      <input class="form-control" id="myInput" type="text" placeholder="Select country">
-                    </ul>
-                <!-- <select type="country" id="country" name="country" class="form-select" aria-label="Select country">
+        <div class="formItem filterSelection">
+          <p class="formText">Country:<span id="selectedCountry"></span></p>
+          <button class="btn btn-primary filterButton" type="button" data-toggle="dropdown">Select destination country
+            <span class="caret"></span></button>
+          <ul class="dropdown-menu" id="country">
+            <input class="form-control" id="myInput" type="text" placeholder="Select country">
+          </ul>
+          <!-- <select type="country" id="country" name="country" class="form-select" aria-label="Select country">
                     <option selected>Select your destination country</option>
                 </select> -->
-            </div>
+        </div>
 
-            <div class="formItem"  style="margin-top:20px;">
-                <p class="formText">Cities:<p id="selectedCities"></p></p>
-                <button class="btn btn-primary" style="float:right;" type="button" data-toggle="dropdown">Select destination cities
-                    <span class="caret"></span></button>
-                    <ul class="dropdown-menu dropdown-city" id="city">
-                      <input class="form-control" id="myCityInput" type="text" placeholder="Select city">
-                    </ul>
-                
-            </div>
-            
+        <div class="formItem" style="margin-top:20px;">
+          <p class="formText">Cities:
+          <p id="selectedCities"></p>
+          </p>
+          <button class="btn btn-primary" style="float:right;" type="button" data-toggle="dropdown">Select destination
+            cities
+            <span class="caret"></span></button>
+          <ul class="dropdown-menu dropdown-city" id="city">
+            <input class="form-control" id="myCityInput" type="text" placeholder="Select city">
+          </ul>
+
         </div>
-        <div class="modal-footer">
-            <button type="button" style="position:absolute;left:15px;" class="btn btn-primary" onclick="getRecommendations()">Get Recommendations</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" onclick="submitForm()">Submit</button>
-        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" style="position:absolute;left:15px;" class="btn btn-primary"
+          onclick="getRecommendations()">Get Recommendations</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="submitForm()">Submit</button>
       </div>
     </div>
   </div>
+</div>
 
-  <div class="modal fade" id="adjustDateModal" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="ModalLabel">Adjust Dates for Itinerary</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal fade" id="adjustDateModal" tabindex="-1" aria-labelledby="ModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="ModalLabel">Adjust Dates for Itinerary</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="formItem">
+          <p class="formText">start date:</p>
+          <div class='input-group date' id='startPickerAdjust'>
+            <input type='text' class="form-control" id="startPickerAdjustValue" />
+            <span class="input-group-addon">
+              <span class="glyphicon glyphicon-calendar"></span>
+            </span>
+          </div>
         </div>
-        <div class="modal-body">
-            <div class="formItem">
-                <p class="formText">start date:</p>
-                <div class='input-group date' id='startPickerAdjust'>
-                    <input type='text' class="form-control" id="startPickerAdjustValue"/>
-                    <span class="input-group-addon">
-                    <span class="glyphicon glyphicon-calendar"></span>
-                    </span>
-                  </div>
-            </div>
-            <div class="formItem">
-                <p class="formText">end date:</p>
-                <div class='input-group date' id='endPickerAdjust'>
-                    <input type='text' class="form-control" id="endPickerAdjustValue"/>
-                    <span class="input-group-addon">
-                    <span class="glyphicon glyphicon-calendar"></span>
-                    </span>
-                  </div>
-            </div>
+        <div class="formItem">
+          <p class="formText">end date:</p>
+          <div class='input-group date' id='endPickerAdjust'>
+            <input type='text' class="form-control" id="endPickerAdjustValue" />
+            <span class="input-group-addon">
+              <span class="glyphicon glyphicon-calendar"></span>
+            </span>
+          </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" onclick="submitAdjustDates()">Submit</button>
-        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="submitAdjustDates()">Submit</button>
       </div>
     </div>
   </div>
+</div>
 
-  <div id="confirmModal" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Confirmation</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p>Are you sure you want to delete the selected city?</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" onclick="deleteCity()">Confirm</button>
-        </div>
+<div id="confirmModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirmation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete the selected city?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="deleteCity()">Confirm</button>
       </div>
     </div>
   </div>
+</div>
+
+<div id="editModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editTitle"></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="formItem">
+          <p class="formText">Start Planning Time:</p>
+          <div class='input-group date' id='startTimePicker'>
+
+            <input type='text' class="form-control timepicker" id="startTimeEdit" />
+            </span>
+          </div>
+        </div>
+
+        <div class="formItem">
+          <p class="formText">Finish Planning Time:</p>
+          <div class='input-group date' id='finishTimePicker'>
+            <input type='text' class="form-control timepicker" id="endTimeEdit" />
+            </span>
+          </div>
+        </div>
+        <div class="formItem">
+          <p class="formText">activity:</p>
+          <input type='text' class="form-control" id="editActivity" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" style="position:absolute;left:15px;" class="btn btn-primary"
+          onclick="deleteActivity()">Delete</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="submitEdit()">Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
