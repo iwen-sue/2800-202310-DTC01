@@ -10,8 +10,8 @@
 }
 
 button[aria-expanded="true"] {
-    background-color:rgb(233, 149, 107);
-    color:rgb(129, 71, 69);
+    background-color:var(--pink);
+    color:#fff;
 }
 
 .itineraryName{
@@ -48,30 +48,49 @@ button[aria-expanded="true"] {
     background-color: var(--lightTheme);
     overflow: visible;
     position: relative;
-    margin-top:10px;
-    border-radius: 2px;
     margin-right:20px;
+    margin-top:10px;
 }
+
+.itineraryBlock:nth-child(1) .itineraryTimeDecorator{
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+}
+
+.itineraryBlock:last-child .itineraryTimeDecorator{
+    border-bottom-left-radius: 2px;
+    border-bottom-right-radius: 2px;
+}
+
+
+
 
 .itineraryTimeDecorator .decoratorCircle{
     position: absolute;
     top:50%;
     left:50%;
-    margin-top:-5px;
-    margin-left:-5px;
+    margin-top:-14px;
+    margin-left:-14px;
     display: inline-block;
-    width:10px;
-    height:10px;
+    width:28px;
+    height:28px;
     border-radius: 50%;
     background-color: var(--lightTheme);
+    color:var(--pink);
+    text-align: center;
+    line-height: 28px;
+    border:2px solid #d6a2e8;
+    font-size:18px;
+    overflow: hidden;
 }
 
 .itineraryActivity{
-    min-height: 70px;;
+    min-height: 100px;;
     display: flex;
     align-items: center;
     flex:1;
     position: relative;
+    padding-right:35px;
 }
 
 .itineraryBlockEdit{
@@ -86,6 +105,7 @@ button[aria-expanded="true"] {
 
 .bottomContent{
     padding:20px 5vw;
+    margin-bottom: 80px;
     display: flex;
     justify-content: space-between;
 }
