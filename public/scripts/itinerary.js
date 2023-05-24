@@ -98,11 +98,6 @@ $(document).ready(function () {
             });
 
     }
-
-
-
-
-
 });
 
 function handleCityClick(e) {
@@ -123,7 +118,7 @@ function deleteCity(){
     readyToRemove.remove();
     var text = readyToRemove.innerHTML;
     deleteFromArray(selectedCities, text);
-    console.log(selectedCities)
+    console.log(selectedCities);
     $("#confirmModal").modal("hide");
 }
 
@@ -133,34 +128,46 @@ function submitForm() {
     var startTime = document.getElementById("startTimeValue").value;
     var endTime = document.getElementById("endTimeValue").value;
     console.log(selectedCities)
-    var postData = {
-        'startDate': startDate,
-        'endDate': endDate,
-        'startTime': startTime,
-        'endTime': endTime,
-        'country': selectedCountry,
-        'cities': JSON.stringify(selectedCities)
+    
+    if(startDate!="" && endDate!="" && startTime!="" && endTime!="" && selectedCountry!=undefined && selectedCities!=[]){
+        if(convertTime(endDate)>=convertTime(startDate) && convertTime(endTime)>convertTime(startTime)){
+            var postData = {
+                'startDate': startDate,
+                'endDate': endDate,
+                'startTime': startTime,
+                'endTime': endTime,
+                'country': selectedCountry,
+                'cities': JSON.stringify(selectedCities)
+            }
+            fetch('/itinerary/submitNew', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams(postData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the response from the backend
+                    console.log(data);
+                })
+                .catch(error => {
+                    // Handle any errors
+                    console.error(error);
+                });
+        }else{
+            alert("start time/ date can not be later than end time/date!")
+        }
+        
+        
+    }else{
+        alert("please select all fields!")
     }
 
 
 
 
-    fetch('/itinerary/submitNew', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams(postData)
-    })
-        .then(response => response.json())
-        .then(data => {
-            // Handle the response from the backend
-            console.log(data);
-        })
-        .catch(error => {
-            // Handle any errors
-            console.error(error);
-        });
+    
 
 }
 
@@ -192,30 +199,40 @@ function getRecommendations() {
     }
 }
 
+function convertTime(timeStr){
+    return new Date(timeStr);
+}
+
 function submitAdjustDates() {
     var startDate = document.getElementById("startPickerAdjustValue").value
     var endDate = document.getElementById("endPickerAdjustValue").value
     if (startDate != "" && endDate != "") {
-        var postData = {
-            'startDate': startDate,
-            'endDate': endDate
-        }
-        fetch('/itinerary/adjustment', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams(postData)
-        })
-            .then(response => response.json())
-            .then(data => {
-                // Handle the response from the backend
-                console.log(data);
+        if(convertTime(endDate)>=convertTime(startDate)){
+            var postData = {
+                'startDate': startDate,
+                'endDate': endDate
+            }
+            fetch('/itinerary/adjustment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams(postData)
             })
-            .catch(error => {
-                // Handle any errors
-                console.error(error);
-            });
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the response from the backend
+                    console.log(data);
+                })
+                .catch(error => {
+                    // Handle any errors
+                    console.error(error);
+                });
+        }else{
+            //alert that starte date can not be latter than end Date
+            alert("Please ensure the start date is ealier or equal to the end date!")
+        }
+        
     } else {
         alert("please select all fields!")
     }
