@@ -31,6 +31,17 @@ const recommendedTrips = [
     { Place: "Auckland, New Zealand", AverageDuration: 7 },
 ];
 
+const itineraryIcons = {
+    "Sightseeing": "travel_explore",
+    "Outdoor Adventure": "hiking",
+    "Cultural Experience": "temple_buddhist",
+    "Food and Dining": "brunch_dining",
+    "Shopping": "shopping_bag",
+    "Entertainment": "attractions",
+    "Nature Exploration": "forest",
+    "Relaxation": "relax"
+}
+
 
 $(document).ready(function () {
     $('#startPicker').datepicker({
@@ -319,6 +330,8 @@ function insertItinerary(itineraryJSON) {
 
             const decoratorCircle = document.createElement('span');
             decoratorCircle.classList.add('decoratorCircle');
+            decoratorCircle.classList.add('material-symbols-outlined');
+            decoratorCircle.innerHTML = itineraryIcons[schedule.category]
 
             itineraryTimeDecorator.appendChild(decoratorCircle);
             itineraryTime.appendChild(itineraryTimeText);
