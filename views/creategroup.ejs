@@ -58,15 +58,19 @@
                 <h1>Create your group!</h1>
             </div>
             <div class="card-body">
-                <h3>What is your group's name?</h3>
+                <h3 id="group-title">Group name</h3>
                 <p>Max 20 characters.</p>
-                <input type="text" id="groupName"  class="centered-input"name="groupName">
+
+                <div class="input-container">
+                    <input type="text" id="groupName" class="centered-input" name="groupName">
+                </div>
+                <br><br>
                 <div class="buttonGroup">
-                    <button class="btn btn-secondary" type="button" onclick="window.location.href='/userprofile'">Cancel</button>
+                    <button class="btn btn-secondary" type="button"
+                        onclick="window.location.href='/userprofile'">Cancel</button>
                     <button class="btn btn-primary" type="submit">Submit</button>
                 </div>
             </div>
-            
         </form>
     </div>
             <%- include('templates/bottomNav') %>
