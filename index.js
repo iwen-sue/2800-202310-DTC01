@@ -826,27 +826,38 @@ app.post('/itinerary/edit', sessionValidation, (req, res)=>{
 })
 
 app.post('/itinerary/delete', sessionValidation, async (req, res) => {
-    // console.log(req.body);
-    // const scheduleElem = JSON.parse(req.body.deleteSchedule);
-    // const startTime = scheduleElem.startTime;
-    // console.log(startTime);
+    console.log(req.body);
+    const date = req.body.date;
+    const scheduleElem = JSON.parse(req.body.deleteSchedule);
+    const startTime = scheduleElem.startTime;
+    console.log(startTime);
+    console.log(date);
 
-    // const userEmail = req.session.email;
-    // const userQuery = await usersModel.findOne({ email: userEmail });
-    // const groupID = userQuery.groupID;
+    const userEmail = req.session.email;
+    const userQuery = await usersModel.findOne({ email: userEmail });
+    const groupID = userQuery.groupID;
+    console.log("groupID:", groupID);
 
-    // const updateQuery = { $pull: { schedule: { startTime: startTime } } };
-    // const result = await groupsModel.updateOne({ _id: groupID }, updateQuery);
+    const filter = {
+        _id: groupID,
+        'itinerary.date': date,
+        'itinerary.schedule.startTime': startTime
+    };
 
-    // if (result.nModified > 0) {
-    //     console.log("Schedule deleted");
-    //     res.send("Schedule object deleted successfully.");
-    // } else {
-    //     console.log("Schedule not found");
-    //     res.send("Schedule object not found.");
-    // }
+    const update = {
+        $pull: { 'itinerary.$.schedule': { startTime: startTime } }
+    };
+
+    const result = await groupsModel.updateOne(filter, update);
+
+    if (result.modifiedCount === 0) {
+        console.log("Matching object not found in the itinerary");
+        res.status(404).json({ error: "Matching object not found in the itinerary" });
+        return;
+    }
+    console.log("Object deleted successfully")
+    res.status(200).json({ message: "Object deleted successfully" });
 });
-
 
 
 //static images address
