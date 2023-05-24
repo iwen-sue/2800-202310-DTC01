@@ -36,37 +36,38 @@
     </style>
     </head>
 
-    <body>
-        <%- include('templates/nav') %>
-            <div class="container">
-                <form class="card text-center m-4" action="/groupconfirm" method="post">
-                    <div class="card-title mt-3">
-                        <h1>Create your group!</h1>
-                    </div>
-                    <div class="card-body">
-                        <h3 id="group-title">Group name</h3>
-                        <p>Max 20 characters.</p>
+<body>
+    <%- include('templates/nav') %>
+    <% if (error !=null) { %>
+        <div class="alert alert-danger d-flex justify-content-center mx-auto" style="width: 80%" role="alert">
+            <p class="alert-heading">
+                <% if (error.includes('not allowed to be empty')) { %>
+                    Group name cannot be empty.
+                <% } else if (error.includes('must be less than or equal to 20 characters long')) {%>
+                    Group name cannot be more than 20 characters long.
+                <% } else {%>
+                    Group name already exists!
+                <% } %>
+            </p>
+        </div>
+    <% } %>
 
-                        <div class="input-container">
-                            <input type="text" id="groupName" class="centered-input" name="groupName">
-                        </div>
-                        <br><br>
-                        <div class="buttonGroup">
-                            <button class="btn btn-secondary" type="button"
-                                onclick="window.location.href='/userprofile'">Cancel</button>
-                            <button class="btn btn-primary" type="submit">Submit</button>
-                        </div>
-                    </div>
-                    <% if (error !=null) { %>
-                        <div class="alert alert-danger d-flex justify-content-center mx-auto" style="width: 80%"
-                            role="alert">
-                            <p class="alert-heading">
-                                <%- error %>
-                            </p>
-                        </div>
-                        <% } %>
-
-                </form>
+    <div class="container">
+        <form class="card text-center m-4" action="/groupconfirm" method="post">
+            <div class="card-title mt-3">
+                <h1>Create your group!</h1>
             </div>
+            <div class="card-body">
+                <h3>What is your group's name?</h3>
+                <p>Max 20 characters.</p>
+                <input type="text" id="groupName"  class="centered-input"name="groupName">
+                <div class="buttonGroup">
+                    <button class="btn btn-secondary" type="button" onclick="window.location.href='/userprofile'">Cancel</button>
+                    <button class="btn btn-primary" type="submit">Submit</button>
+                </div>
+            </div>
+            
+        </form>
+    </div>
             <%- include('templates/bottomNav') %>
     </body>
