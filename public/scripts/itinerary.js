@@ -1,6 +1,6 @@
 
 
-var selectedCountry, selectedCities = [], readyToRemove, deleteSchedule, targetDate;
+var selectedCountry, selectedCities = [], readyToRemove, deleteSchedule, targetDate, referStartTime;
 const recommendedTrips = [
     { Place: "London, United Kingdom", AverageDuration: 7 },
     { Place: "Phuket, Thailand", AverageDuration: 6 },
@@ -52,7 +52,7 @@ $(document).ready(function () {
     $('.timepicker').timepicker({
         format: "HH:mm",
         showMeridian: false,
-        defaultTime:"12:00"
+        defaultTime: "12:00"
     });
 
     $("#myInput").on("keyup", function () {
@@ -202,35 +202,35 @@ function submitForm() {
 
     if (startDate != "" && endDate != "" && startTime != "" && endTime != "" && selectedCountry != undefined && selectedCities != []) {
 
-        if(convertTime(endDate) < convertTime(startDate)){
+        if (convertTime(endDate) < convertTime(startDate)) {
             checkBool = false
         }
 
-        if(convertTime(endTime) <= convertTime(startTime)){
+        if (convertTime(endTime) <= convertTime(startTime)) {
             checkBool = false
         }
-        
+
         if (checkBool) {
-            
 
-                fetch('/itinerary/submitNew', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: new URLSearchParams(postData)
+
+            fetch('/itinerary/submitNew', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams(postData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("data", data.itinerary)
+                    insertItinerary(data.itinerary);
+
+
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log("data", data.itinerary)
-                        insertItinerary(data.itinerary);
-            
-            
-                    })
-                    .catch(error => {
-                        // Handle any errors
-                        console.error(error);
-                    });
+                .catch(error => {
+                    // Handle any errors
+                    console.error(error);
+                });
         } else {
             alert("start time/ date can not be later than end time/date!")
         }
@@ -324,12 +324,12 @@ function insertItinerary(itineraryJSON) {
             var editButton = itineraryActivity.querySelector(".itineraryBlockEdit");
             var passobj = {
                 'date': itinerary.date,
-                'schedule':schedule
+                'schedule': schedule
             }
 
             // Attach an event listener to the 'span' element
-            editButton.addEventListener("click", function() {
-                  editItinerary(passobj);
+            editButton.addEventListener("click", function () {
+                editItinerary(passobj);
             })
         });
 
@@ -342,8 +342,9 @@ function editItinerary(passObj) {
     console.log(passObj);
     deleteSchedule = passObj.schedule;
     targetDate = passObj.date;
+    referStartTime = passObj.schedule.startTime;
     $("#editModal").modal("show");
-    setTimeout(()=>{
+    setTimeout(() => {
         document.getElementById("editActivity").setAttribute("value", passObj.schedule.activity);
         // var elem = document.getElementById("startTimeValue")
         // elem.value = passObj.schedule.startTime
@@ -354,7 +355,7 @@ function editItinerary(passObj) {
 
         // document.getElementById("startTimeValue").setAttribute("value", passObj.schedule.startTime);
         // document.getElementById("endTimeValue").setAttribute("value", passObj.schedule.endTime);
-    },100)
+    }, 100)
 }
 
 function parseCityCountry(inputString) {
@@ -420,24 +421,25 @@ function convertTime(timeStr) {
     return new Date(timeStr);
 }
 
-function submitEdit(){
+function submitEdit() {
     var startTime = document.getElementById("startTimeEdit").value
     var endTime = document.getElementById("endTimeEdit").value
     var activity = document.getElementById("editActivity").value
     var securityCheck = true
-    if(convertTime(endTime) > convertTime(startTime)){
+    if (convertTime(endTime) > convertTime(startTime)) {
         securityCheck = false
     }
-    setTimeout(()=>{
-        if(securityCheck){
-        
+    setTimeout(() => {
+        if (securityCheck) {
+
             var postData = {
                 'schedule': JSON.stringify({
                     'startTime': startTime,
                     'endTime': endTime,
                     'activity': activity
                 }),
-                'date': targetDate
+                'date': targetDate,
+                'referStartTime': referStartTime
             }
             fetch('/itinerary/edit', {
                 method: 'POST',
@@ -455,16 +457,16 @@ function submitEdit(){
                     // Handle any errors
                     console.error(error);
                 });
-    
-        }else{
+
+        } else {
             alert("end time can not be earlier than start time!")
         }
 
     })
-    
+
 }
 
-function deleteActivity(){
+function deleteActivity() {
     var postData = {
         'deleteSchedule': JSON.stringify(deleteSchedule),
         'date': targetDate
@@ -508,7 +510,7 @@ function submitAdjustDates() {
                     // Handle the response from the backend
                     console.log("data", data.itinerary)
                     insertItinerary(data.itinerary);
-                
+
                 })
                 .catch(error => {
                     // Handle any errors
