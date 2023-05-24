@@ -52,7 +52,7 @@ $(document).ready(function () {
     $('.timepicker').timepicker({
         format: "HH:mm",
         showMeridian: false,
-        defaultTime:"12:00"
+        defaultTime: "12:00"
     });
 
     $("#myInput").on("keyup", function () {
@@ -62,21 +62,20 @@ $(document).ready(function () {
         });
     });
 
-    $("#myCityInput").on("keyup", function () {
-        var value = $(this).val().toLowerCase();
-        $(".dropdown-city li").filter(function () {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-        });
-    });
+    
 
 
     var countrySelect = document.getElementById('country');
     var citySelect = document.getElementById('city');
 
+
+
     // Fetch country data from the API
     fetch('https://countriesnow.space/api/v0.1/countries')
         .then(response => response.json())
         .then(data => {
+            console.log(citySelect)
+
             // Iterate over the country data and create country options
             console.log(countrySelect);
             data.data.forEach(info => {
@@ -124,11 +123,31 @@ $(document).ready(function () {
                             citySelect.appendChild(option);
                         });
                     }
+
                 });
+                setTimeout(() => {
+                    var firstChild = document.getElementById('city').firstElementChild;
+                    var inputElement = document.createElement("input"); // Create the <input> element
+
+                    inputElement.setAttribute("class", "form-control"); // Set the class attribute
+                    inputElement.setAttribute("id", "myCityInput"); // Set the id attribute
+                    inputElement.setAttribute("type", "text"); // Set the type attribute
+                    inputElement.setAttribute("placeholder", "Select city"); // Set the placeholder attribute
+                    citySelect.insertBefore(inputElement, firstChild);
+                    $("#myCityInput").on("keyup", function () {
+                        var value = $(this).val().toLowerCase();
+                        $(".dropdown-city li").filter(function () {
+                            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                        });
+                    });
+
+
+                })
             })
             .catch(error => {
                 console.log('Error:', error);
             });
+
     }
 
 
@@ -156,11 +175,9 @@ $(document).ready(function () {
         .catch(error => {
             console.error(error);
         });
-
-
-
-
 });
+
+
 
 function handleCityClick(e) {
     readyToRemove = e.target
@@ -202,35 +219,35 @@ function submitForm() {
 
     if (startDate != "" && endDate != "" && startTime != "" && endTime != "" && selectedCountry != undefined && selectedCities != []) {
 
-        if(convertTime(endDate) < convertTime(startDate)){
+        if (convertTime(endDate) < convertTime(startDate)) {
             checkBool = false
         }
 
-        if(convertTime(endTime) <= convertTime(startTime)){
+        if (convertTime(endTime) <= convertTime(startTime)) {
             checkBool = false
         }
-        
+
         if (checkBool) {
-            
+            console.log("checkPassed")
 
-                fetch('/itinerary/submitNew', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: new URLSearchParams(postData)
+            fetch('/itinerary/submitNew', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams(postData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("data", data.itinerary)
+                    insertItinerary(data.itinerary);
+
+
                 })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log("data", data.itinerary)
-                        insertItinerary(data.itinerary);
-            
-            
-                    })
-                    .catch(error => {
-                        // Handle any errors
-                        console.error(error);
-                    });
+                .catch(error => {
+                    // Handle any errors
+                    console.error(error);
+                });
         } else {
             alert("start time/ date can not be later than end time/date!")
         }
@@ -324,12 +341,12 @@ function insertItinerary(itineraryJSON) {
             var editButton = itineraryActivity.querySelector(".itineraryBlockEdit");
             var passobj = {
                 'date': itinerary.date,
-                'schedule':schedule
+                'schedule': schedule
             }
 
             // Attach an event listener to the 'span' element
-            editButton.addEventListener("click", function() {
-                  editItinerary(passobj);
+            editButton.addEventListener("click", function () {
+                editItinerary(passobj);
             })
         });
 
@@ -343,7 +360,7 @@ function editItinerary(passObj) {
     deleteSchedule = passObj.schedule;
     targetDate = passObj.date;
     $("#editModal").modal("show");
-    setTimeout(()=>{
+    setTimeout(() => {
         document.getElementById("editActivity").setAttribute("value", passObj.schedule.activity);
         // var elem = document.getElementById("startTimeValue")
         // elem.value = passObj.schedule.startTime
@@ -354,7 +371,7 @@ function editItinerary(passObj) {
 
         // document.getElementById("startTimeValue").setAttribute("value", passObj.schedule.startTime);
         // document.getElementById("endTimeValue").setAttribute("value", passObj.schedule.endTime);
-    },100)
+    }, 100)
 }
 
 function parseCityCountry(inputString) {
@@ -420,17 +437,17 @@ function convertTime(timeStr) {
     return new Date(timeStr);
 }
 
-function submitEdit(){
+function submitEdit() {
     var startTime = document.getElementById("startTimeEdit").value
     var endTime = document.getElementById("endTimeEdit").value
     var activity = document.getElementById("editActivity").value
     var securityCheck = true
-    if(convertTime(endTime) > convertTime(startTime)){
+    if (convertTime(endTime) > convertTime(startTime)) {
         securityCheck = false
     }
-    setTimeout(()=>{
-        if(securityCheck){
-        
+    setTimeout(() => {
+        if (securityCheck) {
+
             var postData = {
                 'schedule': JSON.stringify({
                     'startTime': startTime,
@@ -455,16 +472,16 @@ function submitEdit(){
                     // Handle any errors
                     console.error(error);
                 });
-    
-        }else{
+
+        } else {
             alert("end time can not be earlier than start time!")
         }
 
     })
-    
+
 }
 
-function deleteActivity(){
+function deleteActivity() {
     var postData = {
         'deleteSchedule': JSON.stringify(deleteSchedule),
         'date': targetDate
