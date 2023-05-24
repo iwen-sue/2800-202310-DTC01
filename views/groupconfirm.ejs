@@ -13,17 +13,32 @@
 </head>
 <body>
     <%- include('templates/nav') %>
-    <div class="container">
-        <div class="card text-center m-4">
-            <div class="card-title">
-                <h1>Create your group!</h1>
-            </div>
-            <div class="card-body">
-                <h3>Group created successfully!</h3>
-                <p>"<%- groupName %>"</p>
-                <button class="btn btn-primary" onclick="window.location.href='/userprofile/groupdetails'">View Group Details</button>
+    <% if (error == null) { %>
+        <div class="container">
+            <div class="card text-center m-4">
+                <div class="card-title">
+                    <h1>Create your group!</h1>
+                </div>
+                <div class="card-body">
+                    <h3>Group created successfully!</h3>
+                    <p>"<%- groupName %>"</p>
+                    <button class="btn btn-primary" onclick="window.location.href='/userprofile/groupdetails'">View Group Details</button>
+                </div>
             </div>
         </div>
-    </div>
+    <% } else { %>
+        <div class="container">
+            <div class="card text-center m-4">
+                <div class="card-title">
+                    <h1>You are already part of a group!</h1>
+                </div>
+                <div class="card-body">
+                    <h3>Please leave your current group before joining another.</h3>
+                    <button class="btn btn-primary" onclick="window.location.href='/userprofile/groupdetails'">View Group
+                        Details</button>
+                </div>
+            </div>
+        </div>
+    <% } %>
     <%- include('templates/bottomNav') %>
 </body>
