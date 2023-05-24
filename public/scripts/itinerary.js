@@ -212,22 +212,6 @@ function submitForm() {
         
         if (checkBool) {
             
-            fetch('/itinerary/submitNew', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: new URLSearchParams(postData)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    // Handle the response from the backend
-                    console.log(data);
-                })
-                .catch(error => {
-                    // Handle any errors
-                    console.error(error);
-                });
 
                 fetch('/itinerary/submitNew', {
                     method: 'POST',
