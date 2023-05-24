@@ -511,11 +511,18 @@ app.post('/forgotPassword', async (req, res) => {
         const mailOptions = {
             to: user.email,
             from: process.env.EMAIL,
-            subject: 'Reset your password on Vacapal',
-            html: `Hi ${user.firstName} ${user.lastName} \n
-            Please click on the following link, or paste this into your browser to complete the process:\n
-            <a href="${resetUrl}">here</a>\n
-            If you did not request this, please ignore this email and your password will remain unchanged.\n`
+            subject: "Reset your password on Vacapal",
+            html: `
+                <img src="https://raw.githubusercontent.com/nicky81818/images/069cfd55e0f576147dbdb1e1dd98711b29f05677/vacapal-purple.svg" title="Vacapal logo" alt="Vacapal logo" height="100px" width="400px" style="display: block">
+                <p>Hi ${user.firstName} ${user.lastName},</p>
+                <p>Please click on the following link, or paste this into your browser to reset your password: <a href="${resetUrl}">here</a></p>
+                <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
+                <h3>Thank you for using VacaPal!</h3>
+                <h4>Best regards,</h4>
+                <h4>The VacaPal Team</h4>
+                <p>For our privacy policy, <a href="https://www.privacypolicies.com/live/b3c518bb-bebe-497e-9b34-4b78bcac834c">click here.</a> Provided by Privacy Policies Generator.</p>
+                <footer>VacaPal &copy</footer>
+                `,
         };
         await transporter.sendMail(mailOptions);
         res.render('forgotPassword', { success: 'EmailSent' });
@@ -556,30 +563,33 @@ app.get('/creategroup', sessionValidation, (req, res) => {
 
 app.post('/groupconfirm', sessionValidation, async (req, res) => {
     var groupName = req.body.groupName;
-    const schema = Joi.string().max(20).required();
+    const schema = Joi.string().trim().max(20).required();
     const validationResult = schema.validate(groupName);
     if (validationResult.error != null) {
-        var error = "Group name is too long. Please enter a group name that is 20 characters or less.";
-        return res.render("creategroup", { error: error });
+        return res.render("creategroup", { error: validationResult.error.toString() });
     }
     const currentUser = await usersModel.findOne({ email: req.session.email }).exec();
-    const newGroup = new groupsModel({
-        groupName: groupName,
-        members: [
-            {
-                email: currentUser.email,
-                type: 'leader',
-                firstName: currentUser.firstName,
-                lastName: currentUser.lastName,
-                profilePic: currentUser.profilePic,
-                active: true
-            }
-        ]
-    });
-    await newGroup.save();
-    const group = await groupsModel.findOne({ groupName: groupName }).exec();
-    await usersModel.updateOne({ email: req.session.email }, { $set: { groupID: group._id, type: 'leader' } }).exec();
-    res.render("groupconfirm", { groupName: req.body.groupName });
+    try {
+        const newGroup = new groupsModel({
+            groupName: groupName,
+            members: [
+                {
+                    email: currentUser.email,
+                    type: 'leader',
+                    firstName: currentUser.firstName,
+                    lastName: currentUser.lastName,
+                    profilePic: currentUser.profilePic,
+                    active: true
+                }
+            ]
+        });
+        await newGroup.save();
+        const group = await groupsModel.findOne({ groupName: groupName }).exec();
+        await usersModel.updateOne({ email: req.session.email }, { $set: { groupID: group._id, type: 'leader' } }).exec();
+        res.render("groupconfirm", { groupName: req.body.groupName });
+    } catch (err) {
+        res.render("creategroup", { error: "Group name is already taken. Please enter another group name." });
+    }
 });
 
 app.get('/userprofile/groupdetails', sessionValidation, async (req, res) => {
@@ -611,6 +621,8 @@ app.post('/invite', sessionValidation, async (req, res) => {
             <p>Or, enter this token in your profile after clicking "Join Group": <b>${groupToken}</b></p>
             <p>If you do not recognize the inviter, please ignore this email.</p>
             <h3>Thank you for using VacaPal!</h3>
+            <h4>Best regards,</h4>
+            <h4>The VacaPal Team</h4>
             <p>For our privacy policy, <a href="https://www.privacypolicies.com/live/b3c518bb-bebe-497e-9b34-4b78bcac834c">click here.</a> Provided by Privacy Policies Generator.</p>
             <footer>VacaPal &copy</footer>
             `,
@@ -645,39 +657,48 @@ app.post('/removemember', sessionValidation, async (req, res) => {
 app.post('/joingroup', sessionValidation, async (req, res) => {
     var groupToken = req.body.groupToken;
     var currentUser = await usersModel.findOne({ email: req.session.email }).exec();
-    var group = await groupsModel.find({ _id: req.body.groupToken }).exec();
-    var currentMembers = group[0].members;
-    var memberHasJoinedPreviously = false;
-    for (var i = 0; i < currentMembers.length; i++) {
-        if (currentMembers[i].email == req.session.email) {
-            memberHasJoinedPreviously = true;
-        }
-    }
-    if (memberHasJoinedPreviously) {
-        for(var i = 0; i < currentMembers.length; i++){
-            if(currentMembers[i].email == req.session.email){
-                currentMembers[i].active = true;
+    try {
+        var group = await groupsModel.find({ _id: req.body.groupToken }).exec();
+        var currentMembers = group[0].members;
+        var memberHasJoinedPreviously = false;
+        for (var i = 0; i < currentMembers.length; i++) {
+            if (currentMembers[i].email == req.session.email) {
+                memberHasJoinedPreviously = true;
             }
         }
-        await groupsModel.updateOne({ _id: groupToken }, { $set: { members: currentMembers } }).exec();
-    }
-    else {
-        await groupsModel.updateOne({ _id: groupToken }, {
-            $push: {
-                members: {
-                    email: currentUser.email,
-                    type: 'member',
-                    firstName: currentUser.firstName,
-                    lastName: currentUser.lastName,
-                    profilePic: currentUser.profilePic,
-                    active: true
+        if (memberHasJoinedPreviously) {
+            for(var i = 0; i < currentMembers.length; i++){
+                if(currentMembers[i].email == req.session.email){
+                    currentMembers[i].active = true;
                 }
             }
-        }).exec();
-    }
+            await groupsModel.updateOne({ _id: groupToken }, { $set: { members: currentMembers } }).exec();
+        }
+        else {
+            await groupsModel.updateOne({ _id: groupToken }, {
+                $push: {
+                    members: {
+                        email: currentUser.email,
+                        type: 'member',
+                        firstName: currentUser.firstName,
+                        lastName: currentUser.lastName,
+                        profilePic: currentUser.profilePic,
+                        active: true
+                    }
+                }
+            }).exec();
+        }
+    
+        await usersModel.updateOne({ email: req.session.email }, { $set: { groupID: groupToken, type: 'member' } }).exec();
+        res.redirect('/userprofile/groupdetails');
 
-    await usersModel.updateOne({ email: req.session.email }, { $set: { groupID: groupToken, type: 'member' } }).exec();
-    res.redirect('/userprofile/groupdetails');
+    } catch (err) {
+        res.redirect("/userprofile/groupnotfound")
+    }
+});
+
+app.get('/userprofile/groupnotfound', sessionValidation, async (req, res) => {
+    res.render("groupnotfound");
 });
 
 app.post('/leavegroup', sessionValidation, async (req, res) => {

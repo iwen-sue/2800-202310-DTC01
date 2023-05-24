@@ -7,7 +7,7 @@ $(document).ready(function () {
         console.log(memberName)
         $("#modal-title-remove").text("Remove " + memberName + " from the group?");
         $("#modal-body-remove").html(`
-            <p>${memberName} will lose access to the group's itinerary plan, chatroom history, and expense tracker!</p>
+            <p>${memberName} will lose access to the group's itinerary plan and chatroom history!</p>
             <input type="hidden" name="memberEmail" id="memberEmail" value="${memberEmail}">
             `);
     });

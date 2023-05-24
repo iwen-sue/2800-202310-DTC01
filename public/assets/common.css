@@ -72,6 +72,7 @@ div#landingPage {
 }
 .btn-secondary {
     background-color: var(--pink);
+    background-image: linear-gradient(to bottom right, rgb(255, 171, 185), var(--pink));
     color: white;
     border: none;
 }
@@ -96,6 +97,7 @@ div#landingPage {
 /* home page styles */
 .btn-primary {
     background-color: var(--theme);
+    background-image: linear-gradient(to bottom right, var(--lightTheme), var(--theme));
     color: white;
     border: none;
 }
@@ -111,6 +113,27 @@ div#landingPage {
 }
 .btn-primary:active {
     background-color: var(--lightTheme) !important;
+    color: white;
+    border: none !important;
+}
+.btn-danger {
+    background-color: var(--blush);
+    background-image: linear-gradient(to bottom right, var(--beige), var(--blush));
+    color: white;
+    border: none;
+}
+.btn-danger:hover {
+    background-color: var(--beige);
+    color: white;
+    border: none;
+}
+.btn-danger:focus {
+    background-color: var(--beige);
+    color: white;
+    border: none !important;
+}
+.btn-danger:active {
+    background-color: var(--beige) !important;
     color: white;
     border: none !important;
 }
@@ -137,4 +160,10 @@ div#landingPage {
 
 #mySidenav{
     z-index: 5;
+}
+
+/* text rule */
+
+h1 {
+    color: black;
 }
