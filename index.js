@@ -511,11 +511,18 @@ app.post('/forgotPassword', async (req, res) => {
         const mailOptions = {
             to: user.email,
             from: process.env.EMAIL,
-            subject: 'Reset your password on Vacapal',
-            html: `Hi ${user.firstName} ${user.lastName} \n
-            Please click on the following link, or paste this into your browser to complete the process:\n
-            <a href="${resetUrl}">here</a>\n
-            If you did not request this, please ignore this email and your password will remain unchanged.\n`
+            subject: "Reset your password on Vacapal",
+            html: `
+                <img src="https://raw.githubusercontent.com/nicky81818/images/069cfd55e0f576147dbdb1e1dd98711b29f05677/vacapal-purple.svg" title="Vacapal logo" alt="Vacapal logo" height="100px" width="400px" style="display: block">
+                <p>Hi ${user.firstName} ${user.lastName},</p>
+                <p>Please click on the following link, or paste this into your browser to reset your password: <a href="${resetUrl}">here</a></p>
+                <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
+                <h3>Thank you for using VacaPal!</h3>
+                <h4>Best regards,</h4>
+                <h4>The VacaPal Team</h4>
+                <p>For our privacy policy, <a href="https://www.privacypolicies.com/live/b3c518bb-bebe-497e-9b34-4b78bcac834c">click here.</a> Provided by Privacy Policies Generator.</p>
+                <footer>VacaPal &copy</footer>
+                `,
         };
         await transporter.sendMail(mailOptions);
         res.render('forgotPassword', { success: 'EmailSent' });
@@ -611,6 +618,8 @@ app.post('/invite', sessionValidation, async (req, res) => {
             <p>Or, enter this token in your profile after clicking "Join Group": <b>${groupToken}</b></p>
             <p>If you do not recognize the inviter, please ignore this email.</p>
             <h3>Thank you for using VacaPal!</h3>
+            <h4>Best regards,</h4>
+            <h4>The VacaPal Team</h4>
             <p>For our privacy policy, <a href="https://www.privacypolicies.com/live/b3c518bb-bebe-497e-9b34-4b78bcac834c">click here.</a> Provided by Privacy Policies Generator.</p>
             <footer>VacaPal &copy</footer>
             `,
