@@ -1,6 +1,6 @@
 
 
-var selectedCountry, selectedCities = [], readyToRemove;
+var selectedCountry, selectedCities = [], readyToRemove, deleteSchedule, targetDate;
 const recommendedTrips = [
     { Place: "London, United Kingdom", AverageDuration: 7 },
     { Place: "Phuket, Thailand", AverageDuration: 6 },
@@ -51,7 +51,8 @@ $(document).ready(function () {
 
     $('.timepicker').timepicker({
         format: "HH:mm",
-        showMeridian: false
+        showMeridian: false,
+        defaultTime:"12:00"
     });
 
     $("#myInput").on("keyup", function () {
@@ -117,8 +118,8 @@ $(document).ready(function () {
                                 console.log(e.target.innerHTML);
                                 selectedCities.push(e.target.innerHTML)
                                 document.getElementById("selectedCities").appendChild(span);
-                                
-                                
+
+
                             });
                             citySelect.appendChild(option);
                         });
@@ -131,30 +132,30 @@ $(document).ready(function () {
     }
 
 
-// Client-side code
-fetch('/itineraryData')
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Network response was not OK');
-    }
-    return response.json(); 
-  })
-  .then(data => {
-    console.log(data); 
+    // Client-side code
+    fetch('/itineraryData')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not OK');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log(data);
 
-    if (data && data.itinerary) {
-      const itinerary = data.itinerary;
+            if (data && data.itinerary) {
+                const itinerary = data.itinerary;
 
-      console.log(itinerary);
+                console.log(itinerary);
 
-      insertItinerary(itinerary);
-    } else {
-      console.log('Invalid itinerary data');
-    }
-  })
-  .catch(error => {
-    console.error(error);
-  });
+                insertItinerary(itinerary);
+            } else {
+                console.log('Invalid itinerary data');
+            }
+        })
+        .catch(error => {
+            console.error(error);
+        });
 
 
 
@@ -171,11 +172,11 @@ function handleCityClick(e) {
 function deleteFromArray(arr, value) {
     const index = arr.indexOf(value);
     if (index > -1) {
-      arr.splice(index, 1);
+        arr.splice(index, 1);
     }
-  }
+}
 
-function deleteCity(){
+function deleteCity() {
     readyToRemove.remove();
     var text = readyToRemove.innerHTML;
     deleteFromArray(selectedCities, text);
@@ -189,17 +190,28 @@ function submitForm() {
     var startTime = document.getElementById("startTimeValue").value;
     var endTime = document.getElementById("endTimeValue").value;
     console.log(selectedCities)
-    
-    if(startDate!="" && endDate!="" && startTime!="" && endTime!="" && selectedCountry!=undefined && selectedCities!=[]){
-        if(convertTime(endDate)>=convertTime(startDate) && convertTime(endTime)>convertTime(startTime)){
-            var postData = {
-                'startDate': startDate,
-                'endDate': endDate,
-                'startTime': startTime,
-                'endTime': endTime,
-                'country': selectedCountry,
-                'cities': JSON.stringify(selectedCities)
-            }
+    var checkBool = true;
+    var postData = {
+        'startDate': startDate,
+        'endDate': endDate,
+        'startTime': startTime,
+        'endTime': endTime,
+        'country': selectedCountry,
+        'cities': JSON.stringify(selectedCities)
+    }
+
+    if (startDate != "" && endDate != "" && startTime != "" && endTime != "" && selectedCountry != undefined && selectedCities != []) {
+
+        if(convertTime(endDate) < convertTime(startDate)){
+            checkBool = false
+        }
+
+        if(convertTime(endTime) <= convertTime(startTime)){
+            checkBool = false
+        }
+        
+        if (checkBool) {
+            
             fetch('/itinerary/submitNew', {
                 method: 'POST',
                 headers: {
@@ -216,40 +228,41 @@ function submitForm() {
                     // Handle any errors
                     console.error(error);
                 });
-        }else{
+
+                fetch('/itinerary/submitNew', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams(postData)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log("data", data.itinerary)
+                        insertItinerary(data.itinerary);
+            
+            
+                    })
+                    .catch(error => {
+                        // Handle any errors
+                        console.error(error);
+                    });
+        } else {
             alert("start time/ date can not be later than end time/date!")
         }
-        
-        
-    }else{
+
+
+    } else {
         alert("please select all fields!")
     }
 
 
     console.log(postData)
-        
-    
-
-    fetch('/itinerary/submitNew', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-        body: new URLSearchParams(postData)
-    })
-        .then(response => response.json())
-        .then(data => {
-            console.log("data", data.itinerary)
-            insertItinerary(data.itinerary);
 
 
-        })
-        .catch(error => {
-            // Handle any errors
-            console.error(error);
-        });
 
-        // Client-side JavaScript
+
+    // Client-side JavaScript
 }
 
 function calculateEndDate(days, startDate) {
@@ -272,59 +285,93 @@ function insertItinerary(itineraryJSON) {
     const itineraryContainer = document.querySelector('.itineraryPlan');
     itineraryContainer.innerHTML = '';
     for (let i = 0; i < itineraryJSON.length; i++) {
-      const itinerary = itineraryJSON[i];
-      const dateButton = document.createElement('button');
-      dateButton.type = 'button';
-      dateButton.classList.add('dateTrigger');
-      dateButton.setAttribute('data-toggle', 'collapse');
-      dateButton.setAttribute('data-target', `#demo${i + 1}`);
-      dateButton.innerText = itinerary.date;
-  
-      const collapseContainer = document.createElement('div');
-      collapseContainer.id = `demo${i + 1}`;
-      collapseContainer.classList.add('collapse', 'itineraryBlockContainer');
-  
-      itinerary.schedule.forEach((schedule) => {
-        const itineraryBlock = document.createElement('div');
-        itineraryBlock.classList.add('itineraryBlock');
-  
-        const itineraryTime = document.createElement('div');
-        itineraryTime.classList.add('itineraryTime');
-  
-        const itineraryTimeText = document.createElement('div');
-        itineraryTimeText.classList.add('itineraryTimeText');
-        itineraryTimeText.innerHTML = `
+        const itinerary = itineraryJSON[i];
+        const dateButton = document.createElement('button');
+        dateButton.type = 'button';
+        dateButton.classList.add('dateTrigger');
+        dateButton.setAttribute('data-toggle', 'collapse');
+        dateButton.setAttribute('data-target', `#demo${i + 1}`);
+        dateButton.innerText = itinerary.date;
+
+        const collapseContainer = document.createElement('div');
+        collapseContainer.id = `demo${i + 1}`;
+        collapseContainer.classList.add('collapse', 'itineraryBlockContainer');
+
+        itinerary.schedule.forEach((schedule) => {
+            var schedule = schedule;
+            const itineraryBlock = document.createElement('div');
+            itineraryBlock.classList.add('itineraryBlock');
+
+            const itineraryTime = document.createElement('div');
+            itineraryTime.classList.add('itineraryTime');
+
+            const itineraryTimeText = document.createElement('div');
+            itineraryTimeText.classList.add('itineraryTimeText');
+            itineraryTimeText.innerHTML = `
           <p>${schedule.startTime}</p>
           <p>|</p>
           <p>${schedule.endTime}</p>
         `;
-  
-        const itineraryTimeDecorator = document.createElement('p');
-        itineraryTimeDecorator.classList.add('itineraryTimeDecorator');
-  
-        const decoratorCircle = document.createElement('span');
-        decoratorCircle.classList.add('decoratorCircle');
-  
-        itineraryTimeDecorator.appendChild(decoratorCircle);
-        itineraryTime.appendChild(itineraryTimeText);
-        itineraryTime.appendChild(itineraryTimeDecorator);
-  
-        const itineraryActivity = document.createElement('div');
-        itineraryActivity.classList.add('itineraryActivity');
-        itineraryActivity.innerHTML = `
+
+            const itineraryTimeDecorator = document.createElement('p');
+            itineraryTimeDecorator.classList.add('itineraryTimeDecorator');
+
+            const decoratorCircle = document.createElement('span');
+            decoratorCircle.classList.add('decoratorCircle');
+
+            itineraryTimeDecorator.appendChild(decoratorCircle);
+            itineraryTime.appendChild(itineraryTimeText);
+            itineraryTime.appendChild(itineraryTimeDecorator);
+
+            const itineraryActivity = document.createElement('div');
+            itineraryActivity.classList.add('itineraryActivity');
+            itineraryActivity.innerHTML = `
           ${schedule.activity}<br>
           ${schedule.transportation}<span class="material-symbols-outlined itineraryBlockEdit">edit_note</span>
         `;
-  
-        itineraryBlock.appendChild(itineraryTime);
-        itineraryBlock.appendChild(itineraryActivity);
-        collapseContainer.appendChild(itineraryBlock);
-      });
-  
-      itineraryContainer.appendChild(dateButton);
-      itineraryContainer.appendChild(collapseContainer);
+
+            itineraryBlock.appendChild(itineraryTime);
+            itineraryBlock.appendChild(itineraryActivity);
+            collapseContainer.appendChild(itineraryBlock);
+
+
+
+            // Select the 'span' element within 'itineraryActivity'
+            var editButton = itineraryActivity.querySelector(".itineraryBlockEdit");
+            var passobj = {
+                'date': itinerary.date,
+                'schedule':schedule
+            }
+
+            // Attach an event listener to the 'span' element
+            editButton.addEventListener("click", function() {
+                  editItinerary(passobj);
+            })
+        });
+
+        itineraryContainer.appendChild(dateButton);
+        itineraryContainer.appendChild(collapseContainer);
     }
-  }
+}
+
+function editItinerary(passObj) {
+    console.log(passObj);
+    deleteSchedule = passObj.schedule;
+    targetDate = passObj.date;
+    $("#editModal").modal("show");
+    setTimeout(()=>{
+        document.getElementById("editActivity").setAttribute("value", passObj.schedule.activity);
+        // var elem = document.getElementById("startTimeValue")
+        // elem.value = passObj.schedule.startTime
+        // console.log(elem.value)
+        $("#startTimeEdit").val(passObj.schedule.startTime);
+        $("#endTimeEdit").val(passObj.schedule.endTime);
+        // $("#endTimeValue").val(passObj.schedule.endTime)
+
+        // document.getElementById("startTimeValue").setAttribute("value", passObj.schedule.startTime);
+        // document.getElementById("endTimeValue").setAttribute("value", passObj.schedule.endTime);
+    },100)
+}
 
 function parseCityCountry(inputString) {
     // Split the input string by comma and trim whitespace
@@ -338,11 +385,11 @@ function parseCityCountry(inputString) {
     return [city, country];
 }
 
-function getRecommendations(){
+function getRecommendations() {
     var startDate = $("#startDateValue").val();
     if (startDate) {
         var recommededTrip = recommendedTrips[Math.round(Math.random() * recommendedTrips.length)];
-        var endDate = calculateEndDate(recommededTrip.AverageDuration,startDate);
+        var endDate = calculateEndDate(recommededTrip.AverageDuration, startDate);
         var recCity = parseCityCountry(recommededTrip.Place)[0];
         var recCountry = parseCityCountry(recommededTrip.Place)[1];
         selectedCountry = recCountry;
@@ -357,7 +404,7 @@ function getRecommendations(){
         fetch("https://countriesnow.space/api/v0.1/countries")
             .then((response) => response.json())
             .then((data) => {
-            // Iterate over the city data and create city options
+                // Iterate over the city data and create city options
                 data.data.forEach((country) => {
                     if (country.country === recCountry) {
                         country.cities.forEach((city) => {
@@ -376,8 +423,8 @@ function getRecommendations(){
                     }
                 });
             })
-        .catch((error) => {
-            console.log("Error:", error);
+            .catch((error) => {
+                console.log("Error:", error);
             });
 
     } else {
@@ -385,15 +432,82 @@ function getRecommendations(){
     }
 }
 
-function convertTime(timeStr){
+function convertTime(timeStr) {
     return new Date(timeStr);
+}
+
+function submitEdit(){
+    var startTime = document.getElementById("startTimeEdit").value
+    var endTime = document.getElementById("endTimeEdit").value
+    var activity = document.getElementById("editActivity").value
+    var securityCheck = true
+    if(convertTime(endTime) > convertTime(startTime)){
+        securityCheck = false
+    }
+    setTimeout(()=>{
+        if(securityCheck){
+        
+            var postData = {
+                'schedule': JSON.stringify({
+                    'startTime': startTime,
+                    'endTime': endTime,
+                    'activity': activity
+                }),
+                'date': targetDate
+            }
+            fetch('/itinerary/edit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams(postData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the response from the backend
+                    console.log(data);
+                })
+                .catch(error => {
+                    // Handle any errors
+                    console.error(error);
+                });
+    
+        }else{
+            alert("end time can not be earlier than start time!")
+        }
+
+    })
+    
+}
+
+function deleteActivity(){
+    var postData = {
+        'deleteSchedule': JSON.stringify(deleteSchedule),
+        'date': targetDate
+    }
+    fetch('/itinerary/delete', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams(postData)
+    })
+        .then(response => response.json())
+        .then(data => {
+            // Handle the response from the backend
+            console.log(data);
+        })
+        .catch(error => {
+            // Handle any errors
+            console.error(error);
+        });
 }
 
 function submitAdjustDates() {
     var startDate = document.getElementById("startPickerAdjustValue").value
     var endDate = document.getElementById("endPickerAdjustValue").value
     if (startDate != "" && endDate != "") {
-        if(convertTime(endDate)>=convertTime(startDate)){
+        if (convertTime(endDate) >= convertTime(startDate)) {
             var postData = {
                 'startDate': startDate,
                 'endDate': endDate
@@ -414,13 +528,13 @@ function submitAdjustDates() {
                     // Handle any errors
                     console.error(error);
                 });
-        }else{
+        } else {
             //alert that starte date can not be latter than end Date
             alert("Please ensure the start date is ealier or equal to the end date!")
         }
-        
+
     } else {
         alert("please select all fields!")
     }
-    
+
 }
