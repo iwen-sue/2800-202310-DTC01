@@ -256,7 +256,7 @@ function submitForm() {
             })
                 .then(response => response.json())
                 .then(data => {
-                    console.log("data", data.itinerary)
+                    console.log(data)
                     insertItinerary(data.itinerary);
 
 
