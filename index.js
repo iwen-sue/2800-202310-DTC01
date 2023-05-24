@@ -270,6 +270,15 @@ app.get('/editBucket', (req, res) => {
 
 });
 
+// get api key from client-side , for Grace's use
+app.get('/api-key', (req, res) => {
+    // Fetch the API key from your server-side storage
+    const apiKey = process.env.OPENAI_API_KEY;
+  
+    // Return the API key as the response
+    res.json({ apiKey });
+  });
+
 app.get('/enterBucket', (req, res) => {
     res.render("enterBucket");
 });
