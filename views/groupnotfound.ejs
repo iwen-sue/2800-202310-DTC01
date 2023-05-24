@@ -5,19 +5,22 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 <link rel="stylesheet" href="/assets/common.css">
-<link rel="stylesheet" href="/assets/groupnotfound.css">
 </head>
 <body>
     <%- include("templates/nav") %>
     <div class="container text-center">
-        <div class="row">
+        <div class="card text-center m-4">
             <div class="col-12">
-                <h1>Group Not Found</h1>
-                <p>Sorry, the group you're looking for cannot be found.</p>
-                <p>Try joining another group, or double check your group token is correct.</p>
-                <button type="button" class="btn btn-primary" onclick="window.location.href='/userprofile'">
-                    Back to Profile
-                </button>
+                <div class="card-title mt-3">
+                    <h1>Group Not Found</h1>
+                </div>
+                <div class="card-body">
+                    <p>Sorry, the group you're looking for cannot be found.</p>
+                    <p>Try joining another group, or double check your group token is correct.</p>
+                    <button type="button" class="btn btn-primary" onclick="window.location.href='/userprofile'">
+                        Back to Profile
+                    </button>
+                </div>
             </div>
         </div>
     <%- include("templates/bottomNav") %>
