@@ -340,13 +340,37 @@ app.post('/signup', async (req, res) => {
             // Render the signup page with an error message
             return res.render('signup', { error: 'MissingFields', groupToken: req.body.groupToken });
         }
-        console.log(req.body.groupToken, 'groupToken')
+        
+        var userType;
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
-        var userType
+
+        const user = new usersModel({
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            email: req.body.email,
+            password: hashedPassword,
+            groupID: req.body.groupToken,
+            type: userType
+        });
+        await user.save();
+        req.session.authenticated = true;
+        req.session.firstName = req.body.firstName;
+        req.session.lastName = req.body.lastName;
+        req.session.password = hashedPassword;
+        req.session.email = req.body.email;
+        req.session.cookie.maxAge = 2147483647;
+        
         if (req.body.groupToken != null) {
             userType = 'member'
             var group = await groupsModel.find({ _id: req.body.groupToken }).exec();
-            var currentMembers = group[0].members;
+            try {
+                var currentMembers = group[0].members;
+            }
+            catch (error) {
+                console.log(error)
+                res.redirect('/userprofile/groupnotfound')
+                return
+            }
             var memberHasJoinedPreviously = false;
             for (var i = 0; i < currentMembers.length; i++) {
                 if (currentMembers[i].email == req.body.email) {
@@ -375,21 +399,6 @@ app.post('/signup', async (req, res) => {
                 }).exec();
             }
         }
-        const user = new usersModel({
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            email: req.body.email,
-            password: hashedPassword,
-            groupID: req.body.groupToken,
-            type: userType
-        });
-        await user.save();
-        req.session.authenticated = true;
-        req.session.firstName = req.body.firstName;
-        req.session.lastName = req.body.lastName;
-        req.session.password = hashedPassword;
-        req.session.email = req.body.email;
-        req.session.cookie.maxAge = 2147483647;
         res.redirect('/home');
     } catch (error) {
         console.error(error);
@@ -427,7 +436,14 @@ app.post('/login', async (req, res) => {
         req.session.cookie.maxAge = 2147483647;
         if (groupToken != null) {
             var group = await groupsModel.find({ _id: req.body.groupToken }).exec();
-            var currentMembers = group[0].members;
+            try {
+                var currentMembers = group[0].members;
+            }
+            catch (error) {
+                console.log(error)
+                res.redirect('/userprofile/groupnotfound')
+                return
+            }
             var memberHasJoinedPreviously = false;
             for (var i = 0; i < currentMembers.length; i++) {
                 if (currentMembers[i].email == req.body.email) {
