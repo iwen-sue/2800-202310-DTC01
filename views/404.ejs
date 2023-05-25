@@ -1,12 +1,47 @@
-<%- include("templates/header") %>
-<link rel="stylesheet" href="../style/common.css">
-<!-- cite css or js files here -->
-</head>
-<body>
-    <div class="content">
-        <!-- your code goes inside here -->
-        <h1 class="display-1 fw-bold">404</h1>
-    </div>
+<!-- The gif image is found at https://c-ssl.dtstatic.com/uploads/item/202002/26/20200226041958_mkuyr.thumb.1000_0.gif -->
 
+<%- include("templates/header") %>
+<link rel="stylesheet" href="/assets/common.css" />
+</head>
+
+<body>
+    <style>
+        html, body{
+            width:100%;
+            height:100%;
+            background-color: #e9d5fc;
+            overflow: hidden;
+        }
+
+        .NotFoundContent {
+            width:100%;
+            height:100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .noFoundText{
+            font-size:18px;
+            text-align: center;
+        }
+
+        .noFoundImage{
+            display: block;
+            width:100vw;
+        }
+    </style>
+    <%- include("templates/nav") %>
+    <div class="content NotFoundContent">
+        <!-- your code goes inside here -->
+        <h1 class="display-1 fw-bold" style="color:var(--text);">404</h1>
+        <p class="noFoundText">
+            Oops!<br>
+            The page does not exist
+        </p>
+        <img class="noFoundImage" src="/image/404.gif" alt="404 gif" />
+
+    </div>
+    <%- include("templates/bottomNav") %>
 </body>
 </html>
