@@ -5,13 +5,13 @@
 
 
 #imageInputHolder {
-    padding:0;
-    opacity:0;
-    position:fixed;
-    left:2vw;
-    bottom:10px;
-    z-index:0;
-    width:20px;
+    padding: 0;
+    opacity: 0;
+    position: fixed;
+    left: 2vw;
+    bottom: 10px;
+    z-index: 0;
+    width: 20px;
 }
 
 .chatBottomBox {
@@ -20,7 +20,7 @@
     left: 0;
     right: 0;
     height: 45px;
-    z-index:5;
+    z-index: 5;
     background-color: var(--backgroundWhite);
     box-shadow: 2px 2px 20px 2px rgba(0, 0, 0, .15);
 }
@@ -63,26 +63,43 @@
     position: relative;
 }
 
-.emojiIcon{
-    position:absolute;
-    right:-5px;
-    bottom:-5px;
+.emojiIcon {
+    position: absolute;
+    right: -5px;
+    bottom: -5px;
 }
 
 @keyframes shake {
-    0% { transform: translateX(0); }
-    20% { transform: translateX(-2px); }
-    40% { transform: translateX(2px); }
-    60% { transform: translateX(-1px); }
-    80% { transform: translateX(1px); }
-    100% { transform: translateX(0); }
-  }
-  
-  .emojiAnimate {
+    0% {
+        transform: translateX(0);
+    }
+
+    20% {
+        transform: translateX(-2px);
+    }
+
+    40% {
+        transform: translateX(2px);
+    }
+
+    60% {
+        transform: translateX(-1px);
+    }
+
+    80% {
+        transform: translateX(1px);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.emojiAnimate {
     animation: shake 0.4s;
     animation-iteration-count: 1;
-  }
-  
+}
+
 
 
 .chatMessageHeader {
@@ -111,7 +128,8 @@
 
 
 .chatNotification {
-    margin-top: 5px;
+    margin-top: 22px;
+    margin-bottom: 22px;
     text-align: center;
 }
 
@@ -136,16 +154,17 @@
 #container {
     overflow-y: auto;
 }
+
 .chatMessageBoxTwo {
     position: relative;
     flex: 1;
     background-color: unset;
     display: inline-block;
-    height:fit-content;
+    height: fit-content;
 }
 
 .delete-button {
-  visibility: hidden;
+    visibility: hidden;
 }
 
 .messageID {
@@ -153,9 +172,9 @@
 }
 
 .chatMessageBoxTwo:hover .delete-button {
-  visibility: visible;
-  color: red;
-  cursor: pointer;
+    visibility: visible;
+    color: red;
+    cursor: pointer;
 }
 
 
@@ -166,30 +185,30 @@
     align-items: flex-start;
 }
 
-.clientImage{
-    width:200px;
-    height:auto;
+.clientImage {
+    width: 200px;
+    height: auto;
     flex-grow: 1;
 }
 
-.aiSuggestion{
+.aiSuggestion {
     background-color: var(--beige);
-    height:fit-content;
-    width:90vw;
+    height: fit-content;
+    width: 90vw;
     position: fixed;
-    top:80px;
+    top: 80px;
     border-radius: 8px;
     opacity: 0;
     transition: all 0.7s;
     line-height: 25px;
     font-size: 15px;
     padding: 8px 15px;
-    color:rgb(187, 98, 95);
-    box-shadow:0px 0px 2px 2px rgba(197, 194, 194, 0.3);
-    font-weight:normal;
+    color: rgb(187, 98, 95);
+    box-shadow: 0px 0px 2px 2px rgba(197, 194, 194, 0.3);
+    font-weight: normal;
 }
 
-.aiSuggestionShow{
+.aiSuggestionShow {
     opacity: 1;
-    top:60px;
+    top: 60px;
 }
