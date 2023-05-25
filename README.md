@@ -56,7 +56,7 @@ Integrated Development Environments(IDEs): Visual Studio Code
 Deployment and hosting platforms: Heroku, GitHub
 ### Contents of Project Folder 
 Top level of project folder:
-
+```
 ├── .env
 ├── .gitignore
 ├── databaseConnection.js
@@ -144,7 +144,7 @@ Subfolers and files:
             /makeItinerary.ejs
             /nav.ejs
             /subNav.ejs
-
+```
 ### How to install or run the project
 Language(s): Javascript, EJS, and CSS
 IDEs: Visual Studio Code
