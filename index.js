@@ -801,24 +801,56 @@ app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
     const endTime = req.body.endTime;
     const country = req.body.country;
     const cities = citiesArray
-    const promptArgs = `Make an itinerary at ${cities} in ${country} from ${startDate} to ${endDate}, around ${startTime} to ${endTime} in a format {date :, schedule: [{"startTime":,"endTime":, "category":, "activity":, "transportation":  transportation with estimated time }]}, Make an object for each date in JSON format that is in an array. Assign dates properly in only one city considering distance. Include recommended transportation for each activity. Use the following categories to categorize each activity: ${categories}`;
     console.log("Generating itinerary...");
     const userEmail = req.session.email;
     const query = await usersModel.findOne({ email: userEmail });
     const groupID = query.groupID;
 
+    const itineraryMemory = [
+        {
+            date: "date",
+            schedule: [
+                {
+                    startTime: startTime,
+                    endTime: "endTime you estimate",
+                    category: "category you choose",
+                    activity: "recommend ",
+                    transportation: "transportation with estimated time"
+                }
+            ]
+        },
+    ];
+
+    const conversation = [
+        { role: 'system', content: `You are an Assistant that provides recommendations for trip itineraries in a format of ${JSON.stringify(itineraryMemory)} in an array.` },
+        { role: 'user', content: `I need help planning a trip to ${cities}.` },
+        { role: 'assistant', content: 'When are you planning to visit there' },
+        { role: 'user', content: `From ${startDate} to ${endDate}. I want to move from ${startTime} to ${endTime} per a day` },
+        { role: 'assistant', content: 'What are your preferred categories of activities?' },
+        { role: 'user', content: `I\'m interested in ${categories}.` },
+        { role: 'assistant', content: 'Let me generate an itinerary for you based on your preferences.' },
+        { role: 'user', content: `Don\'t forget to include transportation time` },
+    ];
 
     let itinerary; // Declare itinerary variable outside the promise chain
 
     try {
-        itinerary = await generateItinerary(promptArgs);
-        const parsedItinerary = JSON.parse(itinerary);
-        await saveItinerary(parsedItinerary, groupID, country);
-        res.status(200).json({ itinerary: parsedItinerary, message: "itinerary generated!" });
-    } catch (error) {
+        itinerary = await generateItinerary(conversation);
+        
+        // Extract the itinerary contents
+        const startIndex = itinerary.indexOf("[");
+        const endIndex = itinerary.lastIndexOf("]") + 1;
+        const itineraryContent = itinerary.substring(startIndex, endIndex);
+        const parsedItinerary = JSON.parse(itineraryContent);
+        console.log(parsedItinerary)
+        
+        await saveItinerary(parsedItinerary, groupID);
+        res.json({ itinerary: parsedItinerary });
+      } catch (error) {
         console.error("Error:", error);
         res.status(500).json({ error: "An error occurred" });
-    }
+      }
+      
 
 
 });
@@ -840,16 +872,21 @@ async function saveItinerary(itineraryJSON, groupID, country) {
 }
 
 
-async function generateItinerary(promptArgs) {
+async function generateItinerary(conversation) {
     const res = await openai.createChatCompletion({
         model: "gpt-3.5-turbo",
-        messages: [{ role: "user", content: promptArgs }],
-        temperature: 0.3,
-      });
-      console.log(res.data.choices[0].message.content)
-    
-      return res.data.choices[0].message.content; // Return the parsed object directly
-};
+        messages: [
+            { role: "user", content: JSON.stringify(conversation) },
+            { role: "system", content: "You are an Assistant that applies JSON format to an itinerary" }
+        ],
+        temperature: 0.2, // Adjust the temperature value for faster response time
+    });
+
+    let response = res.data.choices[0].message.content;
+
+    return response;
+}
+
   
 
 
