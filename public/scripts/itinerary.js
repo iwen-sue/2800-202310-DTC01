@@ -1,4 +1,4 @@
-
+var groupName = document.currentScript.getAttribute('groupName');
 
 var selectedCountry, selectedCities = [], readyToRemove, deleteSchedule, targetDate, referStartTime;
 const recommendedTrips = [
@@ -75,10 +75,43 @@ $(document).ready(function () {
     });
 
     function setup(){
-        var screenHeight = screen.height
-        document.getElementsByClassName("itineraryPlan")[0].setAttribute("style", `height:${screenHeight - 340}px`)
+        var elem = document.getElementsByClassName("itineraryPlan")
+        
+        if(elem.length >0){
+            var screenHeight = screen.height
+            elem[0].setAttribute("style", `height:${screenHeight - 340}px`)
+        }
+
+         // Client-side code
+    fetch('/itineraryData')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not OK');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log(data);
+
+        if (data && data.itinerary) {
+            const itinerary = data.itinerary;
+
+            console.log(itinerary);
+
+            insertItinerary(itinerary);
+        } else {
+            console.log('Invalid itinerary data');
+        }
+    })
+    .catch(error => {
+        console.error(error);
+    });
+        
     }
-    setup();
+
+    if(groupName != "Join a group First!"){
+        setup();
+    }
 
     
 
@@ -169,30 +202,7 @@ $(document).ready(function () {
     }
 
 
-    // Client-side code
-    fetch('/itineraryData')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not OK');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log(data);
-
-            if (data && data.itinerary) {
-                const itinerary = data.itinerary;
-
-                console.log(itinerary);
-
-                insertItinerary(itinerary);
-            } else {
-                console.log('Invalid itinerary data');
-            }
-        })
-        .catch(error => {
-            console.error(error);
-        });
+   
 });
 
 
@@ -246,7 +256,7 @@ function submitForm() {
         }
 
         if (checkBool) {
-            notify("AI is generating your request! please note that the respond might take longer if the itinerary duration is long.");
+            notify("AI is generating your request! please note that the respond might take longer if the travel duration is long.");
             $('#makeNewModal').modal("hide");
 
 
@@ -528,7 +538,7 @@ function notify(message){
     elem.setAttribute("style", "display:block;opacity:1;top:60px;");
     setTimeout(()=>{
         elem.setAttribute("style", "display:none;opacity:0;top:75px;");
-    }, 3000)
+    }, 8000)
 }
 
 function deleteActivity() {
@@ -563,12 +573,14 @@ function deleteActivity() {
 function submitAdjustDates() {
     var startDate = document.getElementById("startPickerAdjustValue").value
     var endDate = document.getElementById("endPickerAdjustValue").value
+    
     if (startDate != "" && endDate != "") {
         if (convertTime(endDate) >= convertTime(startDate)) {
             var postData = {
                 'startDate': startDate,
                 'endDate': endDate
             }
+            notify("AI is generating your request! please note that the respond might take longer if the travel duration is long.");
             fetch('/itinerary/adjustment', {
                 method: 'POST',
                 headers: {
