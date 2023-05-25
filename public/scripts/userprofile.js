@@ -14,7 +14,7 @@ if(imageData){
 
 
 function goTravelHistroy() {
-  window.location.href = "/userprofile/travel_history";
+  window.location.href = "/userprofile/travelHistory";
 }
 
 function convertImgToBase64(file, callback) {
