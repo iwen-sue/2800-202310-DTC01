@@ -23,6 +23,8 @@ function generalSetUp() {
     elem.setAttribute("style", `height:${viewHeight}px`);
 }
 
+
+
 function setup() {
     console.log(window.userName)
 
