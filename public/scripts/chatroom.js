@@ -12,7 +12,9 @@ console.log(userName)
 
 if (!groupID) {
     swal("please join a travel group to start chat!")
-    window.location.href = "/userprofile"
+    .then(() => {
+        window.location.href = "/userprofile"
+    })
 }
 
 const socket = io();
