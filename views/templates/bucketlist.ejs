@@ -69,7 +69,7 @@
                             <div class="modal-footer">
                                 <form action="/toHistory" method="post">
                                     <input type="hidden" name="bucketID" value="<%=bucketlist[i]._id %>">
-                                    <button type="submit" class="btn btn-secondary">Move to history</button>
+                                    <button type="submit" id="toHistoryBtn" class="btn btn-secondary">Move to history</button>
                                 </form>
                                 <button type="button" class="btn btn-primary" id="<%=bucketlist[i]._id %>" value="<%=bucketlist[i]._id %>" onclick="window.location.href = '/editBucket?cardID=<%= bucketlist[i]._id %>';">Edit</button>
                             </div>
@@ -89,4 +89,30 @@
     document.getElementById('addBucketList').onclick = function () {
         window.location.href = '/enterBucket'; 
     };
+
+    document.getElementById('toHistoryBtn').onclick = function (e) {
+        e.preventDefault();
+
+        swal({
+            title: "Are you sure?",
+            text: "We're moving this card to your history! You won't be able to make any more changes to it, but you can always find it in your travel history section.",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        }).then((willDelete) => {
+            if (willDelete) {
+
+                swal("Your card has been moved to your history!", {
+                    icon: "success",
+                }).then(() => {
+                    e.target.form.submit();
+                });
+            } else {
+                swal("Your card is safe!");
+            }
+        });
+
+    };
+
+
 </script>
