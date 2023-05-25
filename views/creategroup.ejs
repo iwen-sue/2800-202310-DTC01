@@ -37,7 +37,7 @@
     </head>
 
 <body>
-    <%- include('templates/nav') %>
+    <%- include('templates/subNav') %>
     <% if (error !=null) { %>
         <div class="alert alert-danger d-flex justify-content-center mx-auto" style="width: 80%" role="alert">
             <p class="alert-heading">
@@ -52,7 +52,7 @@
         </div>
     <% } %>
 
-    <div class="container">
+    <div class="container mt-5 pt-5">
         <form class="card text-center m-4" action="/groupconfirm" method="post">
             <div class="card-title mt-3">
                 <h1>Create Your Group!</h1>
