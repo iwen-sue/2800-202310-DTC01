@@ -248,30 +248,38 @@ async function submitForm() {
 
     if (startDate != "" && endDate != "" && startTime != "" && endTime != "" && selectedCountry != undefined && selectedCities != []) {
         if (checkBool==true && checkBoolTwo== true) {
-            notify("AI is generating your itinerary! Please note that the response time might take longer if the travel duration is long.");
+            // notify("AI is generating your itinerary! Please note that the response time might take longer if the travel duration is long.");
             $('#makeNewModal').modal("hide");
 
-
-            fetch('/itinerary/submitNew', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: new URLSearchParams(postData)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    
-                    notify(data.message);
-                    console.log(data)
-                    insertItinerary(data.itinerary);
-
-
+            swal({
+                title: "AI is generating your itinerary!",
+                text: "Please note that the response time might take longer if the travel duration is long.",
+                icon: "success",
+            }).then(() => {
+                fetch('/itinerary/submitNew', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams(postData)
                 })
-                .catch(error => {
-                    // Handle any errors
-                    console.error(error);
-                });
+                    .then(response => response.json())
+                    .then(data => {
+                        
+                        notify(data.message);
+                        console.log(data)
+                        insertItinerary(data.itinerary);
+                        window.location.href = "/home";
+    
+    
+                    })
+                    .catch(error => {
+                        // Handle any errors
+                        console.error(error);
+                    });
+            })
+
+
         } else {
             swal("Start time/ date can not be later than end time/date!")
         }
@@ -566,31 +574,40 @@ function submitAdjustDates() {
     
     if (startDate != "" && endDate != "") {
         if (convertTime(endDate) >= convertTime(startDate)) {
+            $("#adjustDateModal").modal("hide");
             var postData = {
                 'startDate': startDate,
                 'endDate': endDate
             }
-            notify("AI is generating your request! please note that the respond might take longer if the travel duration is long.");
-            fetch('/itinerary/adjustment', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: new URLSearchParams(postData)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    // Handle the response from the backend
-                    $("#adjustDateModal").modal("hide");
-                    notify(data.message);
-                    console.log("data", data.itinerary);
-                    insertItinerary(data.itinerary);
+            // notify("AI is generating your request! please note that the respond might take longer if the travel duration is long.");
+            swal({
+                title: "AI is generating your itinerary!",
+                text: "Please note that the response time might take longer if the travel duration is long.",
+                icon: "success",
+            }).then(() => {
 
+                fetch('/itinerary/adjustment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams(postData)
                 })
-                .catch(error => {
-                    // Handle any errors
-                    console.error(error);
-                });
+                    .then(response => response.json())
+                    .then(data => {
+                        // Handle the response from the backend
+                        
+                        notify(data.message);
+                        console.log("data", data.itinerary);
+                        insertItinerary(data.itinerary);
+                        window.location.href = "/home";
+    
+                    })
+                    .catch(error => {
+                        // Handle any errors
+                        console.error(error);
+                    });
+            })
         } else {
             //alert that starte date can not be latter than end Date
             swal("Please ensure the start date is ealier or equal to the end date!")
