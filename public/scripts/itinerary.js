@@ -248,30 +248,38 @@ async function submitForm() {
 
     if (startDate != "" && endDate != "" && startTime != "" && endTime != "" && selectedCountry != undefined && selectedCities != []) {
         if (checkBool==true && checkBoolTwo== true) {
-            notify("AI is generating your itinerary! Please note that the response time might take longer if the travel duration is long.");
+            // notify("AI is generating your itinerary! Please note that the response time might take longer if the travel duration is long.");
             $('#makeNewModal').modal("hide");
 
-
-            fetch('/itinerary/submitNew', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: new URLSearchParams(postData)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    
-                    notify(data.message);
-                    console.log(data)
-                    insertItinerary(data.itinerary);
-
-
+            swal({
+                title: "AI is generating your itinerary!",
+                text: "Please note that the response time might take longer if the travel duration is long.",
+                icon: "success",
+            }).then(() => {
+                fetch('/itinerary/submitNew', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams(postData)
                 })
-                .catch(error => {
-                    // Handle any errors
-                    console.error(error);
-                });
+                    .then(response => response.json())
+                    .then(data => {
+                        
+                        notify(data.message);
+                        console.log(data)
+                        insertItinerary(data.itinerary);
+                        window.location.href = "/home";
+    
+    
+                    })
+                    .catch(error => {
+                        // Handle any errors
+                        console.error(error);
+                    });
+            })
+
+
         } else {
             swal("Start time/ date can not be later than end time/date!")
         }
