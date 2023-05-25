@@ -221,21 +221,22 @@ function deleteFromArray(arr, value) {
     }
 }
 
-function deleteCity() {
-    $("#confirmModal").modal("hide");
-    readyToRemove.remove();
-    var text = readyToRemove.innerHTML;
-    deleteFromArray(selectedCities, text);
-    console.log(selectedCities);
-}
+function keepNumbersOnly(string) {
+    return Number(string.replace(/\D/g, ''));
+  }
+  
 
-function submitForm() {
+
+  
+
+async function submitForm() {
     var startDate = document.getElementById("startDateValue").value;
     var endDate = document.getElementById("endDateValue").value;
     var startTime = document.getElementById("startTimeValue").value;
     var endTime = document.getElementById("endTimeValue").value;
     console.log(selectedCities)
-    var checkBool = true;
+    var checkBool = await keepNumbersOnly(startTime) < keepNumbersOnly(endTime);
+    checkBoolTwo = await new Date(startDate) < new Date(endDate)
     var postData = {
         'startDate': startDate,
         'endDate': endDate,
@@ -246,16 +247,7 @@ function submitForm() {
     }
 
     if (startDate != "" && endDate != "" && startTime != "" && endTime != "" && selectedCountry != undefined && selectedCities != []) {
-
-        if (convertTime(endDate) < convertTime(startDate)) {
-            checkBool = false
-        }
-
-        if (convertTime(endTime) <= convertTime(startTime)) {
-            checkBool = false
-        }
-
-        if (checkBool) {
+        if (checkBool==true && checkBoolTwo== true) {
             notify("AI is generating your itinerary! Please note that the response time might take longer if the travel duration is long.");
             $('#makeNewModal').modal("hide");
 
@@ -484,10 +476,8 @@ function submitEdit() {
     var startTime = document.getElementById("startTimeEdit").value
     var endTime = document.getElementById("endTimeEdit").value
     var activity = document.getElementById("editActivity").value
-    var securityCheck = true
-    if (convertTime(endTime) > convertTime(startTime)) {
-        securityCheck = false
-    }
+    var securityCheck = keepNumbersOnly(endTime) > keepNumbersOnly(startTime)
+
     setTimeout(() => {
         if (securityCheck) {
 
