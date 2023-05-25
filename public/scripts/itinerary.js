@@ -269,7 +269,7 @@ async function submitForm() {
                         notify(data.message);
                         console.log(data)
                         insertItinerary(data.itinerary);
-                        window.location.href = "/home";
+                        // window.location.href = "/home";
     
     
                     })
