@@ -183,6 +183,7 @@ h1 {
 }
 /* swal alert button */
 .swal-button {
+    color: white !important;
     padding: 7px 19px;
     border-radius: 2px;
     background-color: #A72D8b;
