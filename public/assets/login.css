@@ -24,7 +24,7 @@ body#auth-background {
     margin: 0;
     border: none;
     cursor: pointer;
-    width: 50%;
+    width: 60%;
     font-size: small;
 }
 
@@ -69,3 +69,7 @@ body#auth-background {
     font-size: small;
 }
 
+a {
+    color: white;
+    text-decoration: none;
+}
