@@ -55,16 +55,17 @@ Package managers: npm
 Integrated Development Environments(IDEs): Visual Studio Code
 Deployment and hosting platforms: Heroku, GitHub
 ### Contents of Project Folder 
-│   .env
-│   .gitignore
-│   databaseConnection.js
-│   index.js
-│   package-lock.json
-│   package.json
-│   Procfile
-│   README.md
-│   utils.js
-│
+Top level of project folder
+├── .env
+├── .gitignore
+├── databaseConnection.js
+├── index.js
+├── package-lock.json
+├── package.json
+├── Procfile
+├── README.md
+└── utils.js
+
 ├───controller
 │       deleteBucket.js
 │       editBucket.js
