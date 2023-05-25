@@ -11,7 +11,7 @@ fileData.name = ""
 console.log(userName)
 
 if (!groupID) {
-    alert("please join a travel group to start chat!")
+    swal("please join a travel group to start chat!")
     window.location.href = "/userprofile"
 }
 
@@ -362,7 +362,7 @@ chatRoomView.addEventListener('click', function(event) {
         console.log(chatMessageText);
 
         if (userName != messagerName) {
-            alert("You can only delete your own message!");
+            swal("You can only delete your own message!");
             deleteBtn.style.display = 'none';
         } else if (confirm('Are you sure you want to delete this message?')) {
             // Code to handle the delete action
@@ -433,7 +433,7 @@ function upload(files) {
     console.log(fileData)
     if (fileData.size > maxSizeInBytes) {
         // File size exceeds the maximum limit
-        alert('File size exceeds the maximum limit of 5 MB.');
+        swal('File size exceeds the maximum limit of 5 MB.');
         // fileInput.value = null; // Reset the file input
     } else {
         // write file name in text input
