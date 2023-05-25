@@ -32,7 +32,8 @@
         <%- include("templates/nav") %>
             <div>
                 <% if (groupName != "Join a group First!") { %>
-                <h2 class="itineraryName"><%- groupName %></h2>
+                <h2 class="itineraryName"><%- groupName %><p class="countryName">destination: <%- country %></p></h2>
+                
                 <div class="itineraryPlan">
                     <p style="text-align: center;">no record to display</p>
                 </div>
@@ -52,8 +53,8 @@
             <%- include("templates/makeItinerary") %>
 
 
-                <%- include("templates/bottomNav") %>
-                    <script type="text/javascript" src="/scripts/itinerary.js"></script>
+            <%- include("templates/bottomNav") %>
+            <script type="text/javascript" src="/scripts/itinerary.js"></script>
 
 
     </body>

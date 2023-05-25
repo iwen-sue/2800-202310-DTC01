@@ -167,3 +167,17 @@ div#landingPage {
 h1 {
     color: black;
 }
+
+#primaryAlert {
+    position:fixed;
+    top:75px;
+    left:10vw;
+    width:80vw;
+    transition: all 0.3;
+    display: none;
+    opacity: 0;
+    height:fit-content;
+    padding-top:0;
+    z-index:10000000000000;
+    /* padding-bottom: 10px; */
+}
