@@ -1,10 +1,10 @@
 
-async function getSuggestion(promptArgs, apiKey) {
+async function getSuggestion(promptArgs, API_KEY) {
     const option = {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
+            'Authorization': `Bearer ${API_KEY}`
         },
         body: JSON.stringify({
             "model": "gpt-3.5-turbo",
@@ -97,13 +97,13 @@ const setup = () => {
                 console.log(selectedCity);
                 var promptArgs = `what can I do in ${selectedCity}, ${selectedCountry}. list 5 short sentences with few words`;
                 console.log(promptArgs);
+                // getSuggestion(promptArgs);
 
                 fetch('/api-key')
                     .then(response => response.json())
                     .then(data => {
                         const apiKey = data.apiKey;
                         // Use the API key in your client-side code
-                        // console.log(apiKey);
                         getSuggestion(promptArgs, apiKey);
                     })
                     .catch(error => {
