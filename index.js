@@ -148,6 +148,9 @@ app.get('/', (req, res) => {
 
 app.get('/home', sessionValidation, async (req, res) => {
     const userEmail = req.session.email;
+    const userName = req.session.firstName + " " + req.session.lastName
+    
+    
     try {
         const query = await usersModel.findOne({ email: userEmail });
         const groupID = query.groupID;
@@ -165,10 +168,11 @@ app.get('/home', sessionValidation, async (req, res) => {
 
             const itineraryQuery = await groupsModel.findById(groupID, 'itinerary');
             const itinerary = itineraryQuery.itinerary;
+            
 
             res.render('itinerary', { groupName: groupName + "'s Itinerary", itinerary: JSON.stringify(itinerary), country: country });
         } else {
-            res.render('itinerary', { groupName: "Join a group First!" });
+            res.render('itinerary', { userName: userName, groupName: "Join a group First!" });
         }
     } catch (err) {
         console.error(err);

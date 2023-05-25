@@ -28,9 +28,9 @@
     <!-- cite css or js files here -->
     </head>
 
-    <body>
+    <body style="height:100%;width:100%;">
         <%- include("templates/nav") %>
-            <div>
+
                 <% if (groupName != "Join a group First!") { %>
                 <h2 class="itineraryName"><%- groupName %><p class="countryName">destination: <%- country %></p></h2>
                 
@@ -45,16 +45,26 @@
 
                 </div>
                 <%} else{ %>
-                    <h3 class="itineraryName">Create or join a group to start your journey</h3>
-                    <div style="padding: 10vh 5vw; text-align: center;"><button type="button" class="btn btn-primary" style="width:100%; line-height: 35px;" onclick="window.location.href='/creategroup'">Create Group</button></div>
-                    <% } %>
+                    <div id="landingDisplay">
+                    <div>
+                    <h2 style="text-align: center;">Hi <%- userName %>!</h2>
+                    <p class="itineraryName">Create or join a group to start your journey</p>
+                    <div style="padding: 10vh 5vw; text-align: center;">
+                        <button type="button" class="btn btn-primary landingButtons" onclick="window.location.href='/creategroup'">Create Group</button>
+                        <button type="button" class="btn btn-primary landingButtons" onclick="window.location.href='/userprofile'">Join Group</button>
 
-            </div>
+                    </div>
+                    </div>
+                    </div>
+                    <% } %>
+                
+
+
             <%- include("templates/makeItinerary") %>
 
 
             <%- include("templates/bottomNav") %>
-            <script type="text/javascript" src="/scripts/itinerary.js"></script>
+            <script type="text/javascript" src="/scripts/itinerary.js" groupName='<%- groupName %>'></script>
 
 
     </body>

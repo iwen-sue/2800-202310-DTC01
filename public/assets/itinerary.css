@@ -1,5 +1,33 @@
+html, body{
+    width:100%;
+    height:100%;
+}
+
 .itineraryPlan{
     overflow:scroll;
+}
+
+#landingDisplay{
+    height:100%;
+    width:100%;
+    margin-top:-50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size:18px;
+}
+
+.landingButtons{
+    width:200px;
+    line-height: 40px;
+    border-radius: 20px;
+    padding:0;margin-bottom: 20px;
+}
+
+.itineraryName{
+    padding:20px;
+    text-align: center;
+    padding-bottom: 20px;
 }
 
 .countryName{
@@ -27,11 +55,7 @@ button[aria-expanded="true"] {
     border:none;
 }
 
-.itineraryName{
-    padding:20px 5vw;
-    padding-bottom: 20px;
-    color:black;
-}
+
 
 .itineraryBlockContainer{
     margin:10px 5vw;
