@@ -61,89 +61,90 @@ Top level of project folder:
 ├── .gitignore
 ├── databaseConnection.js
 ├── index.js
-├── package-lock.json
 ├── package.json
 ├── Procfile
-├── README.md
-└── utils.js
+├── utils.js
+└── README.md
 
-├───controller
-│       deleteBucket.js
-│       editBucket.js
-│       editProfile.js
-│       enterBucket.js
-│       toHistory.js
+Subfolers and files:
+├── controller
+│       /deleteBucket.js
+│       /editBucket.js
+│       /editProfile.js
+│       /enterBucket.js
+│       /toHistory.js
 │
 ├───models
-│       group.js
-│       user.js
+│       /group.js
+│       /user.js
 │
 ├───public
 │   ├───assets
-│   │       bucketlist.css
-│   │       chatroom.css
-│   │       common.css
-│   │       easteregg.css
-│   │       easteregg.mp3
-│   │       enterBucketList.css
-│   │       groupdetails.css
-│   │       itinerary.css
-│   │       login.css
-│   │       nav.css
-│   │       Travel details dataset.csv
-│   │       travelHistory.css
-│   │       userProfile.css
+│   │       /bucketlist.css
+│   │       /chatroom.css
+│   │       /common.css
+│   │       /easteregg.css
+│   │       /easteregg.mp3
+│   │       /enterBucketList.css
+│   │       /groupdetails.css
+│   │       /itinerary.css
+│   │       /login.css
+│   │       /nav.css
+│   │       /Travel details dataset.csv
+│   │       /travelHistory.css
+│   │       /userProfile.css
 │   │
 │   ├───image
-│   │       001.jpg
-│   │       logo-fontless.svg
-│   │       logo.svg
-│   │       vacapal.svg
+│   │       /001.jpg
+│   │       /logo-fontless.svg
+│   │       /logo.svg
+│   │       /vacapal.svg
 │   │
 │   ├───scripts
-│   │       chatroom.js
-│   │       common.js
-│   │       easteregg.js
-│   │       enterBucketList.js
-│   │       groupdetails.js
-│   │       itinerary.js
-│   │       resetPassword.js
-│   │       travelrecs.js
-│   │       userprofile.js
-│   │       validatetoken.js
+│   │       /chatroom.js
+│   │       /common.js
+│   │       /easteregg.js
+│   │       /enterBucketList.js
+│   │       /groupdetails.js
+│   │       /itinerary.js
+│   │       /resetPassword.js
+│   │       /travelrecs.js
+│   │       /userprofile.js
+│   │       /validatetoken.js
 │   │
 │   └───userProfileImages
-│           avatar-default.png
+│           /avatar-default.png
 │
 └───views
-    │   404.ejs
-    │   chatroom.ejs
-    │   creategroup.ejs
-    │   editBucket.ejs
-    │   emailconfirmation.ejs
-    │   enterBucket.ejs
-    │   errorMessage.ejs
-    │   forgotPassword.ejs
-    │   groupconfirm.ejs
-    │   groupdetails.ejs
-    │   groupnotfound.ejs
-    │   home.ejs
-    │   index.ejs
-    │   itinerary.ejs
-    │   login.ejs
-    │   resetPassword.ejs
-    │   signup.ejs
-    │   travelHistory.ejs
-    │   userprofile.ejs
+    │   /404.ejs
+    │   /chatroom.ejs
+    │   /creategroup.ejs
+    │   /editBucket.ejs
+    │   /emailconfirmation.ejs
+    │   /enterBucket.ejs
+    │   /errorMessage.ejs
+    │   /forgotPassword.ejs
+    │   /groupconfirm.ejs
+    │   /groupdetails.ejs
+    │   /groupnotfound.ejs
+    │   /home.ejs
+    │   /index.ejs
+    │   /itinerary.ejs
+    │   /login.ejs
+    │   /resetPassword.ejs
+    │   /signup.ejs
+    │   /travelHistory.ejs
+    │   /userprofile.ejs
     │
     └───templates
-            bottomNav.ejs
-            bucketlist.ejs
-            header.ejs
-            joinGroup.ejs
-            makeItinerary.ejs
-            nav.ejs
-            subNav.ejs
+            /bottomNav.ejs
+            /bucketlist.ejs
+            /header.ejs
+            /joinGroup.ejs
+            /makeItinerary.ejs
+            /nav.ejs
+            /subNav.ejs
+
 ### How to install or run the project
 Language(s): Javascript, EJS, and CSS
 IDEs: Visual Studio Code
