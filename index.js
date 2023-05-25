@@ -850,6 +850,7 @@ app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
         
         await saveItinerary(parsedItinerary, groupID, country);
         res.json({ itinerary: parsedItinerary, message: "Itinerary generated successfully!" });
+        res.redirect('/home');  // Redirect to home page
       } catch (error) {
         console.error("Error:", error);
         res.status(500).json({ error: "An error occurred", message:"An error occurred" });
