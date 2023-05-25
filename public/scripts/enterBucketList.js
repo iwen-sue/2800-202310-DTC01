@@ -120,7 +120,7 @@ const setup = () => {
     $('.submitBtn').on('click', function () {
         if ($('#country').val() == "" || $('#city').val() == "Select your destination city") {
             console.log('input error')
-            alert("Please select your destination country and city");
+            swal("Please select your destination country and city");
             return false;
         };
     });
