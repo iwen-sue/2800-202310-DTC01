@@ -276,6 +276,15 @@ app.get('/editBucket', (req, res) => {
 
 });
 
+// get api key from client-side , for Grace's use
+app.get('/api-key', (req, res) => {
+    // Fetch the API key from your server-side storage
+    const apiKey = process.env.OPENAI_API_KEY;
+  
+    // Return the API key as the response
+    res.json({ apiKey });
+  });
+
 app.get('/enterBucket', (req, res) => {
     res.render("enterBucket");
 });
@@ -441,44 +450,53 @@ app.post('/login', async (req, res) => {
         req.session.email = result[0].email;
         req.session.cookie.maxAge = 2147483647;
         if (groupToken != null) {
-            var group = await groupsModel.find({ _id: req.body.groupToken }).exec();
-            try {
-                var currentMembers = group[0].members;
-            }
-            catch (error) {
-                console.log(error)
-                res.redirect('/userprofile/groupnotfound')
-                return
-            }
-            var memberHasJoinedPreviously = false;
-            for (var i = 0; i < currentMembers.length; i++) {
-                if (currentMembers[i].email == req.body.email) {
-                    memberHasJoinedPreviously = true;
-                }
-            }
-            if (memberHasJoinedPreviously) {
-                for (var i = 0; i < currentMembers.length; i++) {
-                    if (currentMembers[i].email == email) {
-                        currentMembers[i].active = true;
-                    }
-                }
-                await groupsModel.updateOne({ _id: groupToken }, { $set: { members: currentMembers } }).exec();
+            console.log(result.groupID, "users group")
+            if (result[0].groupID !== null) {
+                console.log("belongs to a group already")
+                res.render('groupconfirm', { error: "You are already in a group. Please leave your current group before joining another.", groupName: null });
+                return;
             }
             else {
-                await groupsModel.updateOne({ _id: groupToken }, {
-                    $push: {
-                        members: {
-                            email: result[0].email,
-                            type: 'member',
-                            firstName: result[0].firstName,
-                            lastName: result[0].lastName,
-                            profilePic: result[0].profilePic,
-                            active: true
+                var group = await groupsModel.find({ _id: req.body.groupToken }).exec();
+                try {
+                    var currentMembers = group[0].members;
+                }
+                catch (error) {
+                    console.log(error)
+                    res.redirect('/userprofile/groupnotfound')
+                    return
+                }
+                var memberHasJoinedPreviously = false;
+                for (var i = 0; i < currentMembers.length; i++) {
+                    if (currentMembers[i].email == req.body.email) {
+                        memberHasJoinedPreviously = true;
+                    }
+                }
+                if (memberHasJoinedPreviously) {
+                    for (var i = 0; i < currentMembers.length; i++) {
+                        if (currentMembers[i].email == email) {
+                            currentMembers[i].active = true;
                         }
                     }
-                }).exec();
+                    await groupsModel.updateOne({ _id: groupToken }, { $set: { members: currentMembers } }).exec();
+                }
+                else {
+                    await groupsModel.updateOne({ _id: groupToken }, {
+                        $push: {
+                            members: {
+                                email: result[0].email,
+                                type: 'member',
+                                firstName: result[0].firstName,
+                                lastName: result[0].lastName,
+                                profilePic: result[0].profilePic,
+                                active: true
+                            }
+                        }
+                    }).exec();
+                }
+                await usersModel.updateOne({ email: result[0].email }, { $set: { groupID: groupToken, type: 'member' } }).exec();
             }
-            await usersModel.updateOne({ email: result[0].email }, { $set: { groupID: groupToken, type: 'member' } }).exec();
+
         }
         res.redirect('/home');
     }
@@ -608,7 +626,7 @@ app.post('/groupconfirm', sessionValidation, async (req, res) => {
         await newGroup.save();
         const group = await groupsModel.findOne({ groupName: groupName }).exec();
         await usersModel.updateOne({ email: req.session.email }, { $set: { groupID: group._id, type: 'leader' } }).exec();
-        res.render("groupconfirm", { groupName: req.body.groupName });
+        res.render("groupconfirm", { groupName: req.body.groupName, error: null });
     } catch (err) {
         res.render("creategroup", { error: "Group name is already taken. Please enter another group name." });
     }
