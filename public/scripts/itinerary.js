@@ -39,7 +39,8 @@ const itineraryIcons = {
     "Shopping": "shopping_bag",
     "Entertainment": "attractions",
     "Nature Exploration": "forest",
-    "Relaxation": "relax"
+    "Relaxation": "relax",
+    "other": "activity_zone"
 }
 
 
@@ -75,7 +76,7 @@ $(document).ready(function () {
 
     function setup(){
         var screenHeight = screen.height
-        document.getElementsByClassName("itineraryPlan")[0].setAttribute("style", `height:${screenHeight - 300}px`)
+        document.getElementsByClassName("itineraryPlan")[0].setAttribute("style", `height:${screenHeight - 340}px`)
     }
     setup();
 
@@ -211,11 +212,11 @@ function deleteFromArray(arr, value) {
 }
 
 function deleteCity() {
+    $("#confirmModal").modal("hide");
     readyToRemove.remove();
     var text = readyToRemove.innerHTML;
     deleteFromArray(selectedCities, text);
     console.log(selectedCities);
-    $("#confirmModal").modal("hide");
 }
 
 function submitForm() {
@@ -245,6 +246,8 @@ function submitForm() {
         }
 
         if (checkBool) {
+            notify("AI is generating your request! please note that the respond might take longer if the itinerary duration is long.");
+            $('#makeNewModal').modal("hide");
 
 
             fetch('/itinerary/submitNew', {
@@ -256,6 +259,8 @@ function submitForm() {
             })
                 .then(response => response.json())
                 .then(data => {
+                    
+                    notify(data.message);
                     console.log("data", data.itinerary)
                     insertItinerary(data.itinerary);
 
@@ -338,8 +343,12 @@ function insertItinerary(itineraryJSON) {
             const decoratorCircle = document.createElement('span');
             decoratorCircle.classList.add('decoratorCircle');
             decoratorCircle.classList.add('material-symbols-outlined');
-            decoratorCircle.innerHTML = itineraryIcons[schedule.category]
 
+            if(itineraryIcons[schedule.category]){
+                decoratorCircle.innerHTML = itineraryIcons[schedule.category]
+            }else{
+                decoratorCircle.innerHTML = itineraryIcons.other
+            }
             itineraryTimeDecorator.appendChild(decoratorCircle);
             itineraryTime.appendChild(itineraryTimeText);
             itineraryTime.appendChild(itineraryTimeDecorator);
@@ -492,6 +501,12 @@ function submitEdit() {
                 .then(data => {
                     // Handle the response from the backend
                     console.log(data);
+                    $("#editModal").modal("hide")
+                    notify(data.message);
+                    setTimeout(()=>{
+                        location.reload()
+                    },800)
+                    
                 })
                 .catch(error => {
                     // Handle any errors
@@ -506,11 +521,23 @@ function submitEdit() {
 
 }
 
+function notify(message){
+    var elem = document.getElementById("primaryAlert");
+    var messageElem = document.getElementById("alertMessage");
+    messageElem.innerText = message;
+    elem.setAttribute("style", "display:block;opacity:1;top:60px;");
+    setTimeout(()=>{
+        elem.setAttribute("style", "display:none;opacity:0;top:75px;");
+    }, 3000)
+}
+
 function deleteActivity() {
     var postData = {
         'deleteSchedule': JSON.stringify(deleteSchedule),
         'date': targetDate
     }
+
+    $("#confirmModal").modal("hide");
     fetch('/itinerary/delete', {
         method: 'POST',
         headers: {
@@ -522,6 +549,10 @@ function deleteActivity() {
         .then(data => {
             // Handle the response from the backend
             console.log(data);
+            notify(data.message);
+            setTimeout(()=>{
+                location.reload()
+            },800)
         })
         .catch(error => {
             // Handle any errors
@@ -548,7 +579,9 @@ function submitAdjustDates() {
                 .then(response => response.json())
                 .then(data => {
                     // Handle the response from the backend
-                    console.log("data", data.itinerary)
+                    $("#adjustDateModal").modal("hide");
+                    notify(data.message);
+                    console.log("data", data.itinerary);
                     insertItinerary(data.itinerary);
 
                 })
