@@ -6,9 +6,7 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
-// user prompt test
-
-
+// User prompt test
 const categories = [
     "Sightseeing",
     "Outdoor Adventure",
@@ -21,31 +19,53 @@ const categories = [
 ];
 
 const startDate = "2023-06-10";
-const endDate = "2023-06-12";
-const startTime = "09:00";
-const endTime = "19:00";
+const endDate = "2023-06-11";
+const scheduleStartTime = "09:00";
+const scheduleEndTime = "19:00";
 const country = "Canada";
 const cities = ["Vancouver", "Victoria"];
-const promptArgs = `Make an itinerary at ${cities} in ${country} from ${startDate} to ${endDate}, around ${startTime} to ${endTime} in a format {date :, schedule: [{"time":, "category":, "activity":, "transportation":  transportation with estimated time }]}, in JSON format as an array. Assign dates properly in only one city considering distance. Include recommended transportation for each activity. Use the following categories to categorize each activity: ${categories}`;
 
-async function generateItinerary() {
+const itineraryMemory = [
+    {
+        date: "date",
+        schedule: [
+            {
+                startTime: scheduleStartTime,
+                endTime: "endTime you estimate",
+                category: "category you choose",
+                activity: "recommend ",
+                transportation: "transportation with estimated time"
+            }
+        ]
+    },
+];
+
+const conversation = [
+    { role: 'system', content: `You are an Assistant that provides recommendations for trip itineraries in a format of ${JSON.stringify(itineraryMemory)} in an array.` },
+    { role: 'user', content: `I need help planning a trip to ${cities}.` },
+    { role: 'assistant', content: 'When are you planning to visit there' },
+    { role: 'user', content: `I\'ll be there from ${startDate} to ${endDate}. I want to move from ${scheduleStartTime} to ${scheduleEndTime} per a day` },
+    { role: 'assistant', content: 'What are your preferred categories of activities?' },
+    { role: 'user', content: `I\'m interested in ${categories}.` },
+    { role: 'assistant', content: 'Let me generate an itinerary for you based on your preferences.' },
+    { role: 'user', content: `Don\'t forget to include transportation time` },
+];
+
+async function generateItinerary(conversation) {
     const res = await openai.createChatCompletion({
         model: "gpt-3.5-turbo",
         messages: [
-            { role: "user", content: promptArgs },
+            { role: "user", content: JSON.stringify(conversation) },
+            { role: "system", content: "You are an Assistant that applies JSON format to an itinerary" }
         ],
-        temperature: 0.3,
+        temperature: 0.2, // Adjust the temperature value for faster response time
     });
 
-    return res.data.choices[0].message.content;
+    let response = res.data.choices[0].message.content;
+
+    return response;
 }
 
-console.log("Generating itinerary...");
-generateItinerary().then((res) => {
-    const jsonObj = JSON.parse(res);
-    console.dir(jsonObj, { depth: null });
+generateItinerary(conversation).then((res) => {
+    console.log(res) // Print the response content
 });
-
-
-
-// above are user prompt test
