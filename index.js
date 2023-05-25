@@ -155,12 +155,18 @@ app.get('/home', sessionValidation, async (req, res) => {
 
         if (groupQuery) {
             const groupName = groupQuery.groupName;
+            var country;
+            if(groupQuery.country){
+                country = groupQuery.country
+            }else{
+                country = "nothing here yet"
+            }
 
 
             const itineraryQuery = await groupsModel.findById(groupID, 'itinerary');
             const itinerary = itineraryQuery.itinerary;
 
-            res.render('itinerary', { groupName: groupName + "'s Itinerary", itinerary: JSON.stringify(itinerary) });
+            res.render('itinerary', { groupName: groupName + "'s Itinerary", itinerary: JSON.stringify(itinerary), country: country });
         } else {
             res.render('itinerary', { groupName: "Join a group First!" });
         }
@@ -807,8 +813,8 @@ app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
     try {
         itinerary = await generateItinerary(promptArgs);
         const parsedItinerary = JSON.parse(itinerary);
-        await saveItinerary(parsedItinerary, groupID);
-        res.json({ itinerary: parsedItinerary });
+        await saveItinerary(parsedItinerary, groupID, country);
+        res.status(200).json({ itinerary: parsedItinerary, message: "itinerary generated!" });
     } catch (error) {
         console.error("Error:", error);
         res.status(500).json({ error: "An error occurred" });
@@ -818,13 +824,19 @@ app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
 });
 
 
-async function saveItinerary(itineraryJSON, groupID) {
+async function saveItinerary(itineraryJSON, groupID, country) {
+    console.log(country)
     // Delete the existing itinerary array
     await groupsModel.updateOne({ _id: groupID }, { $unset: { itinerary: 1 } }).exec();
 
     // Create a new itinerary array and push the new itinerary into it
-    const update = { $push: { itinerary: { $each: itineraryJSON } } };
-    await groupsModel.updateOne({ _id: groupID }, update).exec();
+    if(country){
+        const update = { $push: { itinerary: { $each: itineraryJSON } }, $set: {country: country} };
+        await groupsModel.updateOne({ _id: groupID }, update).exec();
+    }else{
+        const update = { $push: { itinerary: { $each: itineraryJSON } } };
+        await groupsModel.updateOne({ _id: groupID }, update).exec();
+    }
 }
 
 
@@ -837,12 +849,10 @@ async function generateItinerary(promptArgs) {
       console.log(res.data.choices[0].message.content)
     
       return res.data.choices[0].message.content; // Return the parsed object directly
-    };
+};
   
 
-app.post('/itinerary/getRecommendation', sessionValidation, (req, res) => {
-    console.log(req.body)
-})
+
 
 
 app.post('/itinerary/adjustment', sessionValidation, async (req, res) => {
@@ -875,7 +885,7 @@ app.post('/itinerary/adjustment', sessionValidation, async (req, res) => {
         console.log("itienrary is generated")
         await saveItinerary(parsedItinerary, groupID);
         console.log("itinerary is saved")
-        res.json({ itinerary: parsedItinerary });
+        res.status(200).json({ message: "Activity deleted successfully",  itinerary: parsedItinerary});
     } catch (error) {
         console.error("Error:", error);
         res.status(500).json({ error: "An error occurred" });
@@ -915,7 +925,7 @@ app.post('/itinerary/edit', sessionValidation, async (req, res) => {
     };
 
     const updatedDocument = await groupsModel.findOneAndUpdate(filter, update, options);
-    console.log("Successfully updated");
+    res.status(200).json({ message: "edit updated successful!" });
   });
 
 
@@ -952,7 +962,7 @@ app.post('/itinerary/delete', sessionValidation, async (req, res) => {
         return;
     }
     console.log("Object deleted successfully")
-    res.status(200).json({ message: "Object deleted successfully" });
+    res.status(200).json({ message: "Activity deleted successfully" });
 });
 
 
