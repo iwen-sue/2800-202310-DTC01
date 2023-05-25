@@ -3,7 +3,7 @@
 ## VacaPal
 
 ### Project Description
-Our project, VacaPal, is developing a travel planning and coordination app to help friends split expenses and make informed decisions, with the help of sentiment analysis in chat rooms.
+Our project, VacaPal, is developing a travel planning and coordination app to help friends create travel itineraries and make informed decisions, with the help of sentiment analysis in chat rooms.
 
 ### Scope of functionalities
 * a sentiment analysis chatroom powered by OpenAI
