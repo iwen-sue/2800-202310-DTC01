@@ -15,19 +15,23 @@ html, body{
     justify-content: center;
     align-items: center;
     font-size:18px;
+    color:black;
 }
 
 .landingButtons{
-    width:200px;
-    line-height: 40px;
-    border-radius: 20px;
-    padding:0;margin-bottom: 20px;
+    width:220px;
+    line-height: 50px;
+    border-radius: 25px;
+    padding:0;
+    margin-bottom: 20px;
+    background-image: linear-gradient(60deg, #6f2c7b, #9f2d88);
+    font-size:20px;
 }
 
 .itineraryName{
     padding:20px;
     text-align: center;
-    padding-bottom: 20px;
+    padding-bottom: 0;
 }
 
 .countryName{

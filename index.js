@@ -926,7 +926,7 @@ app.post('/itinerary/adjustment', sessionValidation, async (req, res) => {
         console.log("itienrary is generated")
         await saveItinerary(parsedItinerary, groupID);
         console.log("itinerary is saved")
-        res.status(200).json({ message: "Activity deleted successfully",  itinerary: parsedItinerary});
+        res.status(200).json({ message: "Travel Dates adjusted successfully",  itinerary: parsedItinerary});
     } catch (error) {
         console.error("Error:", error);
         res.status(500).json({ error: "An error occurred" });

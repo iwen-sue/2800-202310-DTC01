@@ -17,6 +17,11 @@ function goTravelHistroy() {
   window.location.href = "/userprofile/travelHistory";
 }
 
+/**
+ * 
+ * @param {*} file 
+ * @param {*} callback 
+ */
 function convertImgToBase64(file, callback) {
   let reader = new FileReader();
   reader.readAsDataURL(file);
