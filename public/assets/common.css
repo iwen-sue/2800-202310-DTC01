@@ -197,3 +197,7 @@ h1 {
 .swal-button:hover {
     background-color: #872570 !important;
 }
+
+.swal-button--cancel {
+    background-color: var(--pink);
+}

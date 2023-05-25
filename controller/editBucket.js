@@ -30,7 +30,7 @@ router.post('/editBucket',upload.single('avatar'), async (req, res) => {
         }
     }
     );
-    res.redirect('/userprofile');
+    // res.redirect('/userprofile');
 
 });
 
