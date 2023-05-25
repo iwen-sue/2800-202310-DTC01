@@ -55,7 +55,8 @@ Package managers: npm
 Integrated Development Environments(IDEs): Visual Studio Code
 Deployment and hosting platforms: Heroku, GitHub
 ### Contents of Project Folder 
-Top level of project folder
+Top level of project folder:
+
 ├── .env
 ├── .gitignore
 ├── databaseConnection.js
