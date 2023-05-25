@@ -45,7 +45,10 @@ const groupsSchema = new mongoose.Schema({
     chatContext: {
         type: Array, 
     },
-    itinerary: [itinerarySchema]
+    itinerary: [itinerarySchema],
+    country: {
+      type: String
+    }
 });
 
 const groupsModel = mongoose.model('groups', groupsSchema);

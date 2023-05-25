@@ -2,6 +2,11 @@
     overflow:scroll;
 }
 
+.countryName{
+    font-size:18px;
+    line-height: 30px;
+}
+
 .dateTrigger{
     width:100%;
     line-height: 30px;
@@ -24,7 +29,7 @@ button[aria-expanded="true"] {
 
 .itineraryName{
     padding:20px 5vw;
-    padding-bottom: 30px;
+    padding-bottom: 20px;
     color:black;
 }
 
