@@ -256,7 +256,7 @@ function submitForm() {
         }
 
         if (checkBool) {
-            notify("AI is generating your request! please note that the respond might take longer if the travel duration is long.");
+            notify("AI is generating your itinerary! Please note that the response time might take longer if the travel duration is long.");
             $('#makeNewModal').modal("hide");
 
 
@@ -281,12 +281,12 @@ function submitForm() {
                     console.error(error);
                 });
         } else {
-            alert("start time/ date can not be later than end time/date!")
+            swal("Start time/ date can not be later than end time/date!")
         }
 
 
     } else {
-        alert("please select all fields!")
+        swal("Please fill in all the fields!")
     }
 
 
@@ -472,7 +472,7 @@ function getRecommendations() {
             });
 
     } else {
-        alert("Please select a start date to get an AI recommended trip!");
+        swal("Please select a start date to get an AI recommended trip!");
     }
 }
 
@@ -524,7 +524,7 @@ function submitEdit() {
                 });
 
         } else {
-            alert("end time can not be earlier than start time!")
+            swal("end time can not be earlier than start time!")
         }
 
     })
@@ -603,11 +603,11 @@ function submitAdjustDates() {
                 });
         } else {
             //alert that starte date can not be latter than end Date
-            alert("Please ensure the start date is ealier or equal to the end date!")
+            swal("Please ensure the start date is ealier or equal to the end date!")
         }
 
     } else {
-        alert("please select all fields!")
+        swal("Please fill out all fields!")
     }
 
 }
