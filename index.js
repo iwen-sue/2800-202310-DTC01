@@ -784,21 +784,21 @@ app.post('/uploadImage', sessionValidation, upload.single('imageData'), async (r
 
 })
 
-
+const categories = [
+    "Sightseeing",
+    "Outdoor Adventure",
+    "Cultural Experience",
+    "Food and Dining",
+    "Shopping",
+    "Entertainment",
+    "Nature Exploration",
+    "Relaxation"
+];
 
 app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
 
     var citiesArray = JSON.parse(req.body.cities);
-    const categories = [
-        "Sightseeing",
-        "Outdoor Adventure",
-        "Cultural Experience",
-        "Food and Dining",
-        "Shopping",
-        "Entertainment",
-        "Nature Exploration",
-        "Relaxation"
-    ];
+
     const startDate = req.body.startDate;
     const endDate = req.body.endDate;
     const startTime = req.body.startTime;
@@ -829,7 +829,7 @@ app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
         { role: 'system', content: `You are an Assistant that provides recommendations for trip itineraries in a format of ${JSON.stringify(itineraryMemory)} in an array.` },
         { role: 'user', content: `I need help planning a trip to ${cities}.` },
         { role: 'assistant', content: 'When are you planning to visit there' },
-        { role: 'user', content: `From ${startDate} to ${endDate}. I want to move from ${startTime} to ${endTime} per a day` },
+        { role: 'user', content: `From ${startDate} to ${endDate}. I want to move from ${startTime} to ${endTime} per a day. I want finish all activities at ${endTime}` },
         { role: 'assistant', content: 'What are your preferred categories of activities?' },
         { role: 'user', content: `I\'m interested in ${categories}.` },
         { role: 'assistant', content: 'Let me generate an itinerary for you based on your preferences.' },
@@ -892,6 +892,20 @@ async function generateItinerary(conversation) {
 }
 
   
+async function newItinerary(prompt) {
+    const res = await openai.createChatCompletion({
+        model: "gpt-3.5-turbo",
+        messages: [
+            { role: "user", content: prompt },
+            { role: "system", content: "You are an Assistant that applies JSON format to an itinerary" }
+        ],
+        temperature: 0.2, // Adjust the temperature value for faster response time
+    });
+
+    let response = res.data.choices[0].message.content;
+
+    return response;
+}
 
 
 
@@ -904,16 +918,7 @@ app.post('/itinerary/adjustment', sessionValidation, async (req, res) => {
     const groupQuery = await groupsModel.findOne({ _id: groupID });
     const preItinerary = groupQuery.itinerary;
 
-    const categories = [
-        "Sightseeing",
-        "Outdoor Adventure",
-        "Cultural Experience",
-        "Food and Dining",
-        "Shopping",
-        "Entertainment",
-        "Nature Exploration",
-        "Relaxation"
-    ];
+
     const startDate = req.body.startDate;
     const endDate = req.body.endDate;
     const promptArgs = `Make an itinerary from ${startDate} to ${endDate}, the same country, cities, startTime, and endTime as ${preItinerary} in a format {date :, schedule: [{"startTime":,"endTime":, "category":, "activity":, "transportation":  transportation with estimated time }]}, Make an object for each date in JSON format that is in an array. Assign dates properly in only one city considering distance. Include recommended transportation for each activity. Use the following categories to categorize each activity: ${categories}`;
@@ -921,18 +926,26 @@ app.post('/itinerary/adjustment', sessionValidation, async (req, res) => {
 
     let itinerary; // Declare itinerary variable outside the promise chain
     try {
-        itinerary = await generateItinerary(promptArgs);
-        const parsedItinerary = JSON.parse(itinerary);
-        console.log("itienrary is generated")
+        itinerary = await newItinerary(promptArgs);
+        console.log("Itinerary generated:", itinerary);
+        
+        const startIndex = itinerary.indexOf("[");
+        const endIndex = itinerary.lastIndexOf("]") + 1;
+        const itineraryContent = itinerary.substring(startIndex, endIndex);
+        console.log("Itinerary content:", itineraryContent); // Debugging line
+        
+        const parsedItinerary = JSON.parse(itineraryContent);
+        console.log("Parsed itinerary:", parsedItinerary); // Debugging line
+        
         await saveItinerary(parsedItinerary, groupID);
-        console.log("itinerary is saved")
-        res.status(200).json({ message: "Activity deleted successfully",  itinerary: parsedItinerary});
-    } catch (error) {
+        res.status(200).json({ message: "Activity deleted successfully", itinerary: parsedItinerary });
+      } catch (error) {
         console.error("Error:", error);
         res.status(500).json({ error: "An error occurred" });
-    }
-})
-
+      }
+      
+    });
+    
 app.post('/itinerary/edit', sessionValidation, async (req, res) => {
     const date = req.body.date;
     const referStartTime = req.body.referStartTime;
