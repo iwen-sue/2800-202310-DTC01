@@ -17,11 +17,6 @@ function goTravelHistroy() {
   window.location.href = "/userprofile/travelHistory";
 }
 
-/**
- * 
- * @param {*} file 
- * @param {*} callback 
- */
 function convertImgToBase64(file, callback) {
   let reader = new FileReader();
   reader.readAsDataURL(file);
@@ -38,11 +33,6 @@ function uploadImage(e) {
   var imageUrl = URL.createObjectURL(imageData);
   var elem = document.getElementById("imagePreviewHolder")
   elem.setAttribute("src", imageUrl)
-  
-  
-  // convertImgToBase64(event.target.files[0], function (base64) {
-  //   imageData = base64;
-  // });
 }
 
 function submitForm() {
@@ -60,24 +50,8 @@ function submitForm() {
   formData.append('homeCity', homeCity);
 
 
-  // const data = {
-  //   firstName: firstName,
-  //   lastName: lastName,
-  //   email: email,
-  //   homeCity: homeCity,
-  //   avatar: imageData
-  // }
-
-  // const urlEncodedData = new URLSearchParams();
-  // for (const [key, value] of Object.entries(data)) {
-  //   urlEncodedData.append(key, value);
-  // }
-
   fetch('/editProfile', {
     method: 'POST',
-    // headers: {
-    //   'Content-Type': 'multipart/form-data'
-    // },
     body: formData
   })
     .then(response => {
@@ -91,28 +65,7 @@ function submitForm() {
     .then(data => {
       console.log(data); // do something with the JSON response
       location.reload()
-      // document.getElementById("userAvatar").setAttribute("src", data.profilePic);
-      // document.getElementsByClassName("username")[0].innerHTML = data.firstName + " " + data.lastName;
-      // document.getElementById("userHome").innerHTML = data.homeCity;
-      
-
     })
-    .catch(error => {
-      alert('Error:', error)
-      console.error('Error:', error);
-    });
-
-    // const formData = new FormData();
-    // const newName = userId + ".png"
-    // formData.append('image', imageData, newName);
-
-    // fetch('/sendProfileImage', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'multipart/form-data'
-    //   },
-    //   body: formData
-    // })
 }
 
 function goCreateGroup(){
