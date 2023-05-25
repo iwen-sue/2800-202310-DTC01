@@ -282,13 +282,13 @@ app.get('/api-key', (req, res) => {
 app.get('/enterBucket', (req, res) => {
     res.render("enterBucket");
 });
-app.get('/userprofile/travel_history', (req, res) => {
+app.get('/userprofile/travelHistory', (req, res) => {
     const query = usersModel.findOne({
         email: req.session.email,
     });
     query.then((docs) => {
 
-        res.render("travel_history", { travelHistory: docs.travelHistory });
+        res.render("travelHistory", { travelHistory: docs.travelHistory });
 
     }).catch((err) => {
         console.error(err);
