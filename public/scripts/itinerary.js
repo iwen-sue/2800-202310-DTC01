@@ -314,6 +314,14 @@ function calculateEndDate(days, startDate) {
     return `${year}-${month}-${day}`;
 }
 
+function deleteCity() {
+    $("#confirmModal").modal("hide");
+    readyToRemove.remove();
+    var text = readyToRemove.innerHTML;
+    deleteFromArray(selectedCities, text);
+    console.log(selectedCities);
+}
+
 function insertItinerary(itineraryJSON) {
     if(itineraryJSON.length>0){
         const itineraryContainer = document.querySelector('.itineraryPlan');
