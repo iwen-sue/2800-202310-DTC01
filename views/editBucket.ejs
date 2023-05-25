@@ -9,7 +9,7 @@
     </head>
 
     <style>
-        form {
+        body .container {
             position: relative
         }
 
@@ -20,8 +20,8 @@
 
         .label-overlay {
             position: absolute;
-            top: -36%;
-            left: 98%;
+            top: -5%;
+            left: 95%;
             transform: translate(-50%, -50%);
             text-align: center;
             z-index: 1;
@@ -77,11 +77,11 @@
                         </div>
 
                         <!-- Button trigger modal -->
-                        <button type="button" class="btn btn-danger mr-2" data-toggle="modal" data-target="#deleteBucket" style="margin-bottom:70px;">
+                        <button type="submit" class="submitBtn btn btn-primary ml-2"  style="margin-bottom:70px; float: right;">Submit</button>
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteBucket" style="margin-bottom:70px; float: right;">
                             Delete
                         </button>
 
-                        <button type="submit" class="submitBtn btn btn-primary"  style="margin-bottom:70px;">Submit</button>
                         <!-- <span><label for="deletePost" class="pt-1">Delete</label></span> -->
 
                     </form>
@@ -104,8 +104,8 @@
                         <form action="/deleteBucket" method="POST" class="deleteForm">
                             <input type="hidden" class="form-control" name="cardID" value="<%= card._id %>">
                             <!-- <button id="deletePost" type="submit" class="deleteBtn btn btn-danger" style="display: none">Delete</button> -->
-                            <span data-dismiss="modal" style="margin-right: 10px;">Cancel</span>
-                            <button type="submit" class="btn btn-danger">Delete</button>
+                            <button type="submit" class="btn btn-danger" style="float: right">Delete</button>
+                            <button class="btn btn-secondary mr-2" data-dismiss="modal" style="float: right;">Cancel</button>
                         </form>
                     </div>
                 </div>
@@ -126,7 +126,18 @@
                     reader.readAsDataURL(this.files[0]);
                 }
             });
+
+            $('.submitBtn').click(function () {
+                swal("Your bucket list has been updated", {
+                    icon: "success",
+                }).then(() => {
+                    window.location.href = "/userprofile";
+                });
+            }
+        )
+
         });
+
     </script>
 
     </html>
