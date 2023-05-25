@@ -848,11 +848,11 @@ app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
         const parsedItinerary = JSON.parse(itineraryContent);
         console.log(parsedItinerary)
         
-        await saveItinerary(parsedItinerary, groupID);
-        res.json({ itinerary: parsedItinerary });
+        await saveItinerary(parsedItinerary, groupID, country);
+        res.json({ itinerary: parsedItinerary, message: "Itinerary generated successfully!" });
       } catch (error) {
         console.error("Error:", error);
-        res.status(500).json({ error: "An error occurred" });
+        res.status(500).json({ error: "An error occurred", message:"An error occurred" });
       }
       
 
@@ -942,7 +942,7 @@ app.post('/itinerary/adjustment', sessionValidation, async (req, res) => {
         res.status(200).json({ message: "Travel Dates adjusted successfully",  itinerary: parsedItinerary});
     } catch (error) {
         console.error("Error:", error);
-        res.status(500).json({ error: "An error occurred" });
+        res.status(500).json({ error: "An error occurred", message:"An error occurred" });
       }
       
     });

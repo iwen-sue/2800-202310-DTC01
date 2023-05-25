@@ -271,7 +271,7 @@ function submitForm() {
                 .then(data => {
                     
                     notify(data.message);
-                    console.log("data", data.itinerary)
+                    console.log(data)
                     insertItinerary(data.itinerary);
 
 
