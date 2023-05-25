@@ -1,4 +1,5 @@
 /* Path Type: public\assets\css */
+@import url(https://fonts.googleapis.com/css2?family=Mulish:wght@500&display=swap);
 
 /* this file includes some common css settings for all pages */
 :root {
@@ -29,6 +30,7 @@
 
 html, body {
     color: var(--text);
+    font-family: 'Mulish';
 }
 
 .background {
