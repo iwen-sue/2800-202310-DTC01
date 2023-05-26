@@ -509,7 +509,7 @@ function submitEdit() {
     var startTime = document.getElementById("startTimeEdit").value
     var endTime = document.getElementById("endTimeEdit").value
     var activity = document.getElementById("editActivity").value
-    var securityCheck = keepNumbersOnly(endTime) > keepNumbersOnly(startTime)
+    var securityCheck = keepNumbersOnly(endTime) > keepNumbersOnly(startTime) && activity.replace(/\s/g, "") != "";
 
     setTimeout(() => {
         if (securityCheck) {
@@ -554,7 +554,7 @@ function submitEdit() {
                 });
 
         } else {
-            swal("end time can not be earlier than start time!")
+            swal("end time can not be earlier than start time! Activity can not be empty!")
         }
 
     })
