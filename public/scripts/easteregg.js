@@ -49,15 +49,15 @@ $(document).ready(function() {
                         console.log(music.volume)
                     }, 2000)
                 </script>
-            `)
+            `);
             $(document).scrollTop($(document).height());
             setTimeout(function() {
                 $(".dance-animation").addClass("paused");
                 setTimeout(function() {
                     location.reload();
                     $(document).scrollTop();
-                }, 1700)
-            }, 60000*(2 + Math.floor(3/60)))
+                }, 1700);
+            }, 60000*(2 + Math.floor(3/60)));
             
             $("span.background").click(function() {
                 $(".dance-animation").addClass("paused");
@@ -65,7 +65,7 @@ $(document).ready(function() {
                 setTimeout(function() {
                     location.reload();
                     $(document).scrollTop();
-                }, 1700)
+                }, 1700);
             });
         }
     });

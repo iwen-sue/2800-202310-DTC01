@@ -15,20 +15,6 @@ function isAlphanumeric(inputString) {
  * @returns {boolean} - True if the token is valid, false otherwise
  */
 function validateToken(token) {
-    return token.length == 24 && isAlphanumeric(token);    
+    return token.length == 24 && isAlphanumeric(token);
 }
-
-$(document).ready(function () {
-    $("#joinBtn").click(function (e) {
-        var groupToken = $("#groupToken").val().trim();
-        if (groupToken == "") {
-            e.preventDefault();
-            swal("Please enter a group token.");
-            return;
-        }
-        if (!validateToken(groupToken)) {
-            e.preventDefault();
-            swal("The token must be 24 characters long and contain only alphanumeric characters.");
-        }
-    });
-});
+module.exports = validateToken;
