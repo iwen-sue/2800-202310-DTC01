@@ -1,10 +1,8 @@
 $(document).ready(function () {
     $("button.removeMember").click(function () {
-        console.log("remove member");
+        // activate remove member modal
         var memberEmail = $(this).attr("id");
         var memberName = $(this).attr("memberName");
-        console.log(memberEmail)
-        console.log(memberName)
         $("#modal-title-remove").text("Remove " + memberName + " from the group?");
         $("#modal-body-remove").html(`
             <p>${memberName} will lose access to the group's itinerary plan and chatroom history!</p>
