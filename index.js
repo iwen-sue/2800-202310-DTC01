@@ -357,7 +357,7 @@ app.post('/signup', async (req, res) => {
         // Check if all required fields are present
         if (!req.body.firstName || !req.body.lastName || !req.body.email || !req.body.password) {
             // Render the signup page with an error message
-            return res.render('signup', { error: 'MissingFields', groupToken: req.body.groupToken });
+            return res.render('signup', { error: 'MissingFields', groupToken: req.body.groupToken});
         }
         
         var userType;
@@ -436,14 +436,14 @@ app.post('/login', async (req, res) => {
     const validationResult = schema.validate(email);
     if (validationResult.error != null) {
         var error = "Invalid email format. Please enter a valid email address.";
-        return res.render("login", { error: error, errorType: 'InvalidEmailFormat', groupToken: groupToken });
+        return res.render("login", { error: error, errorType: 'InvalidEmailFormat', groupToken: groupToken, email: "" });
     }
 
     const result = await usersModel.find({ email: email }).select('email type firstName lastName password profilePic _id').exec();
 
     if (result.length == 0) {
         var error = "User is not found";
-        return res.render("login", { error: error, errorType: 'UserNotFound', groupToken: groupToken });
+        return res.render("login", { error: error, errorType: 'UserNotFound', groupToken: groupToken, email: ""});
     }
     if (await bcrypt.compare(password, result[0].password)) {
         console.log("password is correct");
@@ -457,7 +457,7 @@ app.post('/login', async (req, res) => {
             console.log(result.groupID, "users group")
             if (result[0].groupID !== null) {
                 console.log("belongs to a group already")
-                res.render('groupconfirm', { error: "You are already in a group. Please leave your current group before joining another.", groupName: null });
+                res.render('groupconfirm', { error: "You are already in a group. Please leave your current group before joining another.", groupName: null, email: email  });
                 return;
             }
             else {
@@ -506,7 +506,7 @@ app.post('/login', async (req, res) => {
     }
     else {
         var error = "Password is not correct";
-        return res.render("login", { error: error, errorType: 'IncorrectPassword', groupToken: groupToken });
+        return res.render("login", { error: error, errorType: 'IncorrectPassword', groupToken: groupToken, email: email  });
     }
 });
 
