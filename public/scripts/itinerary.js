@@ -277,7 +277,7 @@ async function submitForm() {
                         notify(data.message);
                         console.log(data)
                         insertItinerary(data.itinerary);
-                        window.location.href = "/home";
+                        // window.location.href = "/home";
     
     
                     })
@@ -458,25 +458,34 @@ function getRecommendations() {
         $("#endDateValue").val(endDate);
         $("#startTimeValue").val("09:00");
         $("#endTimeValue").val("18:00");
-        $("#selectedCities").empty().append(
-            `<span class="cityItem" onclick="handleCity(${recCity})">${recCity}</span>`
-        );
+        $("#selectedCities").empty()
+        var span = document.createElement('span');
+        span.classList.add('cityItem');
+        span.textContent = recCity
+        span.addEventListener('click', handleCityClick);
+        selectedCities.push(recCity);
+        document.getElementById("selectedCities").appendChild(span);
+
         fetch("https://countriesnow.space/api/v0.1/countries")
             .then((response) => response.json())
             .then((data) => {
                 // Iterate over the city data and create city options
                 data.data.forEach((country) => {
                     if (country.country === recCountry) {
+                        $("#city").empty();
                         country.cities.forEach((city) => {
                             var option = document.createElement("li");
                             option.innerHTML = city;
                             option.addEventListener("click", function (e) {
                                 // Code to be executed when the li element is clicked
                                 console.log(e.target.innerHTML);
-                                selectedCities.push(e.target.innerHTML);
-                                var html = document.getElementById("selectedCities").innerHTML;
-                                html += `<span class="cityItem" onclick="handleCity(${e.target.innerHTML})">${e.target.innerHTML}</span>`;
-                                document.getElementById("selectedCities").innerHTML = html;
+                                var span = document.createElement('span');
+                                span.classList.add('cityItem');
+                                span.textContent = e.target.innerHTML;
+                                span.addEventListener('click', handleCityClick);
+                                console.log(e.target.innerHTML);
+                                selectedCities.push(e.target.innerHTML)
+                                document.getElementById("selectedCities").appendChild(span);
                             });
                             $("ul#city").append(option);
                         });
