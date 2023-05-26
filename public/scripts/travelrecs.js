@@ -4,6 +4,12 @@ const { parse } = require("csv-parse");
 const data = [];
 var countriesAndLength = [];
 
+/**
+ * calculate the average duration for each place in the given array.
+ * 
+ * @param {Array} jsonArray - target array information needs to calculate
+ * @returns {Array} - the calculated results
+ */
 function calculateAverageDuration(jsonArray) {
 // Create an object to store the sum and count for each place
     const placeData = {};
@@ -33,7 +39,6 @@ function calculateAverageDuration(jsonArray) {
         const averageDuration = Math.round(placeData[place].sum / placeData[place].count);
         result.push({ Place: place, AverageDuration: averageDuration });
     }
-
     return result;
 }
 

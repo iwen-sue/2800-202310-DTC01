@@ -1,5 +1,5 @@
 /**
- * Check if the given input is alphanumeric
+ * Check if the given input is alphanumeric.
  * Source: ChatGPT
  * @param {any} inputString - The input string to check
  * @returns {boolean} - True if the input string is alphanumeric, false otherwise
@@ -10,7 +10,7 @@ function isAlphanumeric(inputString) {
 }
 
 /**
- * Check if the given token is valid; i.e. 24 characters long and only contains alphanumeric characters
+ * Check if the given token is valid; i.e. 24 characters long and only contains alphanumeric characters.
  * @param {any} token - The token to check
  * @returns {boolean} - True if the token is valid, false otherwise
  */

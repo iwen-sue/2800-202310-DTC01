@@ -3,7 +3,6 @@
     background-color: #f4eef4;
 }
 
-
 #imageInputHolder {
     padding: 0;
     opacity: 0;
@@ -100,8 +99,6 @@
     animation-iteration-count: 1;
 }
 
-
-
 .chatMessageHeader {
     position: absolute;
     top: 7px;
@@ -126,20 +123,15 @@
     font-weight: bold;
 }
 
-
 .chatNotification {
     margin-top: 22px;
     margin-bottom: 22px;
     text-align: center;
 }
 
-/* .chatNotification{
-    height: 50px;
-    margin-top:20px;
-    margin-bottom:22px;
-    text-align: center;
-} */
-
+#chatBackGround {
+    overflow:hidden;
+}
 
 #chatRoomView::-webkit-scrollbar {
     display: none

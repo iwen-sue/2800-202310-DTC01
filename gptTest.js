@@ -22,7 +22,6 @@ const startDate = "2023-06-10";
 const endDate = "2023-06-11";
 const scheduleStartTime = "09:00";
 const scheduleEndTime = "19:00";
-const country = "Canada";
 const cities = ["Vancouver", "Victoria"];
 
 const itineraryMemory = [
@@ -51,6 +50,12 @@ const conversation = [
     { role: 'user', content: `Don\'t forget to include transportation time` },
 ];
 
+/**
+ * generate itinenary test playground using openAI api.
+ * 
+ * @param {Object} conversation - JSON object contains conversation information
+ * @returns {*} - the response from AI
+ */
 async function generateItinerary(conversation) {
     const res = await openai.createChatCompletion({
         model: "gpt-3.5-turbo",
@@ -60,12 +65,13 @@ async function generateItinerary(conversation) {
         ],
         temperature: 0.2, // Adjust the temperature value for faster response time
     });
-
     let response = res.data.choices[0].message.content;
-
     return response;
 }
 
+/**
+ * print out play ground test respond in console.
+ */
 generateItinerary(conversation).then((res) => {
     console.log(res) // Print the response content
 });

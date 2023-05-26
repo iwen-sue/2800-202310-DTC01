@@ -1,6 +1,4 @@
 <%- include("templates/header") %>
-    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
-
     <!-- bootstrap 4 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"></script>
@@ -145,14 +143,9 @@
                     </div>
                 </div>
             </div>
-
-
             <%- include("templates/joinGroup") %>
-
             <%- include("templates/bucketlist", { bucketlist: user.bucketlist}) %>
-
                 <%- include("templates/bottomNav") %>
                     <script src="/scripts/userprofile.js" imageData="<%= user.profilePic %>"></script>
     </body>
-
-    </html>
+</html>

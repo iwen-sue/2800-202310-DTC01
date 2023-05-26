@@ -1,16 +1,13 @@
 require("../utils.js");
 const express = require('express');
-// const session = require('express-session');
 const usersModel = require('../models/user.js');
 const router = express.Router();
-
-const multer = require('multer');  // npm install multer
+const multer = require('multer');
 const storage = multer.memoryStorage(); // store the file in memory as a buffer
 const upload = multer({ storage: storage }); // specify the storage option
 
-
-
 router.post('/editBucket',upload.single('avatar'), async (req, res) => {
+    //cath the data user sent with the help of multer, store it in database.
     const query = usersModel.findOne({
         email: req.session.email,
     });
@@ -30,8 +27,6 @@ router.post('/editBucket',upload.single('avatar'), async (req, res) => {
         }
     }
     );
-    // res.redirect('/userprofile');
-
 });
 
 module.exports = router;
