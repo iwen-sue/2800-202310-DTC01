@@ -2,8 +2,6 @@ require("../utils.js");
 const express = require('express');
 const usersModel = require('../models/user.js');
 const groupsModel = require('../models/group.js');
-var { database } = include('databaseConnection');
-const mongodb_database = process.env.MONGODB_DATABASE;
 const router = express.Router();
 const multer = require('multer'); 
 const storage = multer.memoryStorage(); // store the file in memory as a buffer
