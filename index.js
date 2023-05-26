@@ -235,21 +235,32 @@ app.get('/userprofile', sessionValidation, async (req, res) => {
     });
 });
 
+// import the necessary modules
 const bucketlist = require('./controller/enterBucket.js');
 const toHistory = require('./controller/toHistory.js');
 const editBucket = require('./controller/editBucket.js');
 const deleteBucket = require('./controller/deleteBucket.js');
 
+// catch the enter bucket list request and run defined behaviors imported from module.
 app.post('/enterBucket', bucketlist)
+
+// catch request for moving bucket list to history and run defined behaviors imported from module.
 app.post('/toHistory', toHistory)
+
+// catch request for editing the bucket list and run defined behaviors imported from module.
 app.post('/editBucket', editBucket)
+
+// catch request for deleting bucket list and run defined behaviors imported from module.
 app.post('/deleteBucket', deleteBucket)
 
+// import the necessary modules
 const editProfile = require('./controller/editProfile.js');
 const { Server } = require("net");
 
+// post request for editProfile
 app.post('/editProfile', editProfile);
 
+// render editBucket page
 app.get('/editBucket', (req, res) => {
     const query = usersModel.findOne({
         email: req.session.email,
