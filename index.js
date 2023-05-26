@@ -306,11 +306,15 @@ app.get('/userprofile/travelHistory', (req, res) => {
 });
 
 app.get('/signup', (req, res) => {
+    const firstName = "";
+    const lastName = "";
+    const email = "";
+    const password = "";
     if (req.query.groupToken != null) {
-        res.render("signup", { groupToken: req.query.groupToken });
+        res.render("signup", { groupToken: req.query.groupToken, firstName: firstName, lastName: lastName, email: email, password: password });
     }
     else {
-        res.render("signup", { groupToken: null });
+        res.render("signup", { groupToken: null, firstName: firstName, lastName: lastName, email: email, password: password });
     }
 });
 
@@ -356,10 +360,14 @@ app.post('/signup', async (req, res) => {
     try {
         // Check if all required fields are present
         if (!req.body.firstName || !req.body.lastName || !req.body.email || !req.body.password) {
-            // Render the signup page with an error message
-            return res.render('signup', { error: 'MissingFields', groupToken: req.body.groupToken});
-        }
+            const firstName = req.body.firstName || '';
+            const lastName = req.body.lastName || '';
+            const email = req.body.email || '';
+            const password = req.body.password || '';
         
+            return res.render('signup', { error: 'MissingFields', groupToken: req.body.groupToken, firstName, lastName, email, password });
+        }
+
         var userType;
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
@@ -514,10 +522,9 @@ app.post('/login', async (req, res) => {
 app.post('/forgotPassword', async (req, res) => {
     try {
         const email = req.body.email;
-        console.log(email)
         const user = await usersModel.findOne({ email: email }).exec();
         if (!user) {
-            return res.render('forgotPassword', { error: 'UserNotFound' });
+            return res.render('forgotPassword', { error: 'UserNotFound', email: "" });
         }
         const resetToken = crypto.randomBytes(20).toString('hex');
 
@@ -534,7 +541,7 @@ app.post('/forgotPassword', async (req, res) => {
 
 
         await user.save().then(async () => {
-            res.render('forgotPassword', { success: 'Email is successfully sent.' });
+            res.render('forgotPassword', { success: 'Email is successfully sent.', email: email });
         }).catch((err) => {
             console.log(err);
         });
@@ -569,10 +576,10 @@ app.post('/forgotPassword', async (req, res) => {
                 `,
         };
         await transporter.sendMail(mailOptions);
-        res.render('forgotPassword', { success: 'EmailSent' });
+        res.render('forgotPassword', { success: 'EmailSent', email: email });
     } catch (error) {
         console.error(error);
-        res.render('forgotPassword', { error: 'Error' });
+        res.render('forgotPassword', { error: 'Error', email: email });
     }
 });
 
