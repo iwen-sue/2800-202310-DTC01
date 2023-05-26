@@ -51,14 +51,17 @@ const conversation = [
     { role: 'user', content: `Don\'t forget to include transportation time` },
 ];
 
-async function generateItinerary(conversation) {
+async function generateItinerary() {
+    console.log("Generating itinerary...");
+    console.time("programRuntime");
+
     const res = await openai.createChatCompletion({
         model: "gpt-3.5-turbo",
         messages: [
-            { role: "user", content: JSON.stringify(conversation) },
+            { role: "user", content: "give me from June 3rd to June 11th from 9:00 to 19:00 travel itinerary in Mexico City and its surroundings in JSON format" },
             { role: "system", content: "You are an Assistant that applies JSON format to an itinerary" }
         ],
-        temperature: 0.2, // Adjust the temperature value for faster response time
+        temperature: 0.5, // Adjust the temperature value for faster response time
     });
 
     let response = res.data.choices[0].message.content;
@@ -66,6 +69,12 @@ async function generateItinerary(conversation) {
     return response;
 }
 
-generateItinerary(conversation).then((res) => {
+
+
+generateItinerary().then((res) => {
     console.log(res) // Print the response content
+    console.timeEnd("programRuntime");
+    const runtimeInSeconds = (performance.now() / 1000).toFixed(2);
+    console.log(`Program runtime: ${runtimeInSeconds} seconds`);
 });
+
