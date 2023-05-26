@@ -130,6 +130,19 @@ function adminAuthorization(req, res, next) {
     }
 }
 // middleware function finishes
+function isInGroup(id) {
+    const schema = Joi.string().min(22).max(25).hex();
+    const result = schema.validate(id);
+    if (result.error) {
+        return false;
+    }
+    if (id == null || id == undefined) {
+        return false;
+    }
+    return true;
+}
+console.log(isInGroup(null))
+console.log(isInGroup(undefined))
 
 app.use('/', (req, res, next) => {  // for local variables
     next();
@@ -439,7 +452,7 @@ app.post('/login', async (req, res) => {
         return res.render("login", { error: error, errorType: 'InvalidEmailFormat', groupToken: groupToken });
     }
 
-    const result = await usersModel.find({ email: email }).select('email type firstName lastName password profilePic _id').exec();
+    const result = await usersModel.find({ email: email }).select('email type firstName lastName password profilePic groupID _id').exec();
 
     if (result.length == 0) {
         var error = "User is not found";
@@ -454,9 +467,7 @@ app.post('/login', async (req, res) => {
         req.session.email = result[0].email;
         req.session.cookie.maxAge = 2147483647;
         if (groupToken != null) {
-            console.log(result.groupID, "users group")
-            if (result[0].groupID !== null) {
-                console.log("belongs to a group already")
+            if (isInGroup(result[0].groupID)) {
                 res.render('groupconfirm', { error: "You are already in a group. Please leave your current group before joining another.", groupName: null });
                 return;
             }
