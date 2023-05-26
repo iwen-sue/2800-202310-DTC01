@@ -19,7 +19,7 @@ const categories = [
 ];
 
 const startDate = "2023-06-10";
-const endDate = "2023-06-11";
+const endDate = "2023-06-15";
 const scheduleStartTime = "09:00";
 const scheduleEndTime = "19:00";
 const country = "Canada";
@@ -40,25 +40,37 @@ const itineraryMemory = [
     },
 ];
 
-const conversation = [
-    { role: 'system', content: `You are an Assistant that provides recommendations for trip itineraries in a format of ${JSON.stringify(itineraryMemory)} in an array.` },
-    { role: 'user', content: `I need help planning a trip to ${cities}.` },
-    { role: 'assistant', content: 'When are you planning to visit there' },
-    { role: 'user', content: `I\'ll be there from ${startDate} to ${endDate}. I want to move from ${scheduleStartTime} to ${scheduleEndTime} per a day` },
-    { role: 'assistant', content: 'What are your preferred categories of activities?' },
-    { role: 'user', content: `I\'m interested in ${categories}.` },
-    { role: 'assistant', content: 'Let me generate an itinerary for you based on your preferences.' },
-    { role: 'user', content: `Don\'t forget to include transportation time` },
-];
 
-async function generateItinerary(conversation) {
+var cityDates
+
+let assignDateUserPromt = `I want to go ${cities} From ${startDate} to ${endDate}. Assign the dates for each city. Format must be like "city": {"start_date": "2023-06-10", "end_date": "2023-06-12", "duration": number}. You don't need to show anything else. Don't include`;
+
+async function assignDay(startDate, endDate, cities, assignDateUserPromt) {
     const res = await openai.createChatCompletion({
         model: "gpt-3.5-turbo",
         messages: [
-            { role: "user", content: JSON.stringify(conversation) },
-            { role: "system", content: "You are an Assistant that applies JSON format to an itinerary" }
+            { role: "system", content: "You are an Assistant that make response a valid JSON string. Don't inlucde backticks in response" },
+            { role: "user", content: assignDateUserPromt },
         ],
-        temperature: 0.2, // Adjust the temperature value for faster response time
+        temperature: 0.3, // Adjust the temperature value for faster response time
+    });
+
+    let response = res.data.choices[0].message.content;
+    return response;
+}
+
+
+var acitivityMemory = [];
+
+async function generateItinerary(generateUserPrompt, acitivityMemory) {
+    const res = await openai.createChatCompletion({
+        model: "gpt-3.5-turbo",
+        messages: [
+            { role: "system", content: `You are an Assistant that applies JSON format to an itinerary.` },
+            { role: "assistant", content: `This is previous activities already made. ${acitivityMemory}` },
+            { role: "user", content: generateUserPrompt },
+        ],
+        temperature: 0.5, // Adjust the temperature value for faster response time
     });
 
     let response = res.data.choices[0].message.content;
@@ -66,6 +78,58 @@ async function generateItinerary(conversation) {
     return response;
 }
 
-generateItinerary(conversation).then((res) => {
-    console.log(res) // Print the response content
+
+// generateItinerary(generateUserPrompt, tripData).then((res) => {
+//     console.log(res);
+// });
+
+var oneCity, duration;
+let memory = [];
+let activityMemory = [];
+
+assignDay(startDate, endDate, cities, assignDateUserPromt).then((res) => {
+    try {
+        cityDates = JSON.parse(res);
+        for (let i = 0; i < cities.length; i++) {
+            memory.push({
+                city: cities[i],
+                date: cityDates[cities[i]],
+                duration: cityDates[cities[i]].duration
+            })
+        }
+        console.log("memory", memory);
+        for (let i = 0; i < memory.length; i++) {
+            oneCity = memory[i].city;
+            duration = memory[i].duration;
+            for (let j = 0; j < duration; j++) {
+                let generateUserPrompt = `Make an itinerary for day ${j + 1} in ${oneCity}. starttime is ${scheduleStartTime} endtime is ${scheduleEndTime}. Categorize each activity using ${categories}.
+                 No additional words. See ${activityMemory} before you make an activity so that activities won't be duplicated. Right after you make an activity, store that activity into this ${activityMemory} to refer to it later.`;
+
+                (async () => {
+                    // Generate the itinerary for the current day
+                    let res = await generateItinerary(generateUserPrompt, activityMemory);
+                    console.log("This is activityMemory", activityMemory);
+                    console.log(res);
+
+                    // Store the generated activity in activityMemory
+                    activityMemory.push(res);
+                })();
+            }
+        }
+    } catch (error) {
+        console.error("Error parsing JSON:", error);
+    }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
