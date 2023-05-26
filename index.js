@@ -95,6 +95,11 @@ app.use(session({
 ));
 
 // middleware function starts
+/**
+ * Check if the session is valid
+ * @param {any} req - the request object
+ * @returns {boolean} - true if the session is valid, false otherwise
+ */
 function isValidSession(req) {
     if (req.session.authenticated) {
         return true;
@@ -102,6 +107,13 @@ function isValidSession(req) {
     return false;
 }
 
+/**
+ * Redirect page to login if the session is not valid
+ * @param {any} req - the request object
+ * @param {any} res - the response object
+ * @param {any} next - the next function
+ * @returns {any} - redirect to login page if the session is not valid
+ */
 function sessionValidation(req, res, next) {
     if (isValidSession(req)) {
         next();
