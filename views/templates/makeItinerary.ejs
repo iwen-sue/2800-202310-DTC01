@@ -127,11 +127,11 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <p>Are you sure you want to delete the selected city?</p>
+        <p>Are you sure you want to delete the selected item?</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" onclick="deleteCity()">Confirm</button>
+        <button type="button" class="btn btn-primary" id="confirmButtonTrigger">Confirm</button>
       </div>
     </div>
   </div>
@@ -168,7 +168,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" style="position:absolute;left:15px;" class="btn btn-primary"
-          onclick="deleteActivity()">Delete</button>
+          onclick="handleConfirm()">Delete</button>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         <button type="button" class="btn btn-primary" onclick="submitEdit()">Confirm</button>
       </div>

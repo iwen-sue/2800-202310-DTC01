@@ -172,14 +172,14 @@ h1 {
 
 #primaryAlert {
     position:fixed;
-    top:75px;
+    top:100px;
     left:10vw;
     width:80vw;
-    transition: all 0.3;
+    transition: all 0.4;
     display: none;
     opacity: 0;
+    padding-top: 20px;
     height:fit-content;
-    padding-top:0;
     z-index:10000000000000;
     /* padding-bottom: 10px; */
 }
