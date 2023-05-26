@@ -130,6 +130,17 @@ function adminAuthorization(req, res, next) {
     }
 }
 // middleware function finishes
+function isInGroup(id) {
+    const schema = Joi.string().min(22).max(25).hex();
+    const result = schema.validate(id);
+    if (result.error) {
+        return false;
+    }
+    if (id == null || id == undefined) {
+        return false;
+    }
+    return true;
+}
 
 app.use('/', (req, res, next) => {  // for local variables
     next();
@@ -306,20 +317,24 @@ app.get('/userprofile/travelHistory', (req, res) => {
 });
 
 app.get('/signup', (req, res) => {
+    const firstName = "";
+    const lastName = "";
+    const email = "";
+    const password = "";
     if (req.query.groupToken != null) {
-        res.render("signup", { groupToken: req.query.groupToken });
+        res.render("signup", { groupToken: req.query.groupToken, firstName: firstName, lastName: lastName, email: email, password: password });
     }
     else {
-        res.render("signup", { groupToken: null });
+        res.render("signup", { groupToken: null, firstName: firstName, lastName: lastName, email: email, password: password });
     }
 });
 
 app.get('/login', (req, res) => {
     if (req.query.groupToken !== null) {
-        res.render("login", { groupToken: req.query.groupToken });
+        res.render("login", { groupToken: req.query.groupToken, email: "" });
     }
     else {
-        res.render("login", { groupToken: null });
+        res.render("login", { groupToken: null, email: "" });
     }
 });
 
@@ -356,10 +371,14 @@ app.post('/signup', async (req, res) => {
     try {
         // Check if all required fields are present
         if (!req.body.firstName || !req.body.lastName || !req.body.email || !req.body.password) {
-            // Render the signup page with an error message
-            return res.render('signup', { error: 'MissingFields', groupToken: req.body.groupToken });
-        }
+            const firstName = req.body.firstName || '';
+            const lastName = req.body.lastName || '';
+            const email = req.body.email || '';
+            const password = req.body.password || '';
         
+            return res.render('signup', { error: 'MissingFields', groupToken: req.body.groupToken, firstName, lastName, email, password });
+        }
+
         var userType;
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
@@ -436,14 +455,14 @@ app.post('/login', async (req, res) => {
     const validationResult = schema.validate(email);
     if (validationResult.error != null) {
         var error = "Invalid email format. Please enter a valid email address.";
-        return res.render("login", { error: error, errorType: 'InvalidEmailFormat', groupToken: groupToken });
+        return res.render("login", { error: error, errorType: 'InvalidEmailFormat', groupToken: groupToken, email: "" });
     }
 
-    const result = await usersModel.find({ email: email }).select('email type firstName lastName password profilePic _id').exec();
+    const result = await usersModel.find({ email: email }).select('email type firstName lastName password profilePic groupID _id').exec();
 
     if (result.length == 0) {
         var error = "User is not found";
-        return res.render("login", { error: error, errorType: 'UserNotFound', groupToken: groupToken });
+        return res.render("login", { error: error, errorType: 'UserNotFound', groupToken: groupToken, email: ""});
     }
     if (await bcrypt.compare(password, result[0].password)) {
         console.log("password is correct");
@@ -454,9 +473,7 @@ app.post('/login', async (req, res) => {
         req.session.email = result[0].email;
         req.session.cookie.maxAge = 2147483647;
         if (groupToken != null) {
-            console.log(result.groupID, "users group")
-            if (result[0].groupID !== null) {
-                console.log("belongs to a group already")
+            if (isInGroup(result[0].groupID)) {
                 res.render('groupconfirm', { error: "You are already in a group. Please leave your current group before joining another.", groupName: null });
                 return;
             }
@@ -506,7 +523,7 @@ app.post('/login', async (req, res) => {
     }
     else {
         var error = "Password is not correct";
-        return res.render("login", { error: error, errorType: 'IncorrectPassword', groupToken: groupToken });
+        return res.render("login", { error: error, errorType: 'IncorrectPassword', groupToken: groupToken, email: email  });
     }
 });
 
@@ -514,10 +531,9 @@ app.post('/login', async (req, res) => {
 app.post('/forgotPassword', async (req, res) => {
     try {
         const email = req.body.email;
-        console.log(email)
         const user = await usersModel.findOne({ email: email }).exec();
         if (!user) {
-            return res.render('forgotPassword', { error: 'UserNotFound' });
+            return res.render('forgotPassword', { error: 'UserNotFound', email: "" });
         }
         const resetToken = crypto.randomBytes(20).toString('hex');
 
@@ -534,7 +550,7 @@ app.post('/forgotPassword', async (req, res) => {
 
 
         await user.save().then(async () => {
-            res.render('forgotPassword', { success: 'Email is successfully sent.' });
+            res.render('forgotPassword', { success: 'Email is successfully sent.', email: email });
         }).catch((err) => {
             console.log(err);
         });
@@ -569,10 +585,10 @@ app.post('/forgotPassword', async (req, res) => {
                 `,
         };
         await transporter.sendMail(mailOptions);
-        res.render('forgotPassword', { success: 'EmailSent' });
+        res.render('forgotPassword', { success: 'EmailSent', email: email });
     } catch (error) {
         console.error(error);
-        res.render('forgotPassword', { error: 'Error' });
+        res.render('forgotPassword', { error: 'Error', email: email });
     }
 });
 
@@ -850,7 +866,7 @@ app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
         
         await saveItinerary(parsedItinerary, groupID, country);
         res.json({ itinerary: parsedItinerary, message: "Itinerary generated successfully!" });
-        // res.redirect('/home');  // Redirect to home page
+        
       } catch (error) {
         console.error("Error:", error);
         res.status(500).json({ error: "An error occurred", message:"An error occurred" });
@@ -870,9 +886,11 @@ async function saveItinerary(itineraryJSON, groupID, country) {
     if(country){
         const update = { $push: { itinerary: { $each: itineraryJSON } }, $set: {country: country} };
         await groupsModel.updateOne({ _id: groupID }, update).exec();
+        res.redirect('/home');  // Redirect to home page
     }else{
         const update = { $push: { itinerary: { $each: itineraryJSON } } };
         await groupsModel.updateOne({ _id: groupID }, update).exec();
+        res.redirect('/home');  // Redirect to home page
     }
 }
 
