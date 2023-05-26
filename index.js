@@ -388,8 +388,8 @@ app.post('/signup', async (req, res) => {
     try {
         // Check if all required fields are present
         if (!req.body.firstName || !req.body.lastName || !req.body.email || !req.body.password) {
-            const firstName = req.body.firstName || '';
-            const lastName = req.body.lastName || '';
+            const firstName = req.body.firstName.replace(/\s/g, "") || '';
+            const lastName = req.body.lastName.replace(/\s/g, "") || '';
             const email = req.body.email || '';
             const password = req.body.password || '';
         
