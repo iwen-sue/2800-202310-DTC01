@@ -36,8 +36,8 @@ function uploadImage(e) {
 }
 
 function submitForm() {
-  var firstName = $("#firstNameInput").val();
-  var lastName = $("#lastNameInput").val();
+  var firstName = $("#firstNameInput").val().replace(/\s/g, "");
+  var lastName = $("#lastNameInput").val().replace(/\s/g, "");
   var email = $("#emailInput").val();
   var homeCity = $("#homeCityInput").val();
   var formData = new FormData();
