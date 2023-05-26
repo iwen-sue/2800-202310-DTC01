@@ -585,7 +585,7 @@ app.use(express.static(__dirname + "/public"));
 
 //render creategroup page
 app.get('/creategroup', sessionValidation, (req, res) => {
-    res.render("creategroup", { error: null });
+    res.render("createGroup", { error: null });
 });
 
 //catch group confirmation request and run defined behaviors.
@@ -594,7 +594,7 @@ app.post('/groupconfirm', sessionValidation, async (req, res) => {
     const schema = Joi.string().trim().max(20).required();
     const validationResult = schema.validate(groupName);
     if (validationResult.error != null) {
-        return res.render("creategroup", { error: validationResult.error.toString() });
+        return res.render("createGroup", { error: validationResult.error.toString() });
     }
     const currentUser = await usersModel.findOne({ email: req.session.email }).exec();
     try {
@@ -616,7 +616,7 @@ app.post('/groupconfirm', sessionValidation, async (req, res) => {
         await usersModel.updateOne({ email: req.session.email }, { $set: { groupID: group._id, type: 'leader' } }).exec();
         res.render("groupconfirm", { groupName: req.body.groupName, error: null });
     } catch (err) {
-        res.render("creategroup", { error: "Group name is already taken. Please enter another group name." });
+        res.render("createGroup", { error: "Group name is already taken. Please enter another group name." });
     }
 });
 
