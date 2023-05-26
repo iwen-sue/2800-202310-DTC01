@@ -45,20 +45,27 @@ const itineraryIcons = {
 
 
 $(document).ready(function () {
+    var currentDate = new Date();
+    currentDate.setDate(currentDate.getDate());
+
     $('#startPicker').datepicker({
-        format: "yyyy-mm-dd"
+        format: "yyyy-mm-dd",
+        startDate: currentDate
     });
 
     $('#endPicker').datepicker({
-        format: "yyyy-mm-dd"
+        format: "yyyy-mm-dd",
+        startDate: currentDate
     });
 
     $('#startPickerAdjust').datepicker({
-        format: "yyyy-mm-dd"
+        format: "yyyy-mm-dd",
+        startDate: currentDate
     });
 
     $('#endPickerAdjust').datepicker({
-        format: "yyyy-mm-dd"
+        format: "yyyy-mm-dd",
+        startDate: currentDate
     });
 
     $('.timepicker').timepicker({
