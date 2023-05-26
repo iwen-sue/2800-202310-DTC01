@@ -7,6 +7,10 @@ html, body{
     overflow:scroll;
 }
 
+.itineraryPlan::-webkit-scrollbar {
+    display: none;
+}
+
 #landingDisplay{
     height:100%;
     width:100%;
@@ -52,14 +56,11 @@ html, body{
     border-bottom: 15px solid var(--blush);
 }
 
-
 button[aria-expanded="true"] {
     background-color:var(--pink);
     color:#fff;
     border:none;
 }
-
-
 
 .itineraryBlockContainer{
     margin:10px 5vw;
@@ -105,9 +106,6 @@ button[aria-expanded="true"] {
     border-bottom-right-radius: 2px;
 }
 
-
-
-
 .itineraryTimeDecorator .decoratorCircle{
     position: absolute;
     top:50%;
@@ -148,7 +146,7 @@ button[aria-expanded="true"] {
 
 .bottomContent{
     padding:20px 5vw;
-    margin-bottom: 60px;
+    margin-bottom: 80px;
     display: flex;
     justify-content: space-between;
 }

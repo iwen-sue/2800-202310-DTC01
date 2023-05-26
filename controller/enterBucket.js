@@ -1,11 +1,10 @@
 require("../utils.js");
 const express = require('express');
-// const session = require('express-session');
 const usersModel = require('../models/user.js');
 const router = express.Router();
-const bcrypt = require('bcrypt');
 
 router.post('/enterBucket', async (req, res) => {
+    // add a new Bucket and save to database
     const result = await usersModel.findOne({
         email: req.session.email,
     });
@@ -20,9 +19,7 @@ router.post('/enterBucket', async (req, res) => {
             }
         });
         res.redirect('/userprofile');
-        
     }
-
 });
 
 module.exports = router;

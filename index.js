@@ -2,29 +2,20 @@ require("./utils.js");
 require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
-const mongoose = require('mongoose');
 const mongoDBSession = require('connect-mongodb-session')(session);
-// const MongoStore = require('connect-mongo');
 const bcrypt = require('bcrypt');
 const usersModel = require('./models/user.js');
 const groupsModel = require('./models/group.js');
 const ejs = require('ejs');
 const crypto = require('crypto');
-
-
-
-
 const { Configuration, OpenAIApi } = require("openai");
 const configuration = new Configuration({
     apiKey: process.env.OPENAI_API_KEY,
 });
 const openai = new OpenAIApi(configuration);
-
-
 const multer = require('multer');  // npm install multer
 const storage = multer.memoryStorage(); // store the file in memory as a buffer
 const upload = multer({ storage: storage }); // specify the storage option
-
 const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
     service: 'hotmail',
@@ -33,11 +24,8 @@ const transporter = nodemailer.createTransport({
         pass: process.env.EMAIL_PASSWORD
     }
 });
-
 const app = express();
-
 const port = process.env.PORT || 3000;
-
 
 // socket.io dependencies
 const server = require('http').Server(app);
@@ -45,11 +33,6 @@ const socketio = require('socket.io');
 const io = socketio(server)
 
 const Joi = require("joi");
-const { ConnectionClosedEvent } = require("mongodb");
-
-
-//control the strength of the password
-const saltRounds = 6;
 
 /* secret information section */
 const mongodb_host = process.env.MONGODB_HOST;
@@ -64,13 +47,6 @@ var { database } = include('databaseConnection');
 const { GridFSBucket } = require('mongodb');
 const db = database.db(mongodb_database); // Replace 'your_database_name' with the actual database name
 
-// Create a new GridFSBucket instance using the gridFSBucket() method
-const bucket = new GridFSBucket(db);
-
-const groupCollection = database.db(mongodb_database).collection('groups');
-const userCollection = database.db(mongodb_database).collection('users');
-
-
 //declare we use ejs res.render will use ejs the ejs files created under views
 app.set('view engine', 'ejs');
 
@@ -78,7 +54,6 @@ app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }))
 
 const store = new mongoDBSession({
-    // uri: 'mongodb://127.0.0.1:27017/connect_mongodb_session_test',
     uri: `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/${mongodb_database}?retryWrites=true&w=majority`,
     collection: "sessions",
     crypto: {
@@ -95,6 +70,11 @@ app.use(session({
 ));
 
 // middleware function starts
+/**
+ * Check if the session is valid
+ * @param {any} req - the request object
+ * @returns {boolean} - true if the session is valid, false otherwise
+ */
 function isValidSession(req) {
     if (req.session.authenticated) {
         return true;
@@ -102,6 +82,13 @@ function isValidSession(req) {
     return false;
 }
 
+/**
+ * Redirect page to login if the session is not valid
+ * @param {any} req - the request object
+ * @param {any} res - the response object
+ * @param {any} next - the next function
+ * @returns {any} - redirect to login page if the session is not valid
+ */
 function sessionValidation(req, res, next) {
     if (isValidSession(req)) {
         next();
@@ -130,6 +117,11 @@ function adminAuthorization(req, res, next) {
     }
 }
 // middleware function finishes
+/**
+ * Check if the id is a valid group id
+ * @param {any} id - the id to be checked
+ * @returns {boolean} - true if the id is valid, false otherwise
+ */
 function isInGroup(id) {
     const schema = Joi.string().min(22).max(25).hex();
     const result = schema.validate(id);
@@ -154,14 +146,11 @@ app.get('/', (req, res) => {
     }
 });
 
-
-// app.use('/', sessionValidation)
-
+// gathher necessary data, render home page and send the data.
 app.get('/home', sessionValidation, async (req, res) => {
     const userEmail = req.session.email;
     const userName = req.session.firstName + " " + req.session.lastName
-    
-    
+
     try {
         const query = await usersModel.findOne({ email: userEmail });
         const groupID = query.groupID;
@@ -175,12 +164,8 @@ app.get('/home', sessionValidation, async (req, res) => {
             }else{
                 country = "nothing here yet"
             }
-
-
             const itineraryQuery = await groupsModel.findById(groupID, 'itinerary');
             const itinerary = itineraryQuery.itinerary;
-            
-
             res.render('itinerary', { groupName: groupName + "'s Itinerary", itinerary: JSON.stringify(itinerary), country: country });
         } else {
             res.render('itinerary', { userName: userName, groupName: "Join a group First!" });
@@ -191,7 +176,7 @@ app.get('/home', sessionValidation, async (req, res) => {
     }
 });
 
-// This is to pass the itinerary data to the client side 
+// This is to pass the itinerary data to the client side.
 app.get('/itineraryData', sessionValidation, async (req, res) => {
     const userEmail = req.session.email;
     try {
@@ -202,7 +187,6 @@ app.get('/itineraryData', sessionValidation, async (req, res) => {
         if (groupQuery) {
             const itineraryQuery = await groupsModel.findById(groupID, 'itinerary');
             const itinerary = itineraryQuery.itinerary;
-
             res.json({ itinerary }); // Send the itinerary data as JSON response
         } else {
             res.status(404).json({ error: "Group not found" });
@@ -213,8 +197,7 @@ app.get('/itineraryData', sessionValidation, async (req, res) => {
     }
 });
 
-
-
+// gathher necessary data, render chatroom page and send the data.
 app.get('/chatroom', sessionValidation, async (req, res) => {
     const query = usersModel.findOne({
         email: req.session.email,
@@ -234,13 +217,12 @@ app.get('/chatroom', sessionValidation, async (req, res) => {
             }
             res.render("chatroom", { group: groupInfo, user: userObj });
         })
-
-
     }).catch((err) => {
         console.error(err);
     });
 });
 
+//gathher necessary data, render userprofile page and send the data.
 app.get('/userprofile', sessionValidation, async (req, res) => {
     const query = usersModel.findOne({
         email: req.session.email,
@@ -253,25 +235,32 @@ app.get('/userprofile', sessionValidation, async (req, res) => {
     });
 });
 
+// import the necessary modules
 const bucketlist = require('./controller/enterBucket.js');
 const toHistory = require('./controller/toHistory.js');
 const editBucket = require('./controller/editBucket.js');
 const deleteBucket = require('./controller/deleteBucket.js');
 
+// catch the enter bucket list request and run defined behaviors imported from module.
 app.post('/enterBucket', bucketlist)
+
+// catch request for moving bucket list to history and run defined behaviors imported from module.
 app.post('/toHistory', toHistory)
+
+// catch request for editing the bucket list and run defined behaviors imported from module.
 app.post('/editBucket', editBucket)
+
+// catch request for deleting bucket list and run defined behaviors imported from module.
 app.post('/deleteBucket', deleteBucket)
 
-
-// const multer = require('multer');  // npm install multer
-// const memoryStorage = multer.memoryStorage(); // store the file in memory as a buffer
-// const upload = multer({ storage: memoryStorage }); // specify the storage option
+// import the necessary modules
 const editProfile = require('./controller/editProfile.js');
 const { Server } = require("net");
-const { json } = require("body-parser");
+
+// post request for editProfile
 app.post('/editProfile', editProfile);
 
+// render editBucket page
 app.get('/editBucket', (req, res) => {
     const query = usersModel.findOne({
         email: req.session.email,
@@ -288,7 +277,6 @@ app.get('/editBucket', (req, res) => {
         console.error(err);
     }
     );
-
 });
 
 // get api key from client-side , for Grace's use
@@ -298,11 +286,14 @@ app.get('/api-key', (req, res) => {
   
     // Return the API key as the response
     res.json({ apiKey });
-  });
+});
 
+//render enterBucket page
 app.get('/enterBucket', (req, res) => {
     res.render("enterBucket");
 });
+
+//gather necessary data, sender travel history page and send data.
 app.get('/userprofile/travelHistory', (req, res) => {
     const query = usersModel.findOne({
         email: req.session.email,
@@ -316,6 +307,7 @@ app.get('/userprofile/travelHistory', (req, res) => {
     });
 });
 
+//gather necessary data, sender signup page and send data.
 app.get('/signup', (req, res) => {
     const firstName = "";
     const lastName = "";
@@ -329,6 +321,7 @@ app.get('/signup', (req, res) => {
     }
 });
 
+//gather necessary data, sender login page and send data.
 app.get('/login', (req, res) => {
     if (req.query.groupToken !== null) {
         res.render("login", { groupToken: req.query.groupToken, email: "" });
@@ -338,11 +331,12 @@ app.get('/login', (req, res) => {
     }
 });
 
+//render forgot password page.
 app.get('/forgotPassword', (req, res) => {
     res.render('forgotPassword.ejs'); // Render the forgotPassword.ejs template
 });
 
-
+//render reset password page
 app.get('/resetPassword', async (req, res) => {
     console.log(req.query.token);
     const user = await usersModel.findOne({ resetToken: req.query.token }).exec();
@@ -353,9 +347,9 @@ app.get('/resetPassword', async (req, res) => {
     } else {
         res.render('resetPassword', { email: user.email, token: req.query.token });
     }
-
 });
 
+//destroy session and redirect user to /
 app.get('/logout', sessionValidation, (req, res) => {
     req.session.destroy(function (err) {
         // res.clearCookie(this.cookie, { path: '/' });
@@ -363,16 +357,16 @@ app.get('/logout', sessionValidation, (req, res) => {
     });
 });
 
-
 //static images address
 app.use(express.static(__dirname + "/public"));
 
+//catch the signup request and run defined behaviors.
 app.post('/signup', async (req, res) => {
     try {
         // Check if all required fields are present
         if (!req.body.firstName || !req.body.lastName || !req.body.email || !req.body.password) {
-            const firstName = req.body.firstName || '';
-            const lastName = req.body.lastName || '';
+            const firstName = req.body.firstName.replace(/\s/g, "") || '';
+            const lastName = req.body.lastName.replace(/\s/g, "") || '';
             const email = req.body.email || '';
             const password = req.body.password || '';
         
@@ -444,8 +438,7 @@ app.post('/signup', async (req, res) => {
     }
 });
 
-
-
+//catch the login request and run defined behaviors.
 app.post('/login', async (req, res) => {
     var password = req.body.password;
     var email = req.body.email;
@@ -527,7 +520,7 @@ app.post('/login', async (req, res) => {
     }
 });
 
-
+//catch forgot password request and run the defined behaviors.
 app.post('/forgotPassword', async (req, res) => {
     try {
         const email = req.body.email;
@@ -536,25 +529,17 @@ app.post('/forgotPassword', async (req, res) => {
             return res.render('forgotPassword', { error: 'UserNotFound', email: "" });
         }
         const resetToken = crypto.randomBytes(20).toString('hex');
-
-
         const resetTokenExpiry = Date.now() + 3600000; // Expiration in 1 hour
         const expiryDate = new Date(resetTokenExpiry);
-
-
         console.log(expiryDate)
-
         user.resetToken = resetToken;
         user.resetTokenExpiration = expiryDate;
-
-
 
         await user.save().then(async () => {
             res.render('forgotPassword', { success: 'Email is successfully sent.', email: email });
         }).catch((err) => {
             console.log(err);
         });
-
 
         setTimeout(async () => {
             await usersModel.updateOne({ email: email }, { $unset: { resetTokenExpiration: 1 } });
@@ -592,12 +577,12 @@ app.post('/forgotPassword', async (req, res) => {
     }
 });
 
+//catch reset password request and run the defined behaviors.
 app.post('/resetPassword', async (req, res) => {
     try {
         const token = req.body.token;
         const email = req.body.email;
         console.log(email);
-
         const newPassword = req.body.password;
         const confirmPassword = req.body.confirmPassword;
 
@@ -617,10 +602,12 @@ app.post('/resetPassword', async (req, res) => {
 //static images address
 app.use(express.static(__dirname + "/public"));
 
+//render creategroup page
 app.get('/creategroup', sessionValidation, (req, res) => {
     res.render("creategroup", { error: null });
 });
 
+//catch group confirmation request and run defined behaviors.
 app.post('/groupconfirm', sessionValidation, async (req, res) => {
     var groupName = req.body.groupName;
     const schema = Joi.string().trim().max(20).required();
@@ -652,6 +639,7 @@ app.post('/groupconfirm', sessionValidation, async (req, res) => {
     }
 });
 
+//gather necessary information and render groupdetails page, if try block fail redirect it user profile
 app.get('/userprofile/groupdetails', sessionValidation, async (req, res) => {
     var currentUser = await usersModel.findOne({ email: req.session.email }).exec()
     const group = await groupsModel.findOne({ _id: currentUser.groupID }).exec()
@@ -665,6 +653,7 @@ app.get('/userprofile/groupdetails', sessionValidation, async (req, res) => {
     }
 });
 
+//catch invite request, gather necessary information and render emailconfirmation page
 app.post('/invite', sessionValidation, async (req, res) => {
     var inviteEmail = req.body.inviteeEmail;
     const userName = req.session.firstName + " " + req.session.lastName;
@@ -699,10 +688,10 @@ app.post('/invite', sessionValidation, async (req, res) => {
     });
 });
 
+//catch removemember request, run defined behaviors and redirect to groupdetails page
 app.post('/removemember', sessionValidation, async (req, res) => {
     var memberEmail = req.body.memberEmail;
     var groupID = req.body.groupID;
-    // await groupsModel.updateOne({ _id: groupID }, { $pull: { members: { email: memberEmail } } }).exec();
     var currentMembers = await groupsModel.find({ _id: groupID }).exec();
     for (var i = 0; i < currentMembers[0].members.length; i++) {
         if (currentMembers[0].members[i].email == memberEmail) {
@@ -714,6 +703,7 @@ app.post('/removemember', sessionValidation, async (req, res) => {
     res.redirect('/userprofile/groupdetails');
 });
 
+// catch joingroup request, run defined behaviors and redirect to groupdetails page
 app.post('/joingroup', sessionValidation, async (req, res) => {
     var groupToken = req.body.groupToken;
     var currentUser = await usersModel.findOne({ email: req.session.email }).exec();
@@ -757,10 +747,12 @@ app.post('/joingroup', sessionValidation, async (req, res) => {
     }
 });
 
+//render groupnotfound page
 app.get('/userprofile/groupnotfound', sessionValidation, async (req, res) => {
     res.render("groupnotfound");
 });
 
+//catch leavegroup request, run the defined behaviors and redirect to userprofile
 app.post('/leavegroup', sessionValidation, async (req, res) => {
     var groupID = req.body.groupID;
     var currentMembers = await groupsModel.find({ _id: groupID }).exec();
@@ -774,6 +766,7 @@ app.post('/leavegroup', sessionValidation, async (req, res) => {
     res.redirect('/userprofile');
 });
 
+//catch deletegroup, run the defined behaviors and redirect to userprofile page.
 app.post('/deletegroup', sessionValidation, async (req, res) => {
     var groupID = req.body.groupID;
     await groupsModel.deleteOne({ _id: groupID }).exec();
@@ -781,6 +774,7 @@ app.post('/deletegroup', sessionValidation, async (req, res) => {
     res.redirect('/userprofile');
 });
 
+//get and send the request sentiment data to frontend 
 app.get('/chatroom/sentimentScores', sessionValidation, async (req, res) => {
     var groupID = req.query.id
     groupsModel.findOne({ _id: groupID }).then((docs) => {
@@ -788,16 +782,14 @@ app.get('/chatroom/sentimentScores', sessionValidation, async (req, res) => {
     })
 })
 
+//catch uploadImage request, and send the image buffer data back to frontend
 app.post('/uploadImage', sessionValidation, upload.single('imageData'), async (req, res) => {
     const imageData = req.file;
-
     if (imageData) {
-
         res.status(200).json({ message: 'Image uploaded successfully', imageData: imageData.buffer });
     } else {
         res.status(404).json({ message: 'File not found' });
     }
-
 })
 
 const categories = [
@@ -811,10 +803,9 @@ const categories = [
     "Relaxation"
 ];
 
+//catch the submitNew request, run the defined behaviors and send the necessary data to frontend
 app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
-
     var citiesArray = JSON.parse(req.body.cities);
-
     const startDate = req.body.startDate;
     const endDate = req.body.endDate;
     const startTime = req.body.startTime;
@@ -825,7 +816,6 @@ app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
     const userEmail = req.session.email;
     const query = await usersModel.findOne({ email: userEmail });
     const groupID = query.groupID;
-
     const itineraryMemory = [
         {
             date: "date",
@@ -840,7 +830,6 @@ app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
             ]
         },
     ];
-
     const conversation = [
         { role: 'system', content: `You are an Assistant that provides recommendations for trip itineraries in a format of ${JSON.stringify(itineraryMemory)} in an array.` },
         { role: 'user', content: `I need help planning a trip to ${cities}.` },
@@ -851,32 +840,29 @@ app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
         { role: 'assistant', content: 'Let me generate an itinerary for you based on your preferences.' },
         { role: 'user', content: `Don\'t forget to include transportation time` },
     ];
-
     let itinerary; // Declare itinerary variable outside the promise chain
-
     try {
         itinerary = await generateItinerary(conversation);
-        
-        // Extract the itinerary contents
         const startIndex = itinerary.indexOf("[");
         const endIndex = itinerary.lastIndexOf("]") + 1;
         const itineraryContent = itinerary.substring(startIndex, endIndex);
         const parsedItinerary = JSON.parse(itineraryContent);
         console.log(parsedItinerary)
-        
         await saveItinerary(parsedItinerary, groupID, country);
         res.json({ itinerary: parsedItinerary, message: "Itinerary generated successfully!" });
-        
       } catch (error) {
         console.error("Error:", error);
         res.status(500).json({ error: "An error occurred", message:"An error occurred" });
       }
-      
-
-
 });
 
-
+/**
+ * save the given itinerary in databse.
+ * 
+ * @param {Object} itineraryJSON - JSON object with itinerary data information
+ * @param {String} groupID - unique group ID 
+ * @param {String} country - destination country name 
+ */
 async function saveItinerary(itineraryJSON, groupID, country) {
     console.log(country)
     // Delete the existing itinerary array
@@ -886,15 +872,18 @@ async function saveItinerary(itineraryJSON, groupID, country) {
     if(country){
         const update = { $push: { itinerary: { $each: itineraryJSON } }, $set: {country: country} };
         await groupsModel.updateOne({ _id: groupID }, update).exec();
-        res.redirect('/home');  // Redirect to home page
     }else{
         const update = { $push: { itinerary: { $each: itineraryJSON } } };
         await groupsModel.updateOne({ _id: groupID }, update).exec();
-        res.redirect('/home');  // Redirect to home page
     }
 }
 
-
+/**
+ * generate Itinerary information through openAI.
+ * 
+ * @param {Object} conversation - JSON object contains conversation information 
+ * @returns {*} - AI respond
+ */
 async function generateItinerary(conversation) {
     const res = await openai.createChatCompletion({
         model: "gpt-3.5-turbo",
@@ -904,13 +893,16 @@ async function generateItinerary(conversation) {
         ],
         temperature: 0.2, // Adjust the temperature value for faster response time
     });
-
     let response = res.data.choices[0].message.content;
-
     return response;
 }
 
-  
+/**
+ * generate a new itinerary through openAI.
+ * 
+ * @param {String} prompt - the prompt passes to AI
+ * @returns {*} - respond from AI
+ */
 async function newItinerary(prompt) {
     const res = await openai.createChatCompletion({
         model: "gpt-3.5-turbo",
@@ -926,9 +918,7 @@ async function newItinerary(prompt) {
     return response;
 }
 
-
-
-
+//catch date adjustment request and pass the result respond to frontend.
 app.post('/itinerary/adjustment', sessionValidation, async (req, res) => {
     console.log(req.body)
     const userEmail = req.session.email;
@@ -936,8 +926,6 @@ app.post('/itinerary/adjustment', sessionValidation, async (req, res) => {
     const groupID = userQuery.groupID;
     const groupQuery = await groupsModel.findOne({ _id: groupID });
     const preItinerary = groupQuery.itinerary;
-
-
     const startDate = req.body.startDate;
     const endDate = req.body.endDate;
     const promptArgs = `Make an itinerary from ${startDate} to ${endDate}, the same country, cities, startTime, and endTime as ${preItinerary} in a format {date :, schedule: [{"startTime":,"endTime":, "category":, "activity":, "transportation":  transportation with estimated time }]}, Make an object for each date in JSON format that is in an array. Assign dates properly in only one city considering distance. Include recommended transportation for each activity. Use the following categories to categorize each activity: ${categories}`;
@@ -947,15 +935,12 @@ app.post('/itinerary/adjustment', sessionValidation, async (req, res) => {
     try {
         itinerary = await newItinerary(promptArgs);
         console.log("Itinerary generated:", itinerary);
-        
         const startIndex = itinerary.indexOf("[");
         const endIndex = itinerary.lastIndexOf("]") + 1;
         const itineraryContent = itinerary.substring(startIndex, endIndex);
         console.log("Itinerary content:", itineraryContent); // Debugging line
-        
         const parsedItinerary = JSON.parse(itineraryContent);
         console.log("Parsed itinerary:", parsedItinerary); // Debugging line
-        
         await saveItinerary(parsedItinerary, groupID);
         console.log("itinerary is saved")
         res.status(200).json({ message: "Travel Dates adjusted successfully",  itinerary: parsedItinerary});
@@ -963,9 +948,9 @@ app.post('/itinerary/adjustment', sessionValidation, async (req, res) => {
         console.error("Error:", error);
         res.status(500).json({ error: "An error occurred", message:"An error occurred" });
       }
-      
     });
-    
+
+//catch the edit request, run the defined behaviors and send the success message to frontend.
 app.post('/itinerary/edit', sessionValidation, async (req, res) => {
     const date = req.body.date;
     const referStartTime = req.body.referStartTime;
@@ -997,14 +982,11 @@ app.post('/itinerary/edit', sessionValidation, async (req, res) => {
       ],
       new: true
     };
-
     const updatedDocument = await groupsModel.findOneAndUpdate(filter, update, options);
     res.status(200).json({ message: "edit updated successful!" });
   });
 
-
-
-
+// catch the delete request, run the defined behaviors and pass the success message to frontend.
 app.post('/itinerary/delete', sessionValidation, async (req, res) => {
     console.log(req.body);
     const date = req.body.date;
@@ -1012,7 +994,6 @@ app.post('/itinerary/delete', sessionValidation, async (req, res) => {
     const startTime = scheduleElem.startTime;
     console.log(startTime);
     console.log(date);
-
     const userEmail = req.session.email;
     const userQuery = await usersModel.findOne({ email: userEmail });
     const groupID = userQuery.groupID;
@@ -1061,9 +1042,6 @@ io.on('connection', socket => {
         //broadcast when a user connect, to everyone except the client connecting
         //notify who enters the chatroom and who leaves the chatroom
         socket.broadcast.to(joinedRoomObj.groupID).emit('message', message);
-
-
-
     })
 
     socket.on('chatHistory', async (groupID) => {
@@ -1091,7 +1069,6 @@ io.on('connection', socket => {
                 await groupsModel.updateOne({ _id: chatMessageObj.groupID }, { $set: { chatContext: memory } });
             }
         }, 10000);  //Check every 10 seconds
-
 
         if (typeof chatMessageObj.message == 'string') {
             //save message to database
@@ -1160,9 +1137,7 @@ io.on('connection', socket => {
             //user sent image data
             //do not save the image data into messages history
             // saveMessage(chatMessageObj);
-
             io.to(chatMessageObj.groupID).emit('chatMessage', { chatMessageObj });
-
         }
     })
 
@@ -1174,9 +1149,7 @@ io.on('connection', socket => {
         }
         if (numOfScroll > 0) {
             socket.emit('moreChatHistory', getMoreMessageHistory);
-
         }
-
     })
 
     socket.on('deleteMessage', async (groupID, timeStp, chatMessageText) => {
@@ -1186,13 +1159,19 @@ io.on('connection', socket => {
 
 }); // socketio part ends
 
+/**
+ * delete the chat message in the database.
+ * 
+ * @param {String} groupID -unique group ID 
+ * @param {String} messagerName - messager Name
+ * @param {String} chatMessageText - message text
+ */
 async function deleteMessageDB(groupID, messagerName, chatMessageText) {
     try {
         const updateResult = await groupsModel.updateOne(
             { _id: groupID },
             { $pull: { messages: { message: chatMessageText, userName: messagerName } } }
         ).exec();
-
         if (updateResult.modifiedCount > 0) {
             console.log('Message deleted.');
         } else {
@@ -1203,19 +1182,19 @@ async function deleteMessageDB(groupID, messagerName, chatMessageText) {
     }
 }
 
+/**
+ * save chat message in database.
+ * 
+ * @param {Object} chatMessageObj - message information details 
+ * @returns {Array} - updated messages records
+ */
 async function saveMessage(chatMessageObj) {
     try {
         const group = await groupsModel.findOne({ _id: chatMessageObj.groupID });
 
         if (group) {
-            console.log(chatMessageObj)
-
-            // chatMessageObj._id = mongoose.
-
             const update = { $push: { messages: chatMessageObj } };
             await groupsModel.updateOne({ _id: chatMessageObj.groupID }, update)
-            // await msg.insertOne(chatMessageObj);
-            // await group.save();
             return group.messages;
         }
     } catch (error) {
@@ -1223,7 +1202,13 @@ async function saveMessage(chatMessageObj) {
     }
 }
 
-
+/**
+ * load more chat history depends on front end scroll behaviors.
+ * 
+ * @param {String} groupID - unique group ID 
+ * @param {Number} numOfScroll - number of scroll recorded 
+ * @returns 
+ */
 async function showMoreChatHistory(groupID, numOfScroll) {
     try {
         const group = await groupsModel.findOne({ _id: groupID });
@@ -1245,6 +1230,12 @@ async function showMoreChatHistory(groupID, numOfScroll) {
     }
 }
 
+/**
+ * trigger the default message history load.
+ * 
+ * @param {String} groupID - unique group ID 
+ * @returns {Array} - messages array after modification
+ */
 async function showChatHistory(groupID) {
     try {
         const group = await groupsModel.findOne({ _id: groupID });

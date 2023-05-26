@@ -7,9 +7,6 @@ var userEmail = document.currentScript.getAttribute('userEmail');
 var fileData = new Object();
 fileData.name = ""
 
-
-console.log(userName)
-
 if (!groupID) {
     swal("please join a travel group to start chat!")
     .then(() => {
@@ -19,6 +16,9 @@ if (!groupID) {
 
 const socket = io();
 
+/**
+ *  General setup that excutes regardless if user joined a group or not.
+ */
 function generalSetUp() {
     var viewHeight = window.innerHeight - 95;
     let elem = document.getElementById("chatRoomView");
@@ -26,12 +26,10 @@ function generalSetUp() {
 }
 
 
-
+/**
+ * setup DOM if user joined a group
+ */
 function setup() {
-    console.log(window.userName)
-
-
-
 
     const msgBtn = document.getElementById("msgBtn");
     setTimeout(() => {
@@ -41,8 +39,6 @@ function setup() {
 
         socket.emit('joinedRoom', joinedRoomObj);
     })
-
-
 
     socket.emit('chatHistory', groupID);
 
@@ -66,47 +62,47 @@ function setup() {
           return response.json()
         })
         .then(data => {
-            // Process the response data
-            console.log(data);
             const filteredSentiments = data.data.filter(memberSentiment => {
-                return memberSentiment.userName !== userName
+                return memberSentiment.email !== userEmail
             })
-            console.log(filteredSentiments)
-            filteredSentiments.forEach(memberSentiment =>{
-                setTimeout(()=>{
-                    insertEmoji(memberSentiment, "off")
-                }, 2000)
-                
+            setTimeout(()=>{
+                filteredSentiments.forEach(memberSentiment =>{
+                    setTimeout(()=>{
+                        insertEmoji(memberSentiment, "off")
+                    }, 2000)
+                })
             })
-            // insertEmoji(memberSentiment)
           })
         .catch(error => {
-          // Handle any errors
           console.error('Error:', error);
         });
 }
 
+/**
+ * Generate a unique ID by combining timestamp and random number
+ * 
+ * @returns {String} the unique ID value
+ */
 function generateUniqueID() {
     const randomNum = Math.floor(Math.random() * 10000); // Generate random number as a string
     // Combine timestamp and random number
     return randomNum;
 }
 
-// Example usage
 
 
 
-
+/**
+ * send the user input info to the backend following defined rule, user input is either string or a file.
+ */
 function sendMission() {
     const msg = $("#msg").val()
     const messageNM = generateUniqueID()
-
 
     if (msg) {
         var timeStp = new Date();
 
         //emit message to server
-        console.log(userEmail)
         var chatMessageObj = new Object();
         chatMessageObj.messageName = messageNM
         chatMessageObj.message = msg
@@ -116,11 +112,7 @@ function sendMission() {
         chatMessageObj.timeStp = timeStp
         chatMessageObj.email = userEmail
 
-
-
-
         if (fileData.name == msg) {
-            console.log('ready to push file')
             var formData = new FormData();
             formData.append("imageData", fileData);
             formData.append("groupID", groupID);
@@ -130,12 +122,10 @@ function sendMission() {
                 body: formData
             })
                 .then(response => {
-                    console.log(response)
                     return response.json()
                 })
                 .then(data => {
                     // Handle the received JSON data
-                    console.log(data)
                     chatMessageObj.message = { imageData: data.imageData }
                     socket.emit('chatMessage', chatMessageObj);
                 })
@@ -148,11 +138,14 @@ function sendMission() {
         const inputElement = document.getElementById('msg');
         inputElement.value = '';
         inputElement.focus();
-
-
     }
 }
 
+/**
+ * send notification to the chatroom display
+ * 
+ * @param {String} message - message needs to display
+ */
 function sendNotification(message) {
     let elem = document.createElement("div");
     elem.setAttribute("class", "chatNotification");
@@ -160,6 +153,13 @@ function sendNotification(message) {
     document.getElementById("chatRoomView").append(elem)
 }
 
+
+/**
+ * format the date and time date in a defined rule.
+ * 
+ * @param {Date} today - the date date and time data that needs to format
+ * @returns {String} - formatted time as a string
+ */
 function getTime(today) {
     var month = Number(today.getMonth()) + 1;
     var mins = Number(today.getMinutes())
@@ -178,39 +178,30 @@ function getTime(today) {
     return today.getFullYear() + '/' + month + '/' + today.getDate() + ' ' + today.getHours() + ":" + mins;
 }
 
-
-
-
+/**
+ * insert real time message to DOM tree to show the message sent by users dynamically.
+ * 
+ * @param {*} msg - text message or object info with image data stored in
+ * @param {String} userName - the name of the user who sent this message
+ * @param {String} time - the timestamp as a string
+ * @param {String} email - the email detail
+ * @param {String} msgName - message ID information
+ */
 function insertMessage(msg, userName, time, email, msgName) {
-    console.log(time)
 
     const dateInfo = new Date(time);
     var messageElem = document.getElementsByClassName(email)[0];
-    console.log(messageElem)
-
     var messageCard = messageElem.content.cloneNode(true);
-    // if (userImg) {
-    //     messageCard.querySelector('.messageImage').setAttribute("src", "data:image/png;base64," + userImg);
-    //     // messageCard.querySelector('.messageImage').setAttribute("src", dataURL)
-    // }
     messageCard.querySelector('.messagerName').innerHTML = userName;
     messageCard.querySelector('.messagerTime').innerHTML = getTime(dateInfo);
     messageCard.querySelector('.messageID').innerHTML = msgName;
 
-    console.log(typeof msg)
     if (typeof msg == 'string') {
         messageCard.querySelector('.chatMessageText').innerHTML = msg;
     } else {
-
-
-
         messageCard.querySelector('.chatMessageText').innerHTML = `<img class="clientImage" src="data:image/png;base64,${msg.imageData}" />`;
-
     }
-
     document.getElementById("chatRoomView").append(messageCard);
-
-
 
     //set Sroll to Bottom
     var container = document.getElementById("container");
@@ -226,50 +217,54 @@ function insertMessage(msg, userName, time, email, msgName) {
             var parent = parents[parents.length - 1]
             parent.setAttribute("style", `height:${90 + imgHeight}px`)
         }
-
     })
 }
 
+/**
+ * insert history message from the top of chatroom.
+ * 
+ * @param {String} userName - the name of the user who sent this message
+ * @param {String} time - the timestamp as a string
+ * @param {String} email - the email detail
+ * @param {String} msgName - message ID information
+ */
 function insertMessageToTop(msg, userName, time, email, msgName) {
-    console.log(time)
 
     const dateInfo = new Date(time);
     var messageElem = document.getElementsByClassName(email)[0];
-
     var messageCard = messageElem.content.cloneNode(true);
-    // if (userImg) {
-    //     messageCard.querySelector('.messageImage').setAttribute("src", "data:image/png;base64," + userImg);
-    //     // messageCard.querySelector('.messageImage').setAttribute("src", dataURL)
-    // }
     messageCard.querySelector('.messagerName').innerHTML = userName;
     messageCard.querySelector('.messagerTime').innerHTML = getTime(dateInfo);
     messageCard.querySelector('.chatMessageText').innerHTML = msg;
     messageCard.querySelector('.messageID').innerHTML = msgName;
-
     document.getElementById("chatRoomView").prepend(messageCard);
-
-
-
-
 }
 
+
+/**
+ * catch the message history array and insert them one by one to the chatroom DOM tree. 
+ * 
+ * @param {Array} messageHistory - message history as an array
+ */
 function retrieveChatHistory(messageHistory) {
-    console.log(messageHistory); // Check the entire messageHistory array
 
     messageHistory.forEach(async (message) => {
-        if (typeof message.message != "string") {
-            var arrImage = message.message.imageData.data
-            base64Image = await arrayBufferToBase64(arrImage);
-            message.message.imageData = base64Image
-        }
-
+        // if (typeof message.message != "string") {
+        //     var arrImage = message.message.imageData.data
+        //     base64Image = await arrayBufferToBase64(arrImage);
+        //     message.message.imageData = base64Image
+        // }
 
         insertMessage(message.message, message.userName, message.timeStp, message.email, message.messageName);
     });
 }
 
+/**
+ * catch the message history array and insert them one by one to the chatroom DOM tree when load more history. 
+ * 
+ * @param {Array} messageHistory - message history as an array
+ */
 function retrieveChatHistoryToTop(messageHistory) {
-    console.log(messageHistory); // Check the entire messageHistory array
 
     messageHistory.forEach((message) => {
         insertMessageToTop(message.message, message.userName, message.timeStp, message.email, message.messageName);
@@ -279,33 +274,24 @@ function retrieveChatHistoryToTop(messageHistory) {
 var numOfScroll = 0;
 var container = document.getElementById('container');
 
-
+/**
+ * adjust the scroll position and send load history request.
+ */
 function scrollTest() {
-    console.log(container.scrollTop);
-
     if (container.scrollTop == 0) {
-        console.log("Scroll bar reached the top of the page!");
         numOfScroll += 1;
-        console.log(numOfScroll);
         socket.emit('moreChatHistory', groupID, numOfScroll);
         container.scrollTo(0, 50);
     }
-
 }
-
 
 container.addEventListener('scroll', scrollTest);
 
 
-
-
-
-
-//Socket events
+//prepare the chatroom environment when user joined a group
 if (groupID) {
     //show chat history
     socket.on('chatHistory', (messageHistory) => {
-        console.log("message History", messageHistory);
         retrieveChatHistory(messageHistory);
 
     });
@@ -318,13 +304,11 @@ if (groupID) {
     })
 
     socket.on("sentimentScore", ({memberSentiment})=>{
-        console.log(memberSentiment)
         insertEmoji(memberSentiment, "on")
     })
 
     // show chat history
     socket.on('chatMessage', async ({ chatMessageObj }) => {
-        // console.log(chatMessage);
         if (typeof chatMessageObj.message != "string") {
             var arrImg = chatMessageObj.message.imageData.data
             base64Img = await arrayBufferToBase64(arrImg);
@@ -334,18 +318,14 @@ if (groupID) {
     });
 
     socket.on('moreChatHistory', (messageHistory) => {
-        console.log("message History", messageHistory);
         retrieveChatHistoryToTop(messageHistory);
 
     });
 
     setup();
-
 }
 
-//delete message
-
-
+//set up delete message
 const chatRoomView = document.getElementById('chatRoomView');
 chatRoomView.addEventListener('click', function(event) {
     // Check if the clicked element has the delete-button class
@@ -360,8 +340,6 @@ chatRoomView.addEventListener('click', function(event) {
         const timeStp = timeStpElement.textContent.trim();
         const chatMessageTextElement = chatMessageBoxTwo.querySelector('.chatMessageText');
         const chatMessageText = chatMessageTextElement.textContent.trim();
-        console.log(timeStp);
-        console.log(chatMessageText);
 
         if (userName != messagerName) {
             swal("You can only delete your own message!");
@@ -374,16 +352,15 @@ chatRoomView.addEventListener('click', function(event) {
     }
 });
 
-
-
-
-
-
-
 generalSetUp()
 
+/**
+ * add the animated Emoji to the latest message icon for each user in this chatroom group
+ * 
+ * @param {Object} memberSentiment - contains all details of the emoji information
+ * @param {String} ifNote - check if real time chat sentiment analysis notification needs to trigger, 'on' for yes
+ */
 function insertEmoji(memberSentiment, ifNote){
-    //add the animated Emoji to the latest message icon
     
     var classStr = memberSentiment.email + "emoji";
     var elems = document.getElementsByClassName(classStr);
@@ -403,7 +380,6 @@ function insertEmoji(memberSentiment, ifNote){
     }
     
     if(memberSentiment.suggestion!="" && ifNote=="on"){
-        console.log("notification triggered")
         var elem = document.getElementsByClassName("aiSuggestion")[0]
         elem.innerHTML = memberSentiment.suggestion
         elem.setAttribute("class", "aiSuggestion");
@@ -414,10 +390,14 @@ function insertEmoji(memberSentiment, ifNote){
             }, 9500)
         }, 1500)
     }
-    
-    
 }
 
+/**
+ * convert array buffer to base64 string form
+ * 
+ * @param {Array} buffer - array buffer needs to convert
+ * @returns {String} - base64 string image data
+ */
 function arrayBufferToBase64(buffer) {
     var binary = '';
     var bytes = new Uint8Array(buffer);
@@ -428,11 +408,14 @@ function arrayBufferToBase64(buffer) {
     return window.btoa(binary);
 }
 
-
+/**
+ * catch the image file user choooses under 5MB and write the name into input to notify user image is catched. 
+ * 
+ * @param {*} files - file data user chooses
+ */
 function upload(files) {
     fileData = files[0]
     const maxSizeInBytes = 300 * 1024; // 5 MB (adjust to your desired maximum size)
-    console.log(fileData)
     if (fileData.size > maxSizeInBytes) {
         // File size exceeds the maximum limit
         swal('File size exceeds the maximum limit of 5 MB.');
@@ -440,59 +423,5 @@ function upload(files) {
     } else {
         // write file name in text input
         document.getElementById('msg').value = fileData.name
-
     }
-
-
-
-
-}
-
-
-function compressBase64(base64Image) {
-    // Assuming you have the base64 image data as 'base64Image'
-
-    // Create an HTMLImageElement
-    const img = new Image();
-
-    // Set the source of the image to the base64 data
-    img.src = 'data:image/png;base64,' + base64Image;
-
-    // Create a canvas element
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-
-    // Set the desired width and height for the compressed image
-    const maxWidth = 100;
-    const maxHeight = 100;
-
-    // Ensure the image is loaded before manipulating it
-    img.onload = function () {
-        // Calculate the new dimensions while maintaining the aspect ratio
-        let newWidth = img.width;
-        let newHeight = img.height;
-
-        if (newWidth > maxWidth) {
-            newWidth = maxWidth;
-            newHeight = Math.floor((newWidth * img.height) / img.width);
-        }
-
-        if (newHeight > maxHeight) {
-            newHeight = maxHeight;
-            newWidth = Math.floor((newHeight * img.width) / img.height);
-        }
-
-        // Set the canvas dimensions to the new dimensions
-        canvas.width = newWidth;
-        canvas.height = newHeight;
-
-        // Draw the image on the canvas with the new dimensions
-        ctx.drawImage(img, 0, 0, newWidth, newHeight);
-
-        // Get the compressed base64 image data from the canvas
-        const compressedBase64 = canvas.toDataURL('image/png', 0.8);
-
-        // Use the compressed base64 data as needed
-        return compressedBase64
-    };
 }

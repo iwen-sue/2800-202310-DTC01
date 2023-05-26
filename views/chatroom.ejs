@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="/assets/common.css" />
     <link rel="stylesheet" href="/assets/chatroom.css" />
     </head>
-
     <body id="chatBackGround">
         <%- include("templates/nav") %>
             <div class="content" id="container">
@@ -17,11 +16,8 @@
                         <div class="chatNotification">- you have not joined any group yet -</div>
                         <% } %>
                             <% if (group) { %>
-
                                 <div id="chatRoomView">
-
                                     <% group.members.forEach(function(member){ %>
-
                                         <template class="<%= member.email %>">
                                             <div class="chatMessage">
                                                 <div class="chatMessageBoxOne">
@@ -49,9 +45,7 @@
                                         </template>
                                         <% }) %>
                                         <% } %>
-
                                 </div>
-
                                 <from id="chatForm">
                                     <section class="chatBottomBox row" style="margin:0">
                                         <input id="imageInputHolder" type="file" onchange="upload(this.files)" />
@@ -65,13 +59,10 @@
                                             style="border:none;background-color: transparent;">
                                             send
                                         </button>
-
                             </section>
                         </from>
                         <section class="aiSuggestion"></section>
-
             </div>
-            
     </body>
     <script src="/socket.io/socket.io.js"></script>
     <% if (group) { %>
@@ -81,6 +72,4 @@
             <script src="/scripts/chatroom.js" userName="<%= user.name %>" userEmail="<%= user.email %>"
                 profilePic="<%= user.profilePic %>" groupID="<%= null %>" userID="<%= user.userID %>"></script>
             <% } %>
-
-
-                </html>
+</html>

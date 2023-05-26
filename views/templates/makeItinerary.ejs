@@ -11,14 +11,12 @@
         <div class="formItem">
           <p class="formText">Start Date:</p>
           <div class='input-group date' id='startPicker'>
-
             <input type='text' class="form-control" id="startDateValue" readonly/>
             <span class="input-group-addon">
               <span class="glyphicon glyphicon-calendar"></span>
             </span>
           </div>
         </div>
-
         <div class="formItem">
           <p class="formText">End Date:</p>
           <div class='input-group date' id='endPicker'>
@@ -28,26 +26,20 @@
             </span>
           </div>
         </div>
-
         <div class="formItem">
           <p class="formText">Start Planning Time:</p>
           <div class='input-group date' id='startTimePicker'>
-
             <input type='text' class="form-control timepicker" id="startTimeValue" readonly/>
             </span>
           </div>
         </div>
-
         <div class="formItem">
           <p class="formText">Finish Planning Time:</p>
           <div class='input-group date' id='finishTimePicker'>
-
             <input type='text' class="form-control timepicker" id="endTimeValue" readonly/>
-
             </span>
           </div>
         </div>
-
         <div class="formItem filterSelection" style="position: relative;">
           <p class="formText">Country:<span id="selectedCountry"></span></p>
           <button class="btn btn-primary filterButton" type="button" data-toggle="dropdown">Select destination country
@@ -55,9 +47,6 @@
           <ul class="dropdown-menu" id="country">
             <input class="form-control" id="myInput" type="text" placeholder="Select country">
           </ul>
-          <!-- <select type="country" id="country" name="country" class="form-select" aria-label="Select country">
-                    <option selected>Select your destination country</option>
-                </select> -->
         </div>
 
         <div class="formItem" style="margin-top:20px;position: relative;">
@@ -70,9 +59,7 @@
           <ul class="dropdown-menu dropdown-city" id="city">
             <!-- <input class="form-control" id="myCityInput" type="text" placeholder="Select city"> -->
           </ul>
-
         </div>
-
       </div>
       <div class="modal-footer">
         <button type="button" style="position:absolute;left:15px;" class="btn btn-primary"
@@ -127,11 +114,11 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <p>Are you sure you want to delete the selected city?</p>
+        <p>Are you sure you want to delete the selected item?</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" onclick="deleteCity()">Confirm</button>
+        <button type="button" class="btn btn-primary" id="confirmButtonTrigger">Confirm</button>
       </div>
     </div>
   </div>
@@ -148,7 +135,6 @@
         <div class="formItem">
           <p class="formText">Start Planning Time:</p>
           <div class='input-group date' id='startTimePicker'>
-
             <input type='text' class="form-control timepicker" id="startTimeEdit" readonly/>
             </span>
           </div>
@@ -168,7 +154,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" style="position:absolute;left:15px;" class="btn btn-primary"
-          onclick="deleteActivity()">Delete</button>
+          onclick="handleConfirm()">Delete</button>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         <button type="button" class="btn btn-primary" onclick="submitEdit()">Confirm</button>
       </div>

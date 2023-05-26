@@ -11,14 +11,6 @@
                         </span>
                     </button>
                 </div>
-                <!-- <div class="unit">
-                    <div class="card" data-toggle="modal" data-target="#exampleModalCenter" >
-                        <img class="card-image" src="../image/001.jpg" alt="Card image cap" >
-                        <div class="text-overlay">
-                            <h2>PARIS</h2>
-                        </div>
-                    </div>
-                </div> -->
                 <!-- above card is a place holder -->
                 <% for (var i = 0; i < bucketlist.length; i++) { %>
                 <div class="unit">
@@ -32,7 +24,6 @@
 
                         <div class="text-overlay">
                             <h2><%= bucketlist[i].city %></h2>
-                            <!-- to change the data finding way -->
                         </div>
                     </div>
                 </div>
@@ -45,7 +36,6 @@
 
                             <div class="modal-header">
                                 <h1 class="modal-title" id="<%= bucketlist[i]._id %>"><%= bucketlist[i].city %></h1>
-                                <!-- to change the data finding way -->
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                                 </button>
@@ -57,13 +47,11 @@
                             <% } %>
                             <div class="modal-body">
                                 <h5><%=bucketlist[i].country %>
-                                    <!-- to change the data finding way -->
                                     <span style="float: right" class="material-symbols-outlined">
                                     more_vert
                                     </span>
                                 </h5>
                                 <p><%=bucketlist[i].description %></p>
-                                <!-- to change the data finding way -->
                             </div>
 
                             <div class="modal-footer">
@@ -91,6 +79,7 @@
     };
 
     document.getElementById('toHistoryBtn').onclick = function (e) {
+        //ready to move selected bucket to history
         e.preventDefault();
 
         swal({
@@ -101,7 +90,6 @@
             dangerMode: true,
         }).then((willDelete) => {
             if (willDelete) {
-
                 swal("Your card has been moved to your history!", {
                     icon: "success",
                 }).then(() => {
@@ -111,8 +99,5 @@
                 swal("Your card is safe!");
             }
         });
-
     };
-
-
 </script>

@@ -45,20 +45,27 @@ const itineraryIcons = {
 
 
 $(document).ready(function () {
+    var currentDate = new Date();
+    currentDate.setDate(currentDate.getDate());
+
     $('#startPicker').datepicker({
-        format: "yyyy-mm-dd"
+        format: "yyyy-mm-dd",
+        startDate: currentDate
     });
 
     $('#endPicker').datepicker({
-        format: "yyyy-mm-dd"
+        format: "yyyy-mm-dd",
+        startDate: currentDate
     });
 
     $('#startPickerAdjust').datepicker({
-        format: "yyyy-mm-dd"
+        format: "yyyy-mm-dd",
+        startDate: currentDate
     });
 
     $('#endPickerAdjust').datepicker({
-        format: "yyyy-mm-dd"
+        format: "yyyy-mm-dd",
+        startDate: currentDate
     });
 
     $('.timepicker').timepicker({
@@ -68,58 +75,50 @@ $(document).ready(function () {
     });
 
     $("#myInput").on("keyup", function () {
+        //bind filter on the text input
         var value = $(this).val().toLowerCase();
         $(".dropdown-menu li").filter(function () {
             $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
         });
     });
 
-    function setup(){
+    /**
+     * setup the itinerary environment if user has joined a group.
+     */
+    function setup() {
         var elem = document.getElementsByClassName("itineraryPlan")
-        
-        if(elem.length >0){
+        if (elem.length > 0) {
             var screenHeight = screen.height
-            elem[0].setAttribute("style", `height:${screenHeight - 340}px`)
+            elem[0].setAttribute("style", `height:${document.body.offsetHeight - 320}px`)
         }
 
-         // Client-side code
-    fetch('/itineraryData')
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not OK');
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log(data);
-
-        if (data && data.itinerary) {
-            const itinerary = data.itinerary;
-
-            console.log(itinerary);
-
-            insertItinerary(itinerary);
-        } else {
-            console.log('Invalid itinerary data');
-        }
-    })
-    .catch(error => {
-        console.error(error);
-    });
-        
+        // Client-side code
+        fetch('/itineraryData')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not OK');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data && data.itinerary) {
+                    const itinerary = data.itinerary;
+                    insertItinerary(itinerary);
+                } else {
+                    swal('Invalid itinerary data');
+                }
+            })
+            .catch(error => {
+                console.error(error);
+            });
     }
 
-    if(groupName != "Join a group First!"){
+    if (groupName != "Join a group First!") {
         setup();
     }
 
-    
-
-
     var countrySelect = document.getElementById('country');
     var citySelect = document.getElementById('city');
-
-
 
     // Fetch country data from the API
     fetch('https://countriesnow.space/api/v0.1/countries')
@@ -147,6 +146,9 @@ $(document).ready(function () {
             console.log('Error:', error);
         });
 
+    /**
+     * render cities values from API dynamically to the dropdown list
+     */
     function renderCities() {
         fetch('https://countriesnow.space/api/v0.1/countries')
             .then(response => response.json())
@@ -162,28 +164,22 @@ $(document).ready(function () {
                                 var span = document.createElement('span');
                                 span.classList.add('cityItem');
                                 span.textContent = e.target.innerHTML;
-
                                 span.addEventListener('click', handleCityClick);
-
                                 console.log(e.target.innerHTML);
                                 selectedCities.push(e.target.innerHTML)
                                 document.getElementById("selectedCities").appendChild(span);
-
-
                             });
                             citySelect.appendChild(option);
                         });
                     }
-
                 });
                 setTimeout(() => {
                     var firstChild = document.getElementById('city').firstElementChild;
-                    var inputElement = document.createElement("input"); // Create the <input> element
-
-                    inputElement.setAttribute("class", "form-control"); // Set the class attribute
-                    inputElement.setAttribute("id", "myCityInput"); // Set the id attribute
-                    inputElement.setAttribute("type", "text"); // Set the type attribute
-                    inputElement.setAttribute("placeholder", "Select city"); // Set the placeholder attribute
+                    var inputElement = document.createElement("input");
+                    inputElement.setAttribute("class", "form-control");
+                    inputElement.setAttribute("id", "myCityInput");
+                    inputElement.setAttribute("type", "text"); 
+                    inputElement.setAttribute("placeholder", "Select city");
                     citySelect.insertBefore(inputElement, firstChild);
                     $("#myCityInput").on("keyup", function () {
                         var value = $(this).val().toLowerCase();
@@ -191,29 +187,45 @@ $(document).ready(function () {
                             $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
                         });
                     });
-
-
                 })
             })
             .catch(error => {
                 console.log('Error:', error);
             });
-
     }
-
-
-   
 });
 
-
-
-function handleCityClick(e) {
-    readyToRemove = e.target
-    console.log(readyToRemove)
-
-    $("#confirmModal").modal("show")
+/**
+ * handle confirm behaviors and ready to delete selected activity.
+ */
+function handleConfirm() {
+    $("#editModal").modal("hide");
+    $("#confirmModal").modal("show");
+    setTimeout(() => {
+        document.getElementById("confirmButtonTrigger").addEventListener('click', deleteTriggerActivity);
+    });
 }
 
+
+/**
+ * handle confirm behaviors and ready to delete selected city.
+ * 
+ * @param {Object} e - DOM element object that triggered the event 
+ */
+function handleCityClick(e) {
+    readyToRemove = e.target
+    $("#confirmModal").modal("show")
+    setTimeout(() => {
+        document.getElementById("confirmButtonTrigger").addEventListener('click', deleteTriggerCity);
+    });
+}
+
+/**
+ * delete the passed value in an array 
+ * 
+ * @param {Array} arr - the target array needs to manipulate 
+ * @param {*} value - the passed value needs to delete from the array
+ */
 function deleteFromArray(arr, value) {
     const index = arr.indexOf(value);
     if (index > -1) {
@@ -221,14 +233,19 @@ function deleteFromArray(arr, value) {
     }
 }
 
+/**
+ * filter out the characters in a string other then numbers
+ * 
+ * @param {String} string - targeted string needs to filter
+ * @returns {String}-the filtered string only contains numbers
+ */
 function keepNumbersOnly(string) {
     return Number(string.replace(/\D/g, ''));
-  }
-  
+}
 
-
-  
-
+/**
+ * define the behaviors to submit making a new itineary request.
+ */
 async function submitForm() {
     var startDate = document.getElementById("startDateValue").value;
     var endDate = document.getElementById("endDateValue").value;
@@ -247,8 +264,7 @@ async function submitForm() {
     }
 
     if (startDate != "" && endDate != "" && startTime != "" && endTime != "" && selectedCountry != undefined && selectedCities != []) {
-        if (checkBool==true && checkBoolTwo== true) {
-            // notify("AI is generating your itinerary! Please note that the response time might take longer if the travel duration is long.");
+        if (checkBool == true && checkBoolTwo == true) {
             $('#makeNewModal').modal("hide");
 
             swal({
@@ -263,41 +279,40 @@ async function submitForm() {
                     },
                     body: new URLSearchParams(postData)
                 })
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.status == 200) {
+                            swal({
+                                title: "Oops",
+                                text: "seems like you lost connection with backend.",
+                                icon: "error",
+                            })
+                        }
+                        return response.json();
+                    })
                     .then(data => {
-                        
                         notify(data.message);
                         console.log(data)
                         insertItinerary(data.itinerary);
-                        // window.location.href = "/home";
-    
-    
                     })
                     .catch(error => {
-                        // Handle any errors
                         console.error(error);
                     });
             })
-
-
         } else {
             swal("Start time/ date can not be later than end time/date!")
         }
-
-
     } else {
         swal("Please fill in all the fields!")
     }
-
-
-    console.log(postData)
-
-
-
-
-    // Client-side JavaScript
 }
 
+/**
+ * calculate the end date given the start date and duration days
+ * 
+ * @param {Number} days - duration days
+ * @param {String} startDate - start date in string
+ * @returns {String}- formatted timestamp "YYYY-MM-DD"
+ */
 function calculateEndDate(days, startDate) {
     // Convert the start date to a JavaScript Date object
     const startDateObj = new Date(startDate);
@@ -314,7 +329,38 @@ function calculateEndDate(days, startDate) {
     return `${year}-${month}-${day}`;
 }
 
-function deleteCity() {
+/**
+ * delete the selected activity.
+ */
+function deleteTriggerActivity() {
+    var postData = {
+        'deleteSchedule': JSON.stringify(deleteSchedule),
+        'date': targetDate
+    }
+    fetch('/itinerary/delete', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams(postData)
+    })
+        .then(response => response.json())
+        .then(data => {
+            $("#confirmModal").modal("hide");
+            notify(data.message);
+            setTimeout(() => {
+                location.reload()
+            }, 800)
+        })
+        .catch(error => {
+            console.error(error);
+        });
+}
+
+/**
+ * delete the selected city.
+ */
+function deleteTriggerCity() {
     $("#confirmModal").modal("hide");
     readyToRemove.remove();
     var text = readyToRemove.innerHTML;
@@ -322,109 +368,106 @@ function deleteCity() {
     console.log(selectedCities);
 }
 
+/**
+ * insert the given itinerary into DOM tree.
+ * 
+ * @param {Object} itineraryJSON - itinerary object contains all information 
+ */
 function insertItinerary(itineraryJSON) {
-    if(itineraryJSON.length>0){
+    if (itineraryJSON.length > 0) {
         const itineraryContainer = document.querySelector('.itineraryPlan');
-    itineraryContainer.innerHTML = '';
-    for (let i = 0; i < itineraryJSON.length; i++) {
-        const itinerary = itineraryJSON[i];
-        const dateButton = document.createElement('button');
-        dateButton.type = 'button';
-        dateButton.classList.add('dateTrigger');
-        dateButton.setAttribute('data-toggle', 'collapse');
-        dateButton.setAttribute('data-target', `#demo${i + 1}`);
-        dateButton.innerText = itinerary.date;
+        itineraryContainer.innerHTML = '';
+        for (let i = 0; i < itineraryJSON.length; i++) {
+            const itinerary = itineraryJSON[i];
+            const dateButton = document.createElement('button');
+            dateButton.type = 'button';
+            dateButton.classList.add('dateTrigger');
+            dateButton.setAttribute('data-toggle', 'collapse');
+            dateButton.setAttribute('data-target', `#demo${i + 1}`);
+            dateButton.innerText = itinerary.date;
+            const collapseContainer = document.createElement('div');
+            collapseContainer.id = `demo${i + 1}`;
+            collapseContainer.classList.add('collapse', 'itineraryBlockContainer');
+            itinerary.schedule.forEach((schedule) => {
+                var schedule = schedule;
+                const itineraryBlock = document.createElement('div');
+                itineraryBlock.classList.add('itineraryBlock');
 
-        const collapseContainer = document.createElement('div');
-        collapseContainer.id = `demo${i + 1}`;
-        collapseContainer.classList.add('collapse', 'itineraryBlockContainer');
+                const itineraryTime = document.createElement('div');
+                itineraryTime.classList.add('itineraryTime');
 
-        itinerary.schedule.forEach((schedule) => {
-            var schedule = schedule;
-            const itineraryBlock = document.createElement('div');
-            itineraryBlock.classList.add('itineraryBlock');
-
-            const itineraryTime = document.createElement('div');
-            itineraryTime.classList.add('itineraryTime');
-
-            const itineraryTimeText = document.createElement('div');
-            itineraryTimeText.classList.add('itineraryTimeText');
-            itineraryTimeText.innerHTML = `
+                const itineraryTimeText = document.createElement('div');
+                itineraryTimeText.classList.add('itineraryTimeText');
+                itineraryTimeText.innerHTML = `
           <p>${schedule.startTime}</p>
           <p>|</p>
           <p>${schedule.endTime}</p>
         `;
+                const itineraryTimeDecorator = document.createElement('p');
+                itineraryTimeDecorator.classList.add('itineraryTimeDecorator');
+                const decoratorCircle = document.createElement('span');
+                decoratorCircle.classList.add('decoratorCircle');
+                decoratorCircle.classList.add('material-symbols-outlined');
 
-            const itineraryTimeDecorator = document.createElement('p');
-            itineraryTimeDecorator.classList.add('itineraryTimeDecorator');
-
-            const decoratorCircle = document.createElement('span');
-            decoratorCircle.classList.add('decoratorCircle');
-            decoratorCircle.classList.add('material-symbols-outlined');
-
-            if(itineraryIcons[schedule.category]){
-                decoratorCircle.innerHTML = itineraryIcons[schedule.category]
-            }else{
-                decoratorCircle.innerHTML = itineraryIcons.other
-            }
-            itineraryTimeDecorator.appendChild(decoratorCircle);
-            itineraryTime.appendChild(itineraryTimeText);
-            itineraryTime.appendChild(itineraryTimeDecorator);
-
-            const itineraryActivity = document.createElement('div');
-            itineraryActivity.classList.add('itineraryActivity');
-            itineraryActivity.innerHTML = `
+                if (itineraryIcons[schedule.category]) {
+                    decoratorCircle.innerHTML = itineraryIcons[schedule.category]
+                } else {
+                    decoratorCircle.innerHTML = itineraryIcons.other
+                }
+                itineraryTimeDecorator.appendChild(decoratorCircle);
+                itineraryTime.appendChild(itineraryTimeText);
+                itineraryTime.appendChild(itineraryTimeDecorator);
+                const itineraryActivity = document.createElement('div');
+                itineraryActivity.classList.add('itineraryActivity');
+                itineraryActivity.innerHTML = `
           ${schedule.activity}<br>
           ${schedule.transportation}<span class="material-symbols-outlined itineraryBlockEdit">edit_note</span>
         `;
+                itineraryBlock.appendChild(itineraryTime);
+                itineraryBlock.appendChild(itineraryActivity);
+                collapseContainer.appendChild(itineraryBlock);
 
-            itineraryBlock.appendChild(itineraryTime);
-            itineraryBlock.appendChild(itineraryActivity);
-            collapseContainer.appendChild(itineraryBlock);
+                // Select the 'span' element within 'itineraryActivity'
+                var editButton = itineraryActivity.querySelector(".itineraryBlockEdit");
+                var passobj = {
+                    'date': itinerary.date,
+                    'schedule': schedule
+                }
 
-
-
-            // Select the 'span' element within 'itineraryActivity'
-            var editButton = itineraryActivity.querySelector(".itineraryBlockEdit");
-            var passobj = {
-                'date': itinerary.date,
-                'schedule': schedule
-            }
-
-            // Attach an event listener to the 'span' element
-            editButton.addEventListener("click", function () {
-                editItinerary(passobj);
-            })
-        });
-
-        itineraryContainer.appendChild(dateButton);
-        itineraryContainer.appendChild(collapseContainer);
+                // Attach an event listener to the 'span' element
+                editButton.addEventListener("click", function () {
+                    editItinerary(passobj);
+                })
+            });
+            itineraryContainer.appendChild(dateButton);
+            itineraryContainer.appendChild(collapseContainer);
+        }
     }
-
-    }
-    
 }
 
+/**
+ * save the passes object in global variable and ready to do further actions.
+ * 
+ * @param {Object} passObj - the object contains of information of user selected item
+ */
 function editItinerary(passObj) {
-    console.log(passObj);
     deleteSchedule = passObj.schedule;
     targetDate = passObj.date;
     referStartTime = passObj.schedule.startTime;
     $("#editModal").modal("show");
     setTimeout(() => {
         document.getElementById("editActivity").setAttribute("value", passObj.schedule.activity);
-        // var elem = document.getElementById("startTimeValue")
-        // elem.value = passObj.schedule.startTime
-        // console.log(elem.value)
         $("#startTimeEdit").val(passObj.schedule.startTime);
         $("#endTimeEdit").val(passObj.schedule.endTime);
-        // $("#endTimeValue").val(passObj.schedule.endTime)
-
-        // document.getElementById("startTimeValue").setAttribute("value", passObj.schedule.startTime);
-        // document.getElementById("endTimeValue").setAttribute("value", passObj.schedule.endTime);
     }, 100)
 }
 
+/**
+ * return the city and country combined string as an array.
+ * 
+ * @param {String} inputString - the string to convert
+ * @returns {Array} - the city and country as an array
+ */
 function parseCityCountry(inputString) {
     // Split the input string by comma and trim whitespace
     const parts = inputString.split(",").map((part) => part.trim());
@@ -437,6 +480,9 @@ function parseCityCountry(inputString) {
     return [city, country];
 }
 
+/**
+ * send get rocommendation request and dynamically display the respond.
+ */
 function getRecommendations() {
     var startDate = $("#startDateValue").val();
     if (startDate) {
@@ -487,25 +533,32 @@ function getRecommendations() {
             .catch((error) => {
                 console.log("Error:", error);
             });
-
     } else {
         swal("Please select a start date to get an AI recommended trip!");
     }
 }
 
+/**
+ * convert time string to date.
+ * 
+ * @param {String} timeStr - formatted time string needs to convert
+ * @returns {Date} - the date data matches time string
+ */
 function convertTime(timeStr) {
     return new Date(timeStr);
 }
 
+/**
+ * gather all necessary user inputs and submit edit request to backend if eligible.
+ */
 function submitEdit() {
     var startTime = document.getElementById("startTimeEdit").value
     var endTime = document.getElementById("endTimeEdit").value
     var activity = document.getElementById("editActivity").value
-    var securityCheck = keepNumbersOnly(endTime) > keepNumbersOnly(startTime)
+    var securityCheck = keepNumbersOnly(endTime) > keepNumbersOnly(startTime) && activity.replace(/\s/g, "") != "";
 
     setTimeout(() => {
         if (securityCheck) {
-
             var postData = {
                 'schedule': JSON.stringify({
                     'startTime': startTime,
@@ -522,73 +575,55 @@ function submitEdit() {
                 },
                 body: new URLSearchParams(postData)
             })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.status == 200) {
+                        swal({
+                            title: "Oops",
+                            text: "seems like you lost connection with backend.",
+                            icon: "error",
+                        })
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    // Handle the response from the backend
                     console.log(data);
                     $("#editModal").modal("hide")
                     notify(data.message);
-                    setTimeout(()=>{
+                    setTimeout(() => {
                         location.reload()
-                    },800)
-                    
+                    }, 800)
                 })
                 .catch(error => {
-                    // Handle any errors
                     console.error(error);
                 });
-
         } else {
-            swal("end time can not be earlier than start time!")
+            swal("end time can not be earlier than start time! Activity can not be empty!")
         }
-
     })
-
 }
 
-function notify(message){
+/**
+ * notify success message to user.
+ * 
+ * @param {String} message - text message needs to display
+ */
+function notify(message) {
     var elem = document.getElementById("primaryAlert");
     var messageElem = document.getElementById("alertMessage");
     messageElem.innerText = message;
-    elem.setAttribute("style", "display:block;opacity:1;top:60px;");
-    setTimeout(()=>{
-        elem.setAttribute("style", "display:none;opacity:0;top:75px;");
+    elem.setAttribute("style", "display:block;opacity:1;top:90px;");
+    setTimeout(() => {
+        elem.setAttribute("style", "display:none;opacity:0;top:100px;");
     }, 8000)
 }
 
-function deleteActivity() {
-    var postData = {
-        'deleteSchedule': JSON.stringify(deleteSchedule),
-        'date': targetDate
-    }
-
-    $("#confirmModal").modal("hide");
-    fetch('/itinerary/delete', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams(postData)
-    })
-        .then(response => response.json())
-        .then(data => {
-            // Handle the response from the backend
-            console.log(data);
-            notify(data.message);
-            setTimeout(()=>{
-                location.reload()
-            },800)
-        })
-        .catch(error => {
-            // Handle any errors
-            console.error(error);
-        });
-}
-
+/**
+ * gather all necessary information and send the adjust dates request to backend if eligible.
+ */
 function submitAdjustDates() {
     var startDate = document.getElementById("startPickerAdjustValue").value
     var endDate = document.getElementById("endPickerAdjustValue").value
-    
+
     if (startDate != "" && endDate != "") {
         if (convertTime(endDate) >= convertTime(startDate)) {
             $("#adjustDateModal").modal("hide");
@@ -596,7 +631,6 @@ function submitAdjustDates() {
                 'startDate': startDate,
                 'endDate': endDate
             }
-            // notify("AI is generating your request! please note that the respond might take longer if the travel duration is long.");
             swal({
                 title: "AI is generating your itinerary!",
                 text: "Please note that the response time might take longer if the travel duration is long.",
@@ -610,28 +644,30 @@ function submitAdjustDates() {
                     },
                     body: new URLSearchParams(postData)
                 })
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.status == 200) {
+                            swal({
+                                title: "Oops",
+                                text: "seems like you lost connection with backend.",
+                                icon: "error",
+                            })
+                        }
+                        return response.json();
+                    })
                     .then(data => {
-                        // Handle the response from the backend
-                        
+
                         notify(data.message);
                         console.log("data", data.itinerary);
                         insertItinerary(data.itinerary);
-                        // window.location.href = "/home";
-    
                     })
                     .catch(error => {
-                        // Handle any errors
                         console.error(error);
                     });
             })
         } else {
-            //alert that starte date can not be latter than end Date
             swal("Please ensure the start date is ealier or equal to the end date!")
         }
-
     } else {
         swal("Please fill out all fields!")
     }
-
 }
