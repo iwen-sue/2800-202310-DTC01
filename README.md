@@ -38,6 +38,7 @@ JavaScript(express.js) under Node.js environment
     "ejs": "^3.1.9",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
+    "jest": "^29.5.0"
     "joi": "^17.8.4",
     "moment": "^2.29.4",
     "mongodb": "^5.4.0",
@@ -46,6 +47,7 @@ JavaScript(express.js) under Node.js environment
     "nodemailer": "^6.9.2",
     "openai": "^3.2.1",
     "readline": "^1.3.0",
+    "selenium-webdriver": "^4.9.2",
     "socket.io": "^4.6.1"
 #### Database:
 NoSQL database: MongoDB
@@ -110,10 +112,15 @@ Subfolers and files:
 │   │       /resetPassword.js
 │   │       /travelrecs.js
 │   │       /userprofile.js
-│   │       /validatetoken.js
+│   │       /validateToken.js
 │   │
 │   └───userProfileImages
 │           /avatar-default.png
+│ 
+├───tests
+│       functiontest.js
+│       isAlphanumeric.test.js
+│       validateToken.test.js│
 │
 └───views
     │   /404.ejs
