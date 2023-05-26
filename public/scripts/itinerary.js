@@ -266,37 +266,46 @@ async function submitForm() {
     if (startDate != "" && endDate != "" && startTime != "" && endTime != "" && selectedCountry != undefined && selectedCities != []) {
         if (checkBool == true && checkBoolTwo == true) {
             $('#makeNewModal').modal("hide");
+            var counter = 0;
 
             swal({
                 title: "AI is generating your itinerary!",
                 text: "Please note that the response time might take longer if the travel duration is long.",
                 icon: "success",
             }).then(() => {
-                fetch('/itinerary/submitNew', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: new URLSearchParams(postData)
-                })
-                    .then(response => {
-                        if (!response.status == 200) {
-                            swal({
-                                title: "Oops",
-                                text: "seems like you lost connection with backend.",
-                                icon: "error",
-                            })
-                        }
-                        return response.json();
+                function startPolling(){
+                    fetch('/itinerary/submitNew', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: new URLSearchParams(postData)
                     })
-                    .then(data => {
-                        notify(data.message);
-                        console.log(data)
-                        insertItinerary(data.itinerary);
-                    })
-                    .catch(error => {
-                        console.error(error);
-                    });
+                        .then(response => {
+                            if (!response.status == 200) {
+                                swal({
+                                    title: "Oops",
+                                    text: "seems like you lost connection with backend.",
+                                    icon: "error",
+                                })
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            clearInterval(setPolling);
+                            if(data.itinerary && counter == 0){
+                                notify(data.message);
+                                console.log(data);
+                                insertItinerary(data.itinerary);
+                                counter = 1;
+                            }
+                            
+                        })
+                        .catch(error => {
+                            console.error(error);
+                        });
+                }
+                 var setPolling = setInterval(startPolling, 8000);
             })
         } else {
             swal("Start time/ date can not be later than end time/date!")

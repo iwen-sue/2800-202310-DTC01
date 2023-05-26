@@ -141,9 +141,9 @@ app.get('/home', sessionValidation, async (req, res) => {
         if (groupQuery) {
             const groupName = groupQuery.groupName;
             var country;
-            if(groupQuery.country){
+            if (groupQuery.country) {
                 country = groupQuery.country
-            }else{
+            } else {
                 country = "nothing here yet"
             }
             const itineraryQuery = await groupsModel.findById(groupID, 'itinerary');
@@ -265,7 +265,7 @@ app.get('/editBucket', (req, res) => {
 app.get('/api-key', (req, res) => {
     // Fetch the API key from your server-side storage
     const apiKey = process.env.OPENAI_API_KEY;
-  
+
     // Return the API key as the response
     res.json({ apiKey });
 });
@@ -351,7 +351,7 @@ app.post('/signup', async (req, res) => {
             const lastName = req.body.lastName.replace(/\s/g, "") || '';
             const email = req.body.email || '';
             const password = req.body.password || '';
-        
+
             return res.render('signup', { error: 'MissingFields', groupToken: req.body.groupToken, firstName, lastName, email, password });
         }
 
@@ -373,7 +373,7 @@ app.post('/signup', async (req, res) => {
         req.session.password = hashedPassword;
         req.session.email = req.body.email;
         req.session.cookie.maxAge = 2147483647;
-        
+
         if (req.body.groupToken != null) {
             userType = 'member'
             var group = await groupsModel.find({ _id: req.body.groupToken }).exec();
@@ -437,7 +437,7 @@ app.post('/login', async (req, res) => {
 
     if (result.length == 0) {
         var error = "User is not found";
-        return res.render("login", { error: error, errorType: 'UserNotFound', groupToken: groupToken, email: ""});
+        return res.render("login", { error: error, errorType: 'UserNotFound', groupToken: groupToken, email: "" });
     }
     if (await bcrypt.compare(password, result[0].password)) {
         console.log("password is correct");
@@ -498,7 +498,7 @@ app.post('/login', async (req, res) => {
     }
     else {
         var error = "Password is not correct";
-        return res.render("login", { error: error, errorType: 'IncorrectPassword', groupToken: groupToken, email: email  });
+        return res.render("login", { error: error, errorType: 'IncorrectPassword', groupToken: groupToken, email: email });
     }
 });
 
@@ -699,8 +699,8 @@ app.post('/joingroup', sessionValidation, async (req, res) => {
             }
         }
         if (memberHasJoinedPreviously) {
-            for(var i = 0; i < currentMembers.length; i++){
-                if(currentMembers[i].email == req.session.email){
+            for (var i = 0; i < currentMembers.length; i++) {
+                if (currentMembers[i].email == req.session.email) {
                     currentMembers[i].active = true;
                 }
             }
@@ -720,7 +720,7 @@ app.post('/joingroup', sessionValidation, async (req, res) => {
                 }
             }).exec();
         }
-    
+
         await usersModel.updateOne({ email: req.session.email }, { $set: { groupID: groupToken, type: 'member' } }).exec();
         res.redirect('/userprofile/groupdetails');
 
@@ -785,8 +785,13 @@ const categories = [
     "Relaxation"
 ];
 
+const activeConnections = new Set(); // Track active connections
+
 //catch the submitNew request, run the defined behaviors and send the necessary data to frontend
 app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
+    const timeout = 10 * 60 * 1000; // 10 minutes request timeout
+    const startCounter = Date.now(); //set startCounter for polling loop
+
     var citiesArray = JSON.parse(req.body.cities);
     const startDate = req.body.startDate;
     const endDate = req.body.endDate;
@@ -822,7 +827,9 @@ app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
         { role: 'assistant', content: 'Let me generate an itinerary for you based on your preferences.' },
         { role: 'user', content: `Don\'t forget to include transportation time` },
     ];
-    let itinerary; // Declare itinerary variable outside the promise chain
+    var itinerary; // Declare itinerary variable outside the promise chain
+
+    const checkForItinerary = async () => {
     try {
         itinerary = await generateItinerary(conversation);
         const startIndex = itinerary.indexOf("[");
@@ -832,10 +839,24 @@ app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
         console.log(parsedItinerary)
         await saveItinerary(parsedItinerary, groupID, country);
         res.json({ itinerary: parsedItinerary, message: "Itinerary generated successfully!" });
-      } catch (error) {
+        res.end();
+    } catch (error) {
         console.error("Error:", error);
-        res.status(500).json({ error: "An error occurred", message:"An error occurred" });
-      }
+        res.status(500).json({ error: "An error occurred", message: "An error occurred" });
+        res.end();
+    }
+    }
+
+    const pollingLoop = async () => {
+        const currentCounter = Date.now();
+        if (currentCounter - startCounter >= timeout) {
+          res.json({ itinerary: null, message: "Timeout occurred" });
+        } else {
+          await checkForItinerary();
+        }
+      };
+    
+      pollingLoop();
 });
 
 /**
@@ -851,10 +872,10 @@ async function saveItinerary(itineraryJSON, groupID, country) {
     await groupsModel.updateOne({ _id: groupID }, { $unset: { itinerary: 1 } }).exec();
 
     // Create a new itinerary array and push the new itinerary into it
-    if(country){
-        const update = { $push: { itinerary: { $each: itineraryJSON } }, $set: {country: country} };
+    if (country) {
+        const update = { $push: { itinerary: { $each: itineraryJSON } }, $set: { country: country } };
         await groupsModel.updateOne({ _id: groupID }, update).exec();
-    }else{
+    } else {
         const update = { $push: { itinerary: { $each: itineraryJSON } } };
         await groupsModel.updateOne({ _id: groupID }, update).exec();
     }
@@ -911,26 +932,21 @@ app.post('/itinerary/adjustment', sessionValidation, async (req, res) => {
     const startDate = req.body.startDate;
     const endDate = req.body.endDate;
     const promptArgs = `Make an itinerary from ${startDate} to ${endDate}, the same country, cities, startTime, and endTime as ${preItinerary} in a format {date :, schedule: [{"startTime":,"endTime":, "category":, "activity":, "transportation":  transportation with estimated time }]}, Make an object for each date in JSON format that is in an array. Assign dates properly in only one city considering distance. Include recommended transportation for each activity. Use the following categories to categorize each activity: ${categories}`;
-    console.log("Generating itinerary...");
 
     let itinerary; // Declare itinerary variable outside the promise chain
     try {
         itinerary = await newItinerary(promptArgs);
-        console.log("Itinerary generated:", itinerary);
         const startIndex = itinerary.indexOf("[");
         const endIndex = itinerary.lastIndexOf("]") + 1;
         const itineraryContent = itinerary.substring(startIndex, endIndex);
-        console.log("Itinerary content:", itineraryContent); // Debugging line
         const parsedItinerary = JSON.parse(itineraryContent);
-        console.log("Parsed itinerary:", parsedItinerary); // Debugging line
-        await saveItinerary(parsedItinerary, groupID);
-        console.log("itinerary is saved")
+        await saveItinerary(parsedItinerary, groupID, null);
         res.status(200).json({ message: "Travel Dates adjusted successfully",  itinerary: parsedItinerary});
     } catch (error) {
         console.error("Error:", error);
         res.status(500).json({ error: "An error occurred", message:"An error occurred" });
       }
-    });
+});
 
 //catch the edit request, run the defined behaviors and send the success message to frontend.
 app.post('/itinerary/edit', sessionValidation, async (req, res) => {
@@ -951,22 +967,22 @@ app.post('/itinerary/edit', sessionValidation, async (req, res) => {
 
     const filter = { _id: groupID };
     const update = {
-      $set: {
-        "itinerary.$[itineraryObj].schedule.$[scheduleObj].startTime": editedStartTime,
-        "itinerary.$[itineraryObj].schedule.$[scheduleObj].endTime": editedEndTime,
-        "itinerary.$[itineraryObj].schedule.$[scheduleObj].activity": editedActivity
-      }
+        $set: {
+            "itinerary.$[itineraryObj].schedule.$[scheduleObj].startTime": editedStartTime,
+            "itinerary.$[itineraryObj].schedule.$[scheduleObj].endTime": editedEndTime,
+            "itinerary.$[itineraryObj].schedule.$[scheduleObj].activity": editedActivity
+        }
     };
     const options = {
-      arrayFilters: [
-        { "itineraryObj.date": date },
-        { "scheduleObj.startTime": referStartTime }
-      ],
-      new: true
+        arrayFilters: [
+            { "itineraryObj.date": date },
+            { "scheduleObj.startTime": referStartTime }
+        ],
+        new: true
     };
     const updatedDocument = await groupsModel.findOneAndUpdate(filter, update, options);
     res.status(200).json({ message: "edit updated successful!" });
-  });
+});
 
 // catch the delete request, run the defined behaviors and pass the success message to frontend.
 app.post('/itinerary/delete', sessionValidation, async (req, res) => {
