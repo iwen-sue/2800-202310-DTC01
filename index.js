@@ -97,26 +97,8 @@ function sessionValidation(req, res, next) {
         res.redirect('/');
     }
 }
-
-
-function isAdmin(req) {
-    if (req.session.type == 'admin') {
-        return true;
-    }
-    return false;
-}
-
-function adminAuthorization(req, res, next) {
-    if (!isAdmin(req)) {
-        res.status(403);
-        res.render("errorMessage", { error: "Not Authorized" });
-        return;
-    }
-    else {
-        next();
-    }
-}
 // middleware function finishes
+
 /**
  * Check if the id is a valid group id
  * @param {any} id - the id to be checked
@@ -146,7 +128,7 @@ app.get('/', (req, res) => {
     }
 });
 
-// gathher necessary data, render home page and send the data.
+// gather necessary data, render home page and send the data.
 app.get('/home', sessionValidation, async (req, res) => {
     const userEmail = req.session.email;
     const userName = req.session.firstName + " " + req.session.lastName
@@ -197,7 +179,7 @@ app.get('/itineraryData', sessionValidation, async (req, res) => {
     }
 });
 
-// gathher necessary data, render chatroom page and send the data.
+// gather necessary data, render chatroom page and send the data.
 app.get('/chatroom', sessionValidation, async (req, res) => {
     const query = usersModel.findOne({
         email: req.session.email,
@@ -222,7 +204,7 @@ app.get('/chatroom', sessionValidation, async (req, res) => {
     });
 });
 
-//gathher necessary data, render userprofile page and send the data.
+//gather necessary data, render userprofile page and send the data.
 app.get('/userprofile', sessionValidation, async (req, res) => {
     const query = usersModel.findOne({
         email: req.session.email,
@@ -293,7 +275,7 @@ app.get('/enterBucket', (req, res) => {
     res.render("enterBucket");
 });
 
-//gather necessary data, sender travel history page and send data.
+//gather necessary data, render travel history page and send data.
 app.get('/userprofile/travelHistory', (req, res) => {
     const query = usersModel.findOne({
         email: req.session.email,
@@ -307,7 +289,7 @@ app.get('/userprofile/travelHistory', (req, res) => {
     });
 });
 
-//gather necessary data, sender signup page and send data.
+//gather necessary data, render signup page and send data.
 app.get('/signup', (req, res) => {
     const firstName = "";
     const lastName = "";
@@ -321,7 +303,7 @@ app.get('/signup', (req, res) => {
     }
 });
 
-//gather necessary data, sender login page and send data.
+//gather necessary data, render login page and send data.
 app.get('/login', (req, res) => {
     if (req.query.groupToken !== null) {
         res.render("login", { groupToken: req.query.groupToken, email: "" });
@@ -352,7 +334,6 @@ app.get('/resetPassword', async (req, res) => {
 //destroy session and redirect user to /
 app.get('/logout', sessionValidation, (req, res) => {
     req.session.destroy(function (err) {
-        // res.clearCookie(this.cookie, { path: '/' });
         res.redirect('/');
     });
 });
@@ -381,8 +362,8 @@ app.post('/signup', async (req, res) => {
             lastName: req.body.lastName,
             email: req.body.email,
             password: hashedPassword,
-            groupID: req.body.groupToken,
-            type: userType
+            // groupID: req.body.groupToken,
+            // type: userType
         });
         await user.save();
         req.session.authenticated = true;
@@ -397,6 +378,7 @@ app.post('/signup', async (req, res) => {
             var group = await groupsModel.find({ _id: req.body.groupToken }).exec();
             try {
                 var currentMembers = group[0].members;
+                await usersModel.updateOne({ email: req.body.email }, { $set: { groupID: req.body.groupToken, type: userType } }).exec();
             }
             catch (error) {
                 console.log(error)
@@ -458,7 +440,6 @@ app.post('/login', async (req, res) => {
         return res.render("login", { error: error, errorType: 'UserNotFound', groupToken: groupToken, email: ""});
     }
     if (await bcrypt.compare(password, result[0].password)) {
-        console.log("password is correct");
         req.session.authenticated = true;
         req.session.lastName = result[0].lastName;
         req.session.firstName = result[0].firstName;
@@ -653,7 +634,7 @@ app.get('/userprofile/groupdetails', sessionValidation, async (req, res) => {
     }
 });
 
-//catch invite request, gather necessary information and render emailconfirmation page
+//catch invite request, gather necessary information, send invite email, and render emailconfirmation page
 app.post('/invite', sessionValidation, async (req, res) => {
     var inviteEmail = req.body.inviteeEmail;
     const userName = req.session.firstName + " " + req.session.lastName;
