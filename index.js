@@ -320,10 +320,7 @@ app.get('/forgotPassword', (req, res) => {
 
 //render reset password page
 app.get('/resetPassword', async (req, res) => {
-    console.log(req.query.token);
     const user = await usersModel.findOne({ resetToken: req.query.token }).exec();
-    console.log(user)
-    console.log(req.query.token === null)
     if (!user || !req.query.token) {
         res.redirect('/home');
     } else {
@@ -381,7 +378,6 @@ app.post('/signup', async (req, res) => {
                 await usersModel.updateOne({ email: req.body.email }, { $set: { groupID: req.body.groupToken, type: userType } }).exec();
             }
             catch (error) {
-                console.log(error)
                 res.redirect('/userprofile/groupnotfound')
                 return
             }
@@ -512,7 +508,6 @@ app.post('/forgotPassword', async (req, res) => {
         const resetToken = crypto.randomBytes(20).toString('hex');
         const resetTokenExpiry = Date.now() + 3600000; // Expiration in 1 hour
         const expiryDate = new Date(resetTokenExpiry);
-        console.log(expiryDate)
         user.resetToken = resetToken;
         user.resetTokenExpiration = expiryDate;
 
@@ -563,7 +558,6 @@ app.post('/resetPassword', async (req, res) => {
     try {
         const token = req.body.token;
         const email = req.body.email;
-        console.log(email);
         const newPassword = req.body.password;
         const confirmPassword = req.body.confirmPassword;
 
@@ -793,7 +787,6 @@ app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
     const endTime = req.body.endTime;
     const country = req.body.country;
     const cities = citiesArray
-    console.log("Generating itinerary...");
     const userEmail = req.session.email;
     const query = await usersModel.findOne({ email: userEmail });
     const groupID = query.groupID;
@@ -828,7 +821,6 @@ app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
         const endIndex = itinerary.lastIndexOf("]") + 1;
         const itineraryContent = itinerary.substring(startIndex, endIndex);
         const parsedItinerary = JSON.parse(itineraryContent);
-        console.log(parsedItinerary)
         await saveItinerary(parsedItinerary, groupID, country);
         res.json({ itinerary: parsedItinerary, message: "Itinerary generated successfully!" });
       } catch (error) {
@@ -845,7 +837,6 @@ app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
  * @param {String} country - destination country name 
  */
 async function saveItinerary(itineraryJSON, groupID, country) {
-    console.log(country)
     // Delete the existing itinerary array
     await groupsModel.updateOne({ _id: groupID }, { $unset: { itinerary: 1 } }).exec();
 
@@ -910,20 +901,15 @@ app.post('/itinerary/adjustment', sessionValidation, async (req, res) => {
     const startDate = req.body.startDate;
     const endDate = req.body.endDate;
     const promptArgs = `Make an itinerary from ${startDate} to ${endDate}, the same country, cities, startTime, and endTime as ${preItinerary} in a format {date :, schedule: [{"startTime":,"endTime":, "category":, "activity":, "transportation":  transportation with estimated time }]}, Make an object for each date in JSON format that is in an array. Assign dates properly in only one city considering distance. Include recommended transportation for each activity. Use the following categories to categorize each activity: ${categories}`;
-    console.log("Generating itinerary...");
 
     let itinerary; // Declare itinerary variable outside the promise chain
     try {
         itinerary = await newItinerary(promptArgs);
-        console.log("Itinerary generated:", itinerary);
         const startIndex = itinerary.indexOf("[");
         const endIndex = itinerary.lastIndexOf("]") + 1;
         const itineraryContent = itinerary.substring(startIndex, endIndex);
-        console.log("Itinerary content:", itineraryContent); // Debugging line
         const parsedItinerary = JSON.parse(itineraryContent);
-        console.log("Parsed itinerary:", parsedItinerary); // Debugging line
         await saveItinerary(parsedItinerary, groupID);
-        console.log("itinerary is saved")
         res.status(200).json({ message: "Travel Dates adjusted successfully",  itinerary: parsedItinerary});
     } catch (error) {
         console.error("Error:", error);
@@ -939,14 +925,9 @@ app.post('/itinerary/edit', sessionValidation, async (req, res) => {
     const editedStartTime = editedSchedule.startTime;
     const editedEndTime = editedSchedule.endTime;
     const editedActivity = editedSchedule.activity;
-    console.log("editedSchedule", editedSchedule);
-    console.log("date", date);
-    console.log("referStartTime", referStartTime);
-
     const userEmail = req.session.email;
     const userQuery = await usersModel.findOne({ email: userEmail });
     const groupID = userQuery.groupID;
-    console.log("GroupID:", groupID);
 
     const filter = { _id: groupID };
     const update = {
@@ -969,16 +950,12 @@ app.post('/itinerary/edit', sessionValidation, async (req, res) => {
 
 // catch the delete request, run the defined behaviors and pass the success message to frontend.
 app.post('/itinerary/delete', sessionValidation, async (req, res) => {
-    console.log(req.body);
     const date = req.body.date;
     const scheduleElem = JSON.parse(req.body.deleteSchedule);
     const startTime = scheduleElem.startTime;
-    console.log(startTime);
-    console.log(date);
     const userEmail = req.session.email;
     const userQuery = await usersModel.findOne({ email: userEmail });
     const groupID = userQuery.groupID;
-    console.log("groupID:", groupID);
 
     const filter = {
         _id: groupID,
@@ -993,11 +970,9 @@ app.post('/itinerary/delete', sessionValidation, async (req, res) => {
     const result = await groupsModel.updateOne(filter, update);
 
     if (result.modifiedCount === 0) {
-        console.log("Matching object not found in the itinerary");
         res.status(404).json({ error: "Matching object not found in the itinerary" });
         return;
     }
-    console.log("Object deleted successfully")
     res.status(200).json({ message: "Activity deleted successfully" });
 });
 
@@ -1124,7 +1099,6 @@ io.on('connection', socket => {
 
     socket.on('moreChatHistory', async (groupID, numOfScroll) => {
         const getMoreMessageHistory = await showMoreChatHistory(groupID, numOfScroll);
-        console.log(numOfScroll)
         if (getMoreMessageHistory.length == 0) {
             socket.emit('noMoreChatHistory', data = true);
         }
@@ -1153,11 +1127,6 @@ async function deleteMessageDB(groupID, messagerName, chatMessageText) {
             { _id: groupID },
             { $pull: { messages: { message: chatMessageText, userName: messagerName } } }
         ).exec();
-        if (updateResult.modifiedCount > 0) {
-            console.log('Message deleted.');
-        } else {
-            console.log('Message not found.');
-        }
     } catch (err) {
         console.log(err);
     }
