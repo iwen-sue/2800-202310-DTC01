@@ -79,7 +79,7 @@ $(document).ready(function () {
         
         if(elem.length >0){
             var screenHeight = screen.height
-            elem[0].setAttribute("style", `height:${screenHeight - 340}px`)
+            elem[0].setAttribute("style", `height:${document.body.offsetHeight- 320}px`)
         }
 
          // Client-side code
