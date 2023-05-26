@@ -130,6 +130,11 @@ function adminAuthorization(req, res, next) {
     }
 }
 // middleware function finishes
+/**
+ * Check if the id is a valid group id
+ * @param {any} id - the id to be checked
+ * @returns {boolean} - true if the id is valid, false otherwise
+ */
 function isInGroup(id) {
     const schema = Joi.string().min(22).max(25).hex();
     const result = schema.validate(id);
