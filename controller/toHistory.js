@@ -4,10 +4,10 @@ const usersModel = require('../models/user.js');
 const router = express.Router();
 
 router.post('/toHistory', async (req, res) => {
+    //add the bucket passed by frontend to travel history
     const result = await usersModel.findOne({
         email: req.session.email,
     });
-
     result.bucketlist.forEach(async (item) => {
         if (item._id == req.body.bucketID) {
             await usersModel.updateOne({ email: req.session.email }, {
@@ -28,12 +28,9 @@ router.post('/toHistory', async (req, res) => {
                 }
             });
         }
-
     });
 
-
     res.redirect('/userprofile');
-
 });
 
 module.exports = router;

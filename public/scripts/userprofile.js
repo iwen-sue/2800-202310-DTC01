@@ -2,46 +2,38 @@
 
 var imageData = document.currentScript.getAttribute('imageData');
 
-// userData = JSON.parse(userData);
-
-console.log(typeof imageData)
 if(imageData){
   var imageData = imageData;
 }else{
   var imageData = "";
 }
 
-
-
+/**
+ * define the click event behavior of travel history
+ */
 function goTravelHistroy() {
   window.location.href = "/userprofile/travelHistory";
 }
 
-function convertImgToBase64(file, callback) {
-  let reader = new FileReader();
-  reader.readAsDataURL(file);
-  reader.onload = function () {
-    callback(reader.result);
-  };
-  reader.onerror = function (error) {
-    console.log('Error: ', error);
-  };
-}
-
-function uploadImage(e) {
+/**
+ * define the upload image behavior.
+ */
+function uploadImage() {
   imageData = event.target.files[0]
   var imageUrl = URL.createObjectURL(imageData);
   var elem = document.getElementById("imagePreviewHolder")
   elem.setAttribute("src", imageUrl)
 }
 
+/**
+ * gather all user inputs and submit it to backend.
+ */
 function submitForm() {
   var firstName = $("#firstNameInput").val().replace(/\s/g, "");
   var lastName = $("#lastNameInput").val().replace(/\s/g, "");
   var email = $("#emailInput").val();
   var homeCity = $("#homeCityInput").val();
   var formData = new FormData();
-  var imageForm = new FormData();
 
   formData.append('avatar', imageData);
   formData.append('firstName', firstName);
@@ -68,9 +60,16 @@ function submitForm() {
     })
 }
 
+/**
+ * define create group click event behavior.
+ */
 function goCreateGroup(){
     window.location.href = "/creategroup";
 }
+
+/**
+ * define view group click event behavior.
+ */
 function goGroupDetails(){
     window.location.href = "/userprofile/groupdetails";
 }

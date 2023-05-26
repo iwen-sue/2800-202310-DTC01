@@ -1,4 +1,10 @@
 
+/**
+ * get suggestion or get suggestion result from the openAI. 
+ * 
+ * @param {String} promptArgs - the request text sends to openAI
+ * @param {String} API_KEY - openAI key as a string to trigger openAI post
+ */
 async function getSuggestion(promptArgs, API_KEY) {
     const option = {
         method: 'POST',
@@ -23,10 +29,10 @@ async function getSuggestion(promptArgs, API_KEY) {
     }
 };
 
-
+/**
+ * define the set up environment for edit bucket list.
+ */
 const setup = () => {
-    console.log("setup edit bucket list");
-
     let eventCount = 0;
     var countrySelect = document.getElementById('country');
     var citySelect = document.getElementById('city');
@@ -50,7 +56,6 @@ const setup = () => {
             console.log('Error:', error);
         });
 
-
     // Handle country selection change event
     countrySelect.addEventListener('change', function () {
         eventCount++;
@@ -61,7 +66,6 @@ const setup = () => {
 
         // Clear previous city options
         citySelect.innerHTML = '<option selected>Select your destination city</option>';
-
 
         // Fetch city data for the selected country from the API
         fetch('https://countriesnow.space/api/v0.1/countries')
@@ -124,9 +128,6 @@ const setup = () => {
             return false;
         };
     });
-
-
 }
-
 
 $(document).ready(setup);

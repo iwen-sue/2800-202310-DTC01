@@ -11,6 +11,8 @@
 
 
 $(document).ready(function() {
+
+    //setup trigger for the easter egg
     $("button.loginBtn").click(function(e) {
         if ($("input#email").val() === "tomjones@gmail.com") {
             e.preventDefault();
@@ -18,7 +20,6 @@ $(document).ready(function() {
                 <span class="background">
                 </span>
             `);
-
             $(".background").append(`
                 <div class="screen stopBootstrap"></div>
                 <ul class="dance-animation stopBootstrap floatUp">
@@ -59,6 +60,7 @@ $(document).ready(function() {
                 }, 1700);
             }, 60000*(2 + Math.floor(3/60)));
             
+            //setup disable behavior for easter egg
             $("span.background").click(function() {
                 $(".dance-animation").addClass("paused");
                 $("audio").volume = 0;

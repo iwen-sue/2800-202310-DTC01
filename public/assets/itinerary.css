@@ -56,14 +56,11 @@ html, body{
     border-bottom: 15px solid var(--blush);
 }
 
-
 button[aria-expanded="true"] {
     background-color:var(--pink);
     color:#fff;
     border:none;
 }
-
-
 
 .itineraryBlockContainer{
     margin:10px 5vw;
@@ -108,9 +105,6 @@ button[aria-expanded="true"] {
     border-bottom-left-radius: 2px;
     border-bottom-right-radius: 2px;
 }
-
-
-
 
 .itineraryTimeDecorator .decoratorCircle{
     position: absolute;
