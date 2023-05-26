@@ -4,7 +4,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
+    
     <link rel="stylesheet" href="/assets/common.css" />
     <!-- cite css or js files here -->
     <style>
@@ -37,19 +37,6 @@
     </head>
 <body>
     <%- include('templates/subNav') %>
-    <% if (error !=null) { %>
-        <div class="alert alert-danger d-flex justify-content-center mx-auto" style="width: 80%" role="alert">
-            <p class="alert-heading">
-                <% if (error.includes('not allowed to be empty')) { %>
-                    Group name cannot be empty.
-                <% } else if (error.includes('must be less than or equal to 20 characters long')) {%>
-                    Group name cannot be more than 20 characters long.
-                <% } else {%>
-                    Group name already exists!
-                <% } %>
-            </p>
-        </div>
-    <% } %>
     <div class="container mt-5 pt-5">
         <form class="card text-center m-4" action="/groupconfirm" method="post">
             <div class="card-title mt-3">
@@ -71,6 +58,19 @@
             </div>
         </form>
     </div>
-     <%- include('templates/bottomNav') %>
+    <% if (error !=null) { %>
+        <div class="alert alert-danger d-flex justify-content-center mx-auto" style="width: 80%" role="alert">
+            <p class="alert-heading">
+                <% if (error.includes('not allowed to be empty')) { %>
+                    Group name cannot be empty.
+                <% } else if (error.includes('must be less than or equal to 20 characters long')) {%>
+                    Group name cannot be more than 20 characters long.
+                <% } else {%>
+                    Group name already exists!
+                <% } %>
+            </p>
+        </div>
+    <% } %>
+    <%- include('templates/bottomNav') %>
 </body>
 </html>

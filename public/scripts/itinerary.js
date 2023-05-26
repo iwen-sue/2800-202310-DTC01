@@ -124,10 +124,8 @@ $(document).ready(function () {
     fetch('https://countriesnow.space/api/v0.1/countries')
         .then(response => response.json())
         .then(data => {
-            console.log(citySelect)
 
             // Iterate over the country data and create country options
-            console.log(countrySelect);
             data.data.forEach(info => {
                 var option = document.createElement('li');
                 // option.value = info.country;
@@ -251,7 +249,7 @@ async function submitForm() {
     var endDate = document.getElementById("endDateValue").value;
     var startTime = document.getElementById("startTimeValue").value;
     var endTime = document.getElementById("endTimeValue").value;
-    console.log(selectedCities)
+    
     var checkBool = await keepNumbersOnly(startTime) < keepNumbersOnly(endTime);
     checkBoolTwo = await new Date(startDate) < new Date(endDate)
     var postData = {

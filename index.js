@@ -97,8 +97,8 @@ function sessionValidation(req, res, next) {
         res.redirect('/');
     }
 }
-
 // middleware function finishes
+
 /**
  * Check if the id is a valid group id
  * @param {any} id - the id to be checked
@@ -128,7 +128,7 @@ app.get('/', (req, res) => {
     }
 });
 
-// gathher necessary data, render home page and send the data.
+// gather necessary data, render home page and send the data.
 app.get('/home', sessionValidation, async (req, res) => {
     const userEmail = req.session.email;
     const userName = req.session.firstName + " " + req.session.lastName
@@ -179,7 +179,7 @@ app.get('/itineraryData', sessionValidation, async (req, res) => {
     }
 });
 
-// gathher necessary data, render chatroom page and send the data.
+// gather necessary data, render chatroom page and send the data.
 app.get('/chatroom', sessionValidation, async (req, res) => {
     const query = usersModel.findOne({
         email: req.session.email,
@@ -204,7 +204,7 @@ app.get('/chatroom', sessionValidation, async (req, res) => {
     });
 });
 
-//gathher necessary data, render userprofile page and send the data.
+//gather necessary data, render userprofile page and send the data.
 app.get('/userprofile', sessionValidation, async (req, res) => {
     const query = usersModel.findOne({
         email: req.session.email,
@@ -275,7 +275,7 @@ app.get('/enterBucket', (req, res) => {
     res.render("enterBucket");
 });
 
-//gather necessary data, sender travel history page and send data.
+//gather necessary data, render travel history page and send data.
 app.get('/userprofile/travelHistory', (req, res) => {
     const query = usersModel.findOne({
         email: req.session.email,
@@ -289,7 +289,7 @@ app.get('/userprofile/travelHistory', (req, res) => {
     });
 });
 
-//gather necessary data, sender signup page and send data.
+//gather necessary data, render signup page and send data.
 app.get('/signup', (req, res) => {
     const firstName = "";
     const lastName = "";
@@ -303,7 +303,7 @@ app.get('/signup', (req, res) => {
     }
 });
 
-//gather necessary data, sender login page and send data.
+//gather necessary data, render login page and send data.
 app.get('/login', (req, res) => {
     if (req.query.groupToken !== null) {
         res.render("login", { groupToken: req.query.groupToken, email: "" });
@@ -320,10 +320,7 @@ app.get('/forgotPassword', (req, res) => {
 
 //render reset password page
 app.get('/resetPassword', async (req, res) => {
-    console.log(req.query.token);
     const user = await usersModel.findOne({ resetToken: req.query.token }).exec();
-    console.log(user)
-    console.log(req.query.token === null)
     if (!user || !req.query.token) {
         res.redirect('/home');
     } else {
@@ -334,7 +331,6 @@ app.get('/resetPassword', async (req, res) => {
 //destroy session and redirect user to /
 app.get('/logout', sessionValidation, (req, res) => {
     req.session.destroy(function (err) {
-        // res.clearCookie(this.cookie, { path: '/' });
         res.redirect('/');
     });
 });
@@ -363,8 +359,8 @@ app.post('/signup', async (req, res) => {
             lastName: req.body.lastName,
             email: req.body.email,
             password: hashedPassword,
-            groupID: req.body.groupToken,
-            type: userType
+            // groupID: req.body.groupToken,
+            // type: userType
         });
         await user.save();
         req.session.authenticated = true;
@@ -379,9 +375,9 @@ app.post('/signup', async (req, res) => {
             var group = await groupsModel.find({ _id: req.body.groupToken }).exec();
             try {
                 var currentMembers = group[0].members;
+                await usersModel.updateOne({ email: req.body.email }, { $set: { groupID: req.body.groupToken, type: userType } }).exec();
             }
             catch (error) {
-                console.log(error)
                 res.redirect('/userprofile/groupnotfound')
                 return
             }
@@ -440,7 +436,6 @@ app.post('/login', async (req, res) => {
         return res.render("login", { error: error, errorType: 'UserNotFound', groupToken: groupToken, email: "" });
     }
     if (await bcrypt.compare(password, result[0].password)) {
-        console.log("password is correct");
         req.session.authenticated = true;
         req.session.lastName = result[0].lastName;
         req.session.firstName = result[0].firstName;
@@ -513,7 +508,6 @@ app.post('/forgotPassword', async (req, res) => {
         const resetToken = crypto.randomBytes(20).toString('hex');
         const resetTokenExpiry = Date.now() + 3600000; // Expiration in 1 hour
         const expiryDate = new Date(resetTokenExpiry);
-        console.log(expiryDate)
         user.resetToken = resetToken;
         user.resetTokenExpiration = expiryDate;
 
@@ -564,7 +558,6 @@ app.post('/resetPassword', async (req, res) => {
     try {
         const token = req.body.token;
         const email = req.body.email;
-        console.log(email);
         const newPassword = req.body.password;
         const confirmPassword = req.body.confirmPassword;
 
@@ -635,7 +628,7 @@ app.get('/userprofile/groupdetails', sessionValidation, async (req, res) => {
     }
 });
 
-//catch invite request, gather necessary information and render emailconfirmation page
+//catch invite request, gather necessary information, send invite email, and render emailconfirmation page
 app.post('/invite', sessionValidation, async (req, res) => {
     var inviteEmail = req.body.inviteeEmail;
     const userName = req.session.firstName + " " + req.session.lastName;
@@ -799,7 +792,6 @@ app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
     const endTime = req.body.endTime;
     const country = req.body.country;
     const cities = citiesArray
-    console.log("Generating itinerary...");
     const userEmail = req.session.email;
     const query = await usersModel.findOne({ email: userEmail });
     const groupID = query.groupID;
@@ -836,7 +828,6 @@ app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
         const endIndex = itinerary.lastIndexOf("]") + 1;
         const itineraryContent = itinerary.substring(startIndex, endIndex);
         const parsedItinerary = JSON.parse(itineraryContent);
-        console.log(parsedItinerary)
         await saveItinerary(parsedItinerary, groupID, country);
         res.json({ itinerary: parsedItinerary, message: "Itinerary generated successfully!" });
         res.end();
@@ -867,7 +858,6 @@ app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
  * @param {String} country - destination country name 
  */
 async function saveItinerary(itineraryJSON, groupID, country) {
-    console.log(country)
     // Delete the existing itinerary array
     await groupsModel.updateOne({ _id: groupID }, { $unset: { itinerary: 1 } }).exec();
 
@@ -956,14 +946,9 @@ app.post('/itinerary/edit', sessionValidation, async (req, res) => {
     const editedStartTime = editedSchedule.startTime;
     const editedEndTime = editedSchedule.endTime;
     const editedActivity = editedSchedule.activity;
-    console.log("editedSchedule", editedSchedule);
-    console.log("date", date);
-    console.log("referStartTime", referStartTime);
-
     const userEmail = req.session.email;
     const userQuery = await usersModel.findOne({ email: userEmail });
     const groupID = userQuery.groupID;
-    console.log("GroupID:", groupID);
 
     const filter = { _id: groupID };
     const update = {
@@ -986,16 +971,12 @@ app.post('/itinerary/edit', sessionValidation, async (req, res) => {
 
 // catch the delete request, run the defined behaviors and pass the success message to frontend.
 app.post('/itinerary/delete', sessionValidation, async (req, res) => {
-    console.log(req.body);
     const date = req.body.date;
     const scheduleElem = JSON.parse(req.body.deleteSchedule);
     const startTime = scheduleElem.startTime;
-    console.log(startTime);
-    console.log(date);
     const userEmail = req.session.email;
     const userQuery = await usersModel.findOne({ email: userEmail });
     const groupID = userQuery.groupID;
-    console.log("groupID:", groupID);
 
     const filter = {
         _id: groupID,
@@ -1010,11 +991,9 @@ app.post('/itinerary/delete', sessionValidation, async (req, res) => {
     const result = await groupsModel.updateOne(filter, update);
 
     if (result.modifiedCount === 0) {
-        console.log("Matching object not found in the itinerary");
         res.status(404).json({ error: "Matching object not found in the itinerary" });
         return;
     }
-    console.log("Object deleted successfully")
     res.status(200).json({ message: "Activity deleted successfully" });
 });
 
@@ -1141,7 +1120,6 @@ io.on('connection', socket => {
 
     socket.on('moreChatHistory', async (groupID, numOfScroll) => {
         const getMoreMessageHistory = await showMoreChatHistory(groupID, numOfScroll);
-        console.log(numOfScroll)
         if (getMoreMessageHistory.length == 0) {
             socket.emit('noMoreChatHistory', data = true);
         }
@@ -1170,11 +1148,6 @@ async function deleteMessageDB(groupID, messagerName, chatMessageText) {
             { _id: groupID },
             { $pull: { messages: { message: chatMessageText, userName: messagerName } } }
         ).exec();
-        if (updateResult.modifiedCount > 0) {
-            console.log('Message deleted.');
-        } else {
-            console.log('Message not found.');
-        }
     } catch (err) {
         console.log(err);
     }
