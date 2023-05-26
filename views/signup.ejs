@@ -32,21 +32,21 @@
                         <p> * All fields are required *</p>
 
                         <div class="form-floating mb-2">
-                            <input type="text" class="form-control" id="firstName" name="firstName" placeholder="">
+                            <input type="text" class="form-control" id="firstName" name="firstName" placeholder="" value="<%= firstName || '' %>" >
                             <label for="firstName">First Name</label>
                         </div>
                         <div class="form-floating mb-2">
-                            <input type="text" class="form-control" id="lastName" name="lastName" placeholder="">
+                            <input type="text" class="form-control" id="lastName" name="lastName" placeholder="" value="<%= lastName || '' %>">
                             <label for="lastName">Last Name</label>
                         </div>
 
                         <div class="form-floating mb-2">
-                            <input type="email" class="form-control" id="email" name="email" placeholder="">
+                            <input type="email" class="form-control" id="email" name="email" placeholder="" value="<%= email || '' %>">
                             <label for="email">Email address</label>
                         </div>
 
                         <div class="form-floating mb-2">
-                            <input type="password" class="form-control" id="password" name="password" placeholder="">
+                            <input type="password" class="form-control" id="password" name="password" placeholder="" value="<%= password || '' %>">
                             <label for="password">Password</label>
                         </div>
                         <% if (groupToken !==null) { %>
@@ -54,6 +54,7 @@
                             <% } %>
                                 <br>
                                 <button class="btn btn-block signupBtn" type="submit" value="signup">Sign up</button>
+
                     </form>
                 </div>
             </main>
