@@ -141,8 +141,6 @@ function isInGroup(id) {
     }
     return true;
 }
-console.log(isInGroup(null))
-console.log(isInGroup(undefined))
 
 app.use('/', (req, res, next) => {  // for local variables
     next();
