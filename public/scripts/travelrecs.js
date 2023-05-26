@@ -2,7 +2,7 @@ const fs = require("fs");
 const { parse } = require("csv-parse");
 
 const data = [];
-var countriesAndLength = []
+var countriesAndLength = [];
 
 function calculateAverageDuration(jsonArray) {
 // Create an object to store the sum and count for each place
