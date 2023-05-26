@@ -4,6 +4,7 @@ const usersModel = require('../models/user.js');
 const router = express.Router();
 
 router.post('/deleteBucket', async (req, res) => {
+    //delete the bucket passed by frontend.
     const result = await usersModel.findOne({
         email: req.session.email,
     });
@@ -20,10 +21,7 @@ router.post('/deleteBucket', async (req, res) => {
         }
 
     });
-
-
     res.redirect('/userprofile');
-
 });
 
 module.exports = router;

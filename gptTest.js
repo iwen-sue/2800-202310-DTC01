@@ -22,7 +22,6 @@ const startDate = "2023-06-10";
 const endDate = "2023-06-15";
 const scheduleStartTime = "09:00";
 const scheduleEndTime = "19:00";
-const country = "Canada";
 const cities = ["Vancouver", "Victoria"];
 
 const itineraryMemory = [
@@ -46,6 +45,13 @@ var cityDates
 let assignDateUserPromt = `I want to go ${cities} From ${startDate} to ${endDate}. Assign the dates for each city. Format must be like "city": {"start_date": "2023-06-10", "end_date": "2023-06-12", "duration": number}. You don't need to show anything else. Don't include`;
 
 async function assignDay(startDate, endDate, cities, assignDateUserPromt) {
+/**
+ * generate itinenary test playground using openAI api.
+ * 
+ * @param {Object} conversation - JSON object contains conversation information
+ * @returns {*} - the response from AI
+ */
+async function generateItinerary(conversation) {
     const res = await openai.createChatCompletion({
         model: "gpt-3.5-turbo",
         messages: [
@@ -72,9 +78,7 @@ async function generateItinerary(generateUserPrompt, acitivityMemory) {
         ],
         temperature: 0.5, // Adjust the temperature value for faster response time
     });
-
     let response = res.data.choices[0].message.content;
-
     return response;
 }
 
@@ -119,6 +123,11 @@ assignDay(startDate, endDate, cities, assignDateUserPromt).then((res) => {
     } catch (error) {
         console.error("Error parsing JSON:", error);
     }
+/**
+ * print out play ground test respond in console.
+ */
+generateItinerary(conversation).then((res) => {
+    console.log(res) // Print the response content
 });
 
 

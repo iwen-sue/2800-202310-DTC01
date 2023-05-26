@@ -1,9 +1,5 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
-const mongodb_host = process.env.MONGODB_HOST;
-const mongodb_user = process.env.MONGODB_USER;
-const mongodb_password = process.env.MONGODB_PASSWORD;
-const mongodb_database = process.env.MONGODB_DATABASE;
 
 const itinerarySchema = new mongoose.Schema({
     date: mongoose.Schema.Types.Mixed,
