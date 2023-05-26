@@ -91,6 +91,7 @@ $(document).ready(function () {
         return response.json();
     })
     .then(data => {
+        
         console.log(data);
 
         if (data && data.itinerary) {
@@ -265,6 +266,13 @@ async function submitForm() {
                 })
                     .then(response => response.json())
                     .then(data => {
+                        if(!response.status == 200){
+                            swal({
+                                title: "Oops",
+                                text: "seems like you lost connection with backend.",
+                                icon: "error",
+                            })
+                        }
                         
                         notify(data.message);
                         console.log(data)
@@ -516,6 +524,13 @@ function submitEdit() {
                 .then(response => response.json())
                 .then(data => {
                     // Handle the response from the backend
+                    if(!response.status == 200){
+                        swal({
+                            title: "Oops",
+                            text: "seems like you lost connection with backend.",
+                            icon: "error",
+                        })  
+                    }
                     console.log(data);
                     $("#editModal").modal("hide")
                     notify(data.message);
@@ -601,9 +616,19 @@ function submitAdjustDates() {
                     },
                     body: new URLSearchParams(postData)
                 })
-                    .then(response => response.json())
+                    .then(response => {
+                        if(!response.status == 200){
+                            swal({
+                                title: "Oops",
+                                text: "seems like you lost connection with backend.",
+                                icon: "error",
+                            })   
+                        }
+                        response.json();
+                    })
                     .then(data => {
                         // Handle the response from the backend
+                        
                         
                         notify(data.message);
                         console.log("data", data.itinerary);
