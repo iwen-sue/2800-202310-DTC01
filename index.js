@@ -98,24 +98,6 @@ function sessionValidation(req, res, next) {
     }
 }
 
-
-function isAdmin(req) {
-    if (req.session.type == 'admin') {
-        return true;
-    }
-    return false;
-}
-
-function adminAuthorization(req, res, next) {
-    if (!isAdmin(req)) {
-        res.status(403);
-        res.render("errorMessage", { error: "Not Authorized" });
-        return;
-    }
-    else {
-        next();
-    }
-}
 // middleware function finishes
 /**
  * Check if the id is a valid group id
