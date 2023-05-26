@@ -448,7 +448,7 @@ app.post('/login', async (req, res) => {
         req.session.cookie.maxAge = 2147483647;
         if (groupToken != null) {
             if (isInGroup(result[0].groupID)) {
-                res.render('groupconfirm', { error: "You are already in a group. Please leave your current group before joining another.", groupName: null });
+                res.render('groupConfirm', { error: "You are already in a group. Please leave your current group before joining another.", groupName: null });
                 return;
             }
             else {
@@ -614,7 +614,7 @@ app.post('/groupconfirm', sessionValidation, async (req, res) => {
         await newGroup.save();
         const group = await groupsModel.findOne({ groupName: groupName }).exec();
         await usersModel.updateOne({ email: req.session.email }, { $set: { groupID: group._id, type: 'leader' } }).exec();
-        res.render("groupconfirm", { groupName: req.body.groupName, error: null });
+        res.render("groupConfirm", { groupName: req.body.groupName, error: null });
     } catch (err) {
         res.render("createGroup", { error: "Group name is already taken. Please enter another group name." });
     }
