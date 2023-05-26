@@ -81,47 +81,47 @@ $(document).ready(function () {
         });
     });
 
-    function setup(){
+    function setup() {
         var elem = document.getElementsByClassName("itineraryPlan")
-        
-        if(elem.length >0){
+
+        if (elem.length > 0) {
             var screenHeight = screen.height
-            elem[0].setAttribute("style", `height:${document.body.offsetHeight- 320}px`)
+            elem[0].setAttribute("style", `height:${document.body.offsetHeight - 320}px`)
         }
 
-         // Client-side code
-    fetch('/itineraryData')
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not OK');
-        }
-        return response.json();
-    })
-    .then(data => {
-        
-        console.log(data);
+        // Client-side code
+        fetch('/itineraryData')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not OK');
+                }
+                return response.json();
+            })
+            .then(data => {
 
-        if (data && data.itinerary) {
-            const itinerary = data.itinerary;
+                console.log(data);
 
-            console.log(itinerary);
+                if (data && data.itinerary) {
+                    const itinerary = data.itinerary;
 
-            insertItinerary(itinerary);
-        } else {
-            console.log('Invalid itinerary data');
-        }
-    })
-    .catch(error => {
-        console.error(error);
-    });
-        
+                    console.log(itinerary);
+
+                    insertItinerary(itinerary);
+                } else {
+                    console.log('Invalid itinerary data');
+                }
+            })
+            .catch(error => {
+                console.error(error);
+            });
+
     }
 
-    if(groupName != "Join a group First!"){
+    if (groupName != "Join a group First!") {
         setup();
     }
 
-    
+
 
 
     var countrySelect = document.getElementById('country');
@@ -210,16 +210,29 @@ $(document).ready(function () {
     }
 
 
-   
+
 });
+
+function handleConfirm() {
+    $("#editModal").modal("hide");
+    $("#confirmModal").modal("show");
+    setTimeout(() => {
+        document.getElementById("confirmButtonTrigger").addEventListener('click', deleteTriggerActivity);
+    });
+}
 
 
 
 function handleCityClick(e) {
+
     readyToRemove = e.target
-    console.log(readyToRemove)
 
     $("#confirmModal").modal("show")
+    setTimeout(() => {
+        document.getElementById("confirmButtonTrigger").addEventListener('click', deleteTriggerCity);
+    });
+
+
 }
 
 function deleteFromArray(arr, value) {
@@ -231,11 +244,11 @@ function deleteFromArray(arr, value) {
 
 function keepNumbersOnly(string) {
     return Number(string.replace(/\D/g, ''));
-  }
-  
+}
 
 
-  
+
+
 
 async function submitForm() {
     var startDate = document.getElementById("startDateValue").value;
@@ -255,7 +268,7 @@ async function submitForm() {
     }
 
     if (startDate != "" && endDate != "" && startTime != "" && endTime != "" && selectedCountry != undefined && selectedCities != []) {
-        if (checkBool==true && checkBoolTwo== true) {
+        if (checkBool == true && checkBoolTwo == true) {
             // notify("AI is generating your itinerary! Please note that the response time might take longer if the travel duration is long.");
             $('#makeNewModal').modal("hide");
 
@@ -273,20 +286,20 @@ async function submitForm() {
                 })
                     .then(response => response.json())
                     .then(data => {
-                        if(!response.status == 200){
+                        if (!response.status == 200) {
                             swal({
                                 title: "Oops",
                                 text: "seems like you lost connection with backend.",
                                 icon: "error",
                             })
                         }
-                        
+
                         notify(data.message);
                         console.log(data)
                         insertItinerary(data.itinerary);
                         // window.location.href = "/home";
-    
-    
+
+
                     })
                     .catch(error => {
                         // Handle any errors
@@ -329,7 +342,34 @@ function calculateEndDate(days, startDate) {
     return `${year}-${month}-${day}`;
 }
 
-function deleteCity() {
+function deleteTriggerActivity() {
+    var postData = {
+        'deleteSchedule': JSON.stringify(deleteSchedule),
+        'date': targetDate
+    }
+    fetch('/itinerary/delete', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams(postData)
+    })
+        .then(response => response.json())
+        .then(data => {
+            // Handle the response from the backend
+            console.log(data);
+            $("#confirmModal").modal("hide");
+            notify(data.message);
+            setTimeout(() => {
+                location.reload()
+            }, 800)
+        })
+        .catch(error => {
+            console.error(error);
+        });
+}
+
+function deleteTriggerCity() {
     $("#confirmModal").modal("hide");
     readyToRemove.remove();
     var text = readyToRemove.innerHTML;
@@ -338,86 +378,86 @@ function deleteCity() {
 }
 
 function insertItinerary(itineraryJSON) {
-    if(itineraryJSON.length>0){
+    if (itineraryJSON.length > 0) {
         const itineraryContainer = document.querySelector('.itineraryPlan');
-    itineraryContainer.innerHTML = '';
-    for (let i = 0; i < itineraryJSON.length; i++) {
-        const itinerary = itineraryJSON[i];
-        const dateButton = document.createElement('button');
-        dateButton.type = 'button';
-        dateButton.classList.add('dateTrigger');
-        dateButton.setAttribute('data-toggle', 'collapse');
-        dateButton.setAttribute('data-target', `#demo${i + 1}`);
-        dateButton.innerText = itinerary.date;
+        itineraryContainer.innerHTML = '';
+        for (let i = 0; i < itineraryJSON.length; i++) {
+            const itinerary = itineraryJSON[i];
+            const dateButton = document.createElement('button');
+            dateButton.type = 'button';
+            dateButton.classList.add('dateTrigger');
+            dateButton.setAttribute('data-toggle', 'collapse');
+            dateButton.setAttribute('data-target', `#demo${i + 1}`);
+            dateButton.innerText = itinerary.date;
 
-        const collapseContainer = document.createElement('div');
-        collapseContainer.id = `demo${i + 1}`;
-        collapseContainer.classList.add('collapse', 'itineraryBlockContainer');
+            const collapseContainer = document.createElement('div');
+            collapseContainer.id = `demo${i + 1}`;
+            collapseContainer.classList.add('collapse', 'itineraryBlockContainer');
 
-        itinerary.schedule.forEach((schedule) => {
-            var schedule = schedule;
-            const itineraryBlock = document.createElement('div');
-            itineraryBlock.classList.add('itineraryBlock');
+            itinerary.schedule.forEach((schedule) => {
+                var schedule = schedule;
+                const itineraryBlock = document.createElement('div');
+                itineraryBlock.classList.add('itineraryBlock');
 
-            const itineraryTime = document.createElement('div');
-            itineraryTime.classList.add('itineraryTime');
+                const itineraryTime = document.createElement('div');
+                itineraryTime.classList.add('itineraryTime');
 
-            const itineraryTimeText = document.createElement('div');
-            itineraryTimeText.classList.add('itineraryTimeText');
-            itineraryTimeText.innerHTML = `
+                const itineraryTimeText = document.createElement('div');
+                itineraryTimeText.classList.add('itineraryTimeText');
+                itineraryTimeText.innerHTML = `
           <p>${schedule.startTime}</p>
           <p>|</p>
           <p>${schedule.endTime}</p>
         `;
 
-            const itineraryTimeDecorator = document.createElement('p');
-            itineraryTimeDecorator.classList.add('itineraryTimeDecorator');
+                const itineraryTimeDecorator = document.createElement('p');
+                itineraryTimeDecorator.classList.add('itineraryTimeDecorator');
 
-            const decoratorCircle = document.createElement('span');
-            decoratorCircle.classList.add('decoratorCircle');
-            decoratorCircle.classList.add('material-symbols-outlined');
+                const decoratorCircle = document.createElement('span');
+                decoratorCircle.classList.add('decoratorCircle');
+                decoratorCircle.classList.add('material-symbols-outlined');
 
-            if(itineraryIcons[schedule.category]){
-                decoratorCircle.innerHTML = itineraryIcons[schedule.category]
-            }else{
-                decoratorCircle.innerHTML = itineraryIcons.other
-            }
-            itineraryTimeDecorator.appendChild(decoratorCircle);
-            itineraryTime.appendChild(itineraryTimeText);
-            itineraryTime.appendChild(itineraryTimeDecorator);
+                if (itineraryIcons[schedule.category]) {
+                    decoratorCircle.innerHTML = itineraryIcons[schedule.category]
+                } else {
+                    decoratorCircle.innerHTML = itineraryIcons.other
+                }
+                itineraryTimeDecorator.appendChild(decoratorCircle);
+                itineraryTime.appendChild(itineraryTimeText);
+                itineraryTime.appendChild(itineraryTimeDecorator);
 
-            const itineraryActivity = document.createElement('div');
-            itineraryActivity.classList.add('itineraryActivity');
-            itineraryActivity.innerHTML = `
+                const itineraryActivity = document.createElement('div');
+                itineraryActivity.classList.add('itineraryActivity');
+                itineraryActivity.innerHTML = `
           ${schedule.activity}<br>
           ${schedule.transportation}<span class="material-symbols-outlined itineraryBlockEdit">edit_note</span>
         `;
 
-            itineraryBlock.appendChild(itineraryTime);
-            itineraryBlock.appendChild(itineraryActivity);
-            collapseContainer.appendChild(itineraryBlock);
+                itineraryBlock.appendChild(itineraryTime);
+                itineraryBlock.appendChild(itineraryActivity);
+                collapseContainer.appendChild(itineraryBlock);
 
 
 
-            // Select the 'span' element within 'itineraryActivity'
-            var editButton = itineraryActivity.querySelector(".itineraryBlockEdit");
-            var passobj = {
-                'date': itinerary.date,
-                'schedule': schedule
-            }
+                // Select the 'span' element within 'itineraryActivity'
+                var editButton = itineraryActivity.querySelector(".itineraryBlockEdit");
+                var passobj = {
+                    'date': itinerary.date,
+                    'schedule': schedule
+                }
 
-            // Attach an event listener to the 'span' element
-            editButton.addEventListener("click", function () {
-                editItinerary(passobj);
-            })
-        });
+                // Attach an event listener to the 'span' element
+                editButton.addEventListener("click", function () {
+                    editItinerary(passobj);
+                })
+            });
 
-        itineraryContainer.appendChild(dateButton);
-        itineraryContainer.appendChild(collapseContainer);
+            itineraryContainer.appendChild(dateButton);
+            itineraryContainer.appendChild(collapseContainer);
+        }
+
     }
 
-    }
-    
 }
 
 function editItinerary(passObj) {
@@ -540,20 +580,20 @@ function submitEdit() {
                 .then(response => response.json())
                 .then(data => {
                     // Handle the response from the backend
-                    if(!response.status == 200){
+                    if (!response.status == 200) {
                         swal({
                             title: "Oops",
                             text: "seems like you lost connection with backend.",
                             icon: "error",
-                        })  
+                        })
                     }
                     console.log(data);
                     $("#editModal").modal("hide")
                     notify(data.message);
-                    setTimeout(()=>{
+                    setTimeout(() => {
                         location.reload()
-                    },800)
-                    
+                    }, 800)
+
                 })
                 .catch(error => {
                     // Handle any errors
@@ -568,49 +608,20 @@ function submitEdit() {
 
 }
 
-function notify(message){
+function notify(message) {
     var elem = document.getElementById("primaryAlert");
     var messageElem = document.getElementById("alertMessage");
     messageElem.innerText = message;
-    elem.setAttribute("style", "display:block;opacity:1;top:60px;");
-    setTimeout(()=>{
-        elem.setAttribute("style", "display:none;opacity:0;top:75px;");
+    elem.setAttribute("style", "display:block;opacity:1;top:90px;");
+    setTimeout(() => {
+        elem.setAttribute("style", "display:none;opacity:0;top:100px;");
     }, 8000)
-}
-
-function deleteActivity() {
-    var postData = {
-        'deleteSchedule': JSON.stringify(deleteSchedule),
-        'date': targetDate
-    }
-
-    $("#confirmModal").modal("hide");
-    fetch('/itinerary/delete', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams(postData)
-    })
-        .then(response => response.json())
-        .then(data => {
-            // Handle the response from the backend
-            console.log(data);
-            notify(data.message);
-            setTimeout(()=>{
-                location.reload()
-            },800)
-        })
-        .catch(error => {
-            // Handle any errors
-            console.error(error);
-        });
 }
 
 function submitAdjustDates() {
     var startDate = document.getElementById("startPickerAdjustValue").value
     var endDate = document.getElementById("endPickerAdjustValue").value
-    
+
     if (startDate != "" && endDate != "") {
         if (convertTime(endDate) >= convertTime(startDate)) {
             $("#adjustDateModal").modal("hide");
@@ -633,24 +644,24 @@ function submitAdjustDates() {
                     body: new URLSearchParams(postData)
                 })
                     .then(response => {
-                        if(!response.status == 200){
+                        if (!response.status == 200) {
                             swal({
                                 title: "Oops",
                                 text: "seems like you lost connection with backend.",
                                 icon: "error",
-                            })   
+                            })
                         }
                         response.json();
                     })
                     .then(data => {
                         // Handle the response from the backend
-                        
-                        
+
+
                         notify(data.message);
                         console.log("data", data.itinerary);
                         insertItinerary(data.itinerary);
                         // window.location.href = "/home";
-    
+
                     })
                     .catch(error => {
                         // Handle any errors
