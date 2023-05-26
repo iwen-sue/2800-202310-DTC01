@@ -320,10 +320,10 @@ app.get('/signup', (req, res) => {
 
 app.get('/login', (req, res) => {
     if (req.query.groupToken !== null) {
-        res.render("login", { groupToken: req.query.groupToken });
+        res.render("login", { groupToken: req.query.groupToken, email: "" });
     }
     else {
-        res.render("login", { groupToken: null });
+        res.render("login", { groupToken: null, email: "" });
     }
 });
 
