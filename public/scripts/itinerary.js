@@ -241,6 +241,16 @@ function keepNumbersOnly(string) {
     return Number(string.replace(/\D/g, ''));
 }
 
+function sendHeartbeat() {
+    return fetch('/heartbeat')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not OK');
+        }
+        console.log('heaertbeat!');
+    });
+}
+
 /**
  * define the behaviors to submit making a new itineary request.
  */
@@ -270,14 +280,20 @@ async function submitForm() {
                 text: "Please note that the response time might take longer if the travel duration is long.",
                 icon: "success",
             }).then(() => {
+                const heartbeatInterval = setInterval(sendHeartbeat, 8000);
+
                 fetch('/itinerary/submitNew', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
                     },
                     body: new URLSearchParams(postData)
+
                 })
                     .then(response => {
+                        console.log(response)
+                        clearInterval(heartbeatInterval);  // stop sending heartbeats
+
                         if (!response.status == 200) {
                             swal({
                                 title: "Oops",

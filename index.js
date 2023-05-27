@@ -778,6 +778,11 @@ const categories = [
     "Relaxation"
 ];
 
+//handle heartbeat request, keep connection and send the light-weight data to frontend
+app.get('/heartbeat', (req, res) => {
+    res.sendStatus(200);
+});
+
 //catch the submitNew request, run the defined behaviors and send the necessary data to frontend
 app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
     var citiesArray = JSON.parse(req.body.cities);
@@ -815,8 +820,9 @@ app.post('/itinerary/submitNew', sessionValidation, async (req, res) => {
         { role: 'user', content: `Don\'t forget to include transportation time` },
     ];
     let itinerary; // Declare itinerary variable outside the promise chain
+
     try {
-        itinerary = await generateItinerary(conversation);
+        itinerary = await generateItinerary(conversation);  // Generate itinerary from AI
         const startIndex = itinerary.indexOf("[");
         const endIndex = itinerary.lastIndexOf("]") + 1;
         const itineraryContent = itinerary.substring(startIndex, endIndex);
