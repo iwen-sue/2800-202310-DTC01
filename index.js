@@ -779,7 +779,7 @@ const categories = [
 ];
 
 //handle heartbeat request, keep connection and send the light-weight data to frontend
-app.get('/heartbeat', (req, res) => {
+app.get('/itinerary/submitNew', (req, res) => {
     res.sendStatus(200);
 });
 

@@ -242,7 +242,7 @@ function keepNumbersOnly(string) {
 }
 
 function sendHeartbeat() {
-    return fetch('/heartbeat')
+    return fetch('/itinerary/submitNew')
     .then(response => {
         if (!response.ok) {
             throw new Error('Network response was not OK');
