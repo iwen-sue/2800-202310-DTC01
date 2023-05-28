@@ -245,7 +245,7 @@ async function checkValue() {
     return fetch('/itineraryData')
     .then(response => {
         if (!response.ok) {
-            throw new Error('Network response was not OK');
+            throw new Error('Join or create a group first!');
         }
         // console.log(response);
         return response.json();
@@ -259,7 +259,7 @@ async function checkValue() {
         }
     }
     ).catch(error => {
-        console.error(error);
+        // console.error(error);
     }
     );
 }
