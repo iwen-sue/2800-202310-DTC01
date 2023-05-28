@@ -241,14 +241,49 @@ function keepNumbersOnly(string) {
     return Number(string.replace(/\D/g, ''));
 }
 
-function sendHeartbeat() {
-    return fetch('/itinerary/submitNew')
+async function checkValue() {
+    return fetch('/itineraryData')
     .then(response => {
         if (!response.ok) {
             throw new Error('Network response was not OK');
         }
-        console.log('heaertbeat!');
-    });
+        // console.log(response);
+        return response.json();
+    }).then(data => {
+        if (data && data.itinerary) {
+            const itinerary = data.itinerary;
+            // console.log(itinerary);
+            return itinerary;
+        } else {
+            swal('Invalid itinerary data');
+        }
+    }
+    ).catch(error => {
+        console.error(error);
+    }
+    );
+}
+
+let shouldStartInterval = localStorage.getItem("shouldStartInterval");
+(async () => {
+    storeValue = await checkValue();
+    console.log("store value: checked");
+})();
+
+if (shouldStartInterval === 'true') {
+    let interval = setInterval(checkValueChange, 5000);
+
+    async function checkValueChange() {
+        let newValue = await checkValue();
+        console.log("new value: checked");
+        if (JSON.stringify(storeValue) != JSON.stringify(newValue)) {
+            console.log("value changed");
+            clearInterval(interval);
+            localStorage.setItem("shouldStartInterval", false);
+            console.log("interval stopped");
+            // window.location.href = "/home";
+        }
+    }
 }
 
 /**
@@ -270,6 +305,12 @@ async function submitForm() {
         'country': selectedCountry,
         'cities': JSON.stringify(selectedCities)
     }
+    // storeValue = await checkValue();
+    // console.log("store value: " + JSON.stringify(storeValue));
+    
+    localStorage.setItem("shouldStartInterval", 'true');
+    console.log("interval started");
+    
 
     if (startDate != "" && endDate != "" && startTime != "" && endTime != "" && selectedCountry != undefined && selectedCities != []) {
         if (checkBool == true && checkBoolTwo == true) {
@@ -280,7 +321,6 @@ async function submitForm() {
                 text: "Please note that the response time might take longer if the travel duration is long.",
                 icon: "success",
             }).then(() => {
-                const heartbeatInterval = setInterval(sendHeartbeat, 8000);
 
                 fetch('/itinerary/submitNew', {
                     method: 'POST',
@@ -292,7 +332,6 @@ async function submitForm() {
                 })
                     .then(response => {
                         console.log(response)
-                        clearInterval(heartbeatInterval);  // stop sending heartbeats
 
                         if (!response.status == 200) {
                             swal({
