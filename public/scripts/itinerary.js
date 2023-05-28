@@ -257,11 +257,9 @@ async function checkValue() {
         } else {
             swal('Invalid itinerary data');
         }
-    }
-    ).catch(error => {
+    }).catch(error => {
         // console.error(error);
-    }
-    );
+    });
 }
 
 let shouldStartInterval = localStorage.getItem("shouldStartInterval");

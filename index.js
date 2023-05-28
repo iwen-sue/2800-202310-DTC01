@@ -171,7 +171,7 @@ app.get('/itineraryData', sessionValidation, async (req, res) => {
             const itinerary = itineraryQuery.itinerary;
             res.json({ itinerary }); // Send the itinerary data as JSON response
         } else {
-            res.status(404).json({ error: "Group not found" });
+            // res.status(404).json({ error: "Group not found" });
         }
     } catch (err) {
         console.error(err);
