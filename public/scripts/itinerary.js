@@ -281,7 +281,7 @@ if (shouldStartInterval === 'true') {
             clearInterval(interval);
             localStorage.setItem("shouldStartInterval", false);
             console.log("interval stopped");
-            // window.location.href = "/home";
+            window.location.href = "/home";
         }
     }
 }
@@ -321,6 +321,7 @@ async function submitForm() {
                 text: "Please note that the response time might take longer if the travel duration is long.",
                 icon: "success",
             }).then(() => {
+                window.location.href = "/home";
 
                 fetch('/itinerary/submitNew', {
                     method: 'POST',
