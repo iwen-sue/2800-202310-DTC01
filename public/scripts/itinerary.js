@@ -676,6 +676,9 @@ function submitAdjustDates() {
     var startDate = document.getElementById("startPickerAdjustValue").value
     var endDate = document.getElementById("endPickerAdjustValue").value
 
+    localStorage.setItem("shouldStartInterval", 'true');
+    console.log("interval started");
+
     if (startDate != "" && endDate != "") {
         if (convertTime(endDate) >= convertTime(startDate)) {
             $("#adjustDateModal").modal("hide");
@@ -688,6 +691,7 @@ function submitAdjustDates() {
                 text: "Please note that the response time might take longer if the travel duration is long.",
                 icon: "success",
             }).then(() => {
+                window.location.href = "/home";
 
                 fetch('/itinerary/adjustment', {
                     method: 'POST',
