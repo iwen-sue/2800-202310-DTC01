@@ -269,7 +269,7 @@ let shouldStartInterval = localStorage.getItem("shouldStartInterval");
 })();
 
 if (shouldStartInterval === 'true') {
-    let interval = setInterval(checkValueChange, 20000);
+    let interval = setInterval(checkValueChange, 5000);
 
     async function checkValueChange() {
         let newValue = await checkValue();
@@ -279,7 +279,7 @@ if (shouldStartInterval === 'true') {
             clearInterval(interval);
             localStorage.setItem("shouldStartInterval", false);
             console.log("interval stopped");
-            // window.location.href = "/home";
+            window.location.href = "/home";
         }
     }
 }
