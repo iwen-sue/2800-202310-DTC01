@@ -318,6 +318,8 @@ async function submitForm() {
             console.log(data);
             notify(data.message);
             insertItinerary(data.itinerary);
+            countryDiv = document.getElementsByClassName("countryName");
+            countryDiv[0].innerText = `destination: ${selectedCountry}`;
           })
           .catch((error) => {
             console.error(error);
