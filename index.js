@@ -259,6 +259,7 @@ app.post("/editProfile", editProfile);
 
 // render editBucket page
 app.get("/editBucket", (req, res) => {
+  const usersModel = require("./models/user.js");
   const query = usersModel.findOne({
     email: req.session.email,
   });
@@ -698,6 +699,8 @@ app.get("/creategroup", sessionValidation, (req, res) => {
 
 //catch group confirmation request and run defined behaviors.
 app.post("/groupconfirm", sessionValidation, async (req, res) => {
+  const usersModel = require("./models/user.js");
+  const groupsModel = require("./models/group.js");
   var groupName = req.body.groupName;
   const schema = Joi.string().trim().max(20).required();
   const validationResult = schema.validate(groupName);
@@ -910,6 +913,7 @@ app.post("/leavegroup", sessionValidation, async (req, res) => {
 //catch deletegroup, run the defined behaviors and redirect to userprofile page.
 app.post("/deletegroup", sessionValidation, async (req, res) => {
   const groupsModel = require("./models/group.js");
+  const usersModel = require("./models/user.js");
   var groupID = req.body.groupID;
   await groupsModel.deleteOne({ _id: groupID }).exec();
   await usersModel
