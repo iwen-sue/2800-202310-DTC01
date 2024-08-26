@@ -90,16 +90,12 @@ $(document).ready(function () {
    * setup the itinerary environment if user has joined a group.
    */
   function setup() {
-    var elem = document.getElementsByClassName("itineraryPlan");
-    if (elem.length > 0) {
-      var screenHeight = screen.height;
-      elem[0].setAttribute(
-        "style",
-        `height:${document.body.offsetHeight - 320}px`
-      );
-    }
-    const itineraryContainer = document.querySelector(".itineraryPlan");
-    itineraryContainer.innerHTML = "<div class='loader'></div>";
+    const elem = document.getElementsByClassName("itineraryPlan");
+    elem[0].setAttribute(
+      "style",
+      `height:${document.body.offsetHeight - 320}px`
+    );
+    elem[0].innerHTML = "<div class='loader'></div>";
 
     // Client-side code
     fetch("/itineraryData")
@@ -115,6 +111,10 @@ $(document).ready(function () {
           const itinerary = data.itinerary;
           try {
             insertItinerary(itinerary);
+            if ((itinerary.length = 0)) {
+              elem[0].innerHTML =
+                '<p style="text-align: center;">no record to display</p>';
+            }
           } catch (error) {
             console.error(error);
           }
@@ -404,7 +404,8 @@ function deleteTriggerCity() {
 function insertItinerary(itineraryJSON) {
   console.log(itineraryJSON);
   if (itineraryJSON.length > 0) {
-    const itineraryContainer = document.querySelector(".itineraryPlan");
+    const itineraryContainer =
+      document.getElementsByClassName("itineraryPlan")[0];
     itineraryContainer.innerHTML = "";
     for (let i = 0; i < itineraryJSON.length; i++) {
       const itinerary = itineraryJSON[i];
@@ -416,6 +417,7 @@ function insertItinerary(itineraryJSON) {
       dateButton.innerText = itinerary.date;
       const collapseContainer = document.createElement("div");
       collapseContainer.id = `demo${i + 1}`;
+      insertItinerary;
       collapseContainer.classList.add("collapse", "itineraryBlockContainer");
       itinerary.schedule.forEach((schedule) => {
         const itineraryBlock = document.createElement("div");
