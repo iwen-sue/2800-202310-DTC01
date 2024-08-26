@@ -1,3 +1,307 @@
+<<<<<<< HEAD
+html,
+body {
+  width: 100%;
+  height: 100%;
+}
+
+.itineraryPlan {
+  overflow: scroll;
+}
+
+.itineraryPlan::-webkit-scrollbar {
+  display: none;
+}
+
+#landingDisplay {
+  height: 100%;
+  width: 100%;
+  margin-top: -50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+  color: black;
+}
+
+.landingButtons {
+  width: 220px;
+  line-height: 50px;
+  border-radius: 25px;
+  padding: 0;
+  margin-bottom: 20px;
+  background-image: linear-gradient(60deg, #6f2c7b, #9f2d88);
+  font-size: 20px;
+}
+
+.itineraryName {
+  padding: 20px;
+  text-align: center;
+  padding-bottom: 15px;
+}
+
+.countryName {
+  font-size: 18px;
+  line-height: 30px;
+}
+
+.dateTrigger {
+  width: 100%;
+  line-height: 30px;
+  font-size: 18px;
+  text-align: left;
+  border: none;
+  padding: 0 5vw;
+  background-color: var(--beige);
+  color: rgb(187, 98, 95);
+  font-weight: bold;
+  border-bottom: 15px solid var(--blush);
+}
+
+button[aria-expanded="true"] {
+  background-color: var(--pink);
+  color: #fff;
+  border: none;
+}
+
+.itineraryBlockContainer {
+  margin: 10px 5vw;
+}
+
+.itineraryBlock {
+  display: flex;
+}
+
+.itineraryTime {
+  width: 80px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.itineraryTimeText {
+  width: 40px;
+  text-align: center;
+}
+
+.itineraryTimeText p {
+  margin: 0;
+}
+
+.itineraryTimeDecorator {
+  width: 4px;
+  height: 100%;
+  background-color: var(--lightTheme);
+  overflow: visible;
+  position: relative;
+  margin-right: 20px;
+  margin-top: 10px;
+}
+
+.itineraryBlock:nth-child(1) .itineraryTimeDecorator {
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+}
+
+.itineraryBlock:last-child .itineraryTimeDecorator {
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+}
+
+.itineraryTimeDecorator .decoratorCircle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -14px;
+  margin-left: -14px;
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--lightTheme);
+  color: var(--pink);
+  text-align: center;
+  line-height: 28px;
+  border: 2px solid #d5b9df;
+  font-size: 18px;
+  overflow: hidden;
+}
+
+.itineraryActivity {
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  position: relative;
+  padding-right: 35px;
+}
+
+.itineraryBlockEdit {
+  position: absolute;
+  right: 0;
+  font-size: 28px;
+}
+
+.itineraryBlockEdit:hover {
+  color: var(--theme);
+}
+
+.bottomContent {
+  padding: 20px 5vw;
+  margin-bottom: 80px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.fade {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-dialog {
+  margin-top: 180px;
+}
+
+.formText {
+  margin: 0;
+}
+
+.formItem {
+  margin-bottom: 10px;
+}
+
+#country,
+#city {
+  height: 300px;
+  width: 200px;
+  overflow-y: scroll;
+  padding: 8px;
+  float: right;
+  margin-right: -200px;
+}
+
+#country input,
+#city input {
+  margin-bottom: 10px;
+  width: 180px;
+}
+
+#country li,
+#city li {
+  padding: 5px 0;
+}
+
+#country li:hover,
+#city li:hover {
+  background-color: #f1f2f6;
+}
+
+.filterSelection {
+  position: relative;
+  margin-top: 25px;
+}
+
+.filterButton {
+  position: absolute;
+  right: 0;
+  top: -5px;
+}
+
+.cityItem {
+  background-color: var(--pink);
+  color: var(--theme);
+  line-height: 20px;
+  border-radius: 8px;
+  padding: 0 5px;
+}
+
+.modal-footer {
+  position: relative;
+}
+
+.loader {
+  position: relative;
+  width: 2.5em;
+  height: 2.5em;
+  transform: rotate(165deg);
+}
+
+.loader:before,
+.loader:after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: block;
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 0.25em;
+  transform: translate(-50%, -50%);
+}
+
+.loader:before {
+  animation: before8 2s infinite;
+}
+
+.loader:after {
+  animation: after6 2s infinite;
+}
+
+@keyframes before8 {
+  0% {
+    width: 0.5em;
+    box-shadow: 1em -0.5em rgba(225, 20, 98, 0.75),
+      -1em 0.5em rgba(111, 202, 220, 0.75);
+  }
+
+  35% {
+    width: 2.5em;
+    box-shadow: 0 -0.5em rgba(225, 20, 98, 0.75),
+      0 0.5em rgba(111, 202, 220, 0.75);
+  }
+
+  70% {
+    width: 0.5em;
+    box-shadow: -1em -0.5em rgba(225, 20, 98, 0.75),
+      1em 0.5em rgba(111, 202, 220, 0.75);
+  }
+
+  100% {
+    box-shadow: 1em -0.5em rgba(225, 20, 98, 0.75),
+      -1em 0.5em rgba(111, 202, 220, 0.75);
+  }
+}
+
+@keyframes after6 {
+  0% {
+    height: 0.5em;
+    box-shadow: 0.5em 1em rgba(61, 184, 143, 0.75),
+      -0.5em -1em rgba(233, 169, 32, 0.75);
+  }
+
+  35% {
+    height: 2.5em;
+    box-shadow: 0.5em 0 rgba(61, 184, 143, 0.75),
+      -0.5em 0 rgba(233, 169, 32, 0.75);
+  }
+
+  70% {
+    height: 0.5em;
+    box-shadow: 0.5em -1em rgba(61, 184, 143, 0.75),
+      -0.5em 1em rgba(233, 169, 32, 0.75);
+  }
+
+  100% {
+    box-shadow: 0.5em 1em rgba(61, 184, 143, 0.75),
+      -0.5em -1em rgba(233, 169, 32, 0.75);
+  }
+}
+
+.loader {
+  position: absolute;
+  top: calc(50% - 1.25em);
+  left: calc(50% - 1.25em);
+}
+=======
 html, body{
     width:100%;
     height:100%;
@@ -211,3 +515,4 @@ button[aria-expanded="true"] {
 .modal-footer{
     position: relative;
 }
+>>>>>>> origin/main
